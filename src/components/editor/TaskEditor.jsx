@@ -144,23 +144,24 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       </div>
 
       <div className="space-y-5">
+        {/* Hidden input for native emoji keyboard — sr-only keeps it focusable but invisible */}
+        <input
+          ref={emojiInputRef}
+          type="text"
+          className="sr-only"
+          aria-hidden="true"
+          onChange={handleEmojiInput}
+          onBlur={e => { e.target.value = ''; }}
+        />
+
         {/* Emoji + Name */}
         <div className="flex gap-3 items-start">
-          <div className="relative flex-shrink-0">
-            <button
-              onClick={() => emojiInputRef.current?.focus()}
-              className={`w-14 h-14 rounded-2xl ${colorObj.bg} flex items-center justify-center text-2xl active:scale-95 transition-transform`}
-            >
-              {emoji}
-            </button>
-            <input
-              ref={emojiInputRef}
-              type="text"
-              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-              onChange={handleEmojiInput}
-              onBlur={e => { e.target.value = ''; }}
-            />
-          </div>
+          <button
+            onClick={() => emojiInputRef.current?.focus()}
+            className={`w-14 h-14 rounded-2xl ${colorObj.bg} flex items-center justify-center text-2xl flex-shrink-0 active:scale-95 transition-transform`}
+          >
+            {emoji}
+          </button>
           <div className="flex-1">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Task Name</label>
             <input
