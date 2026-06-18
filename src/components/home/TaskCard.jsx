@@ -30,7 +30,7 @@ function useSwipeLeft() {
       setTransitioning(true);
       setOffset(0);
       setIsOpen(false);
-    }, 2500);
+    }, 1500);
   }, [cancelAutoClose]);
 
   useEffect(() => cancelAutoClose, []); // eslint-disable-line react-hooks/exhaustive-deps
