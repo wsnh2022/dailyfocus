@@ -29,8 +29,15 @@ export function useMidnightArchive() {
         const todayLog = await getTodayLog();
 
         if (todayLog) {
-          // Same day — restore existing state
-          setTodayTasks(todayLog.tasks ?? []);
+          // Same day — restore existing state, merging with templates to pick up any field changes
+          const templates   = await getAllTasks();
+          const templateMap = new Map(templates.map(t => [t.id, t]));
+          const tasks = (todayLog.tasks ?? []).map(t => {
+            const tmpl = templateMap.get(t.id);
+            if (!tmpl) return t; // task deleted from templates — keep snapshot as-is
+            return { ...tmpl, completed: t.completed ?? false };
+          });
+          setTodayTasks(tasks);
           setTodayDayState(todayLog.dayState ?? 'active');
         } else {
           // New day — start fresh from templates and persist immediately

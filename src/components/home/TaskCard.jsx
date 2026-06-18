@@ -12,19 +12,36 @@ import TimerDisplay from './TimerDisplay';
 const ACTION_WIDTH = 80;
 
 function useSwipeLeft() {
-  const [offset, setOffset]           = useState(0);
-  const [isOpen, setIsOpen]           = useState(false);
+  const [offset, setOffset]               = useState(0);
+  const [isOpen, setIsOpen]               = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const startX   = useRef(null);
-  const startY   = useRef(null);
-  const isHoriz  = useRef(false);
+  const startX       = useRef(null);
+  const startY       = useRef(null);
+  const isHoriz      = useRef(false);
+  const autoCloseRef = useRef(null);
+
+  const cancelAutoClose = useCallback(() => {
+    if (autoCloseRef.current) { clearTimeout(autoCloseRef.current); autoCloseRef.current = null; }
+  }, []);
+
+  const scheduleAutoClose = useCallback(() => {
+    cancelAutoClose();
+    autoCloseRef.current = setTimeout(() => {
+      setTransitioning(true);
+      setOffset(0);
+      setIsOpen(false);
+    }, 2500);
+  }, [cancelAutoClose]);
+
+  useEffect(() => cancelAutoClose, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onTouchStart = useCallback((e) => {
+    cancelAutoClose();
     setTransitioning(false);
     startX.current  = e.touches[0].clientX;
     startY.current  = e.touches[0].clientY;
     isHoriz.current = false;
-  }, []);
+  }, [cancelAutoClose]);
 
   const onTouchMove = useCallback((e) => {
     if (startX.current === null) return;
@@ -43,18 +60,21 @@ function useSwipeLeft() {
     if (!isHoriz.current) return;
     setTransitioning(true);
     setOffset(prev => {
-      const snap = prev < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
-      setIsOpen(snap < 0);
+      const snap       = prev < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
+      const willBeOpen = snap < 0;
+      setIsOpen(willBeOpen);
+      if (willBeOpen) scheduleAutoClose();
       return snap;
     });
     startX.current = null;
-  }, []);
+  }, [scheduleAutoClose]);
 
   const close = useCallback(() => {
+    cancelAutoClose();
     setTransitioning(true);
     setOffset(0);
     setIsOpen(false);
-  }, []);
+  }, [cancelAutoClose]);
 
   return { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close };
 }
@@ -77,7 +97,13 @@ function SwipeCard({ taskId, completed, children }) {
   const { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close } = useSwipeLeft();
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl shadow-sm select-none ${completed ? 'opacity-60' : ''}`}>
+    // Touch handlers on the outer container so the overlay doesn't block swipe-right
+    <div
+      className={`relative overflow-hidden rounded-2xl shadow-sm select-none ${completed ? 'opacity-60' : ''}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Edit action revealed on swipe */}
       <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 flex items-center justify-center">
         <button
@@ -93,9 +119,6 @@ function SwipeCard({ taskId, completed, children }) {
       <div
         className="bg-white p-4 flex items-center gap-3"
         style={{ transform: `translateX(${offset}px)`, transition: transitioning ? 'transform 0.2s ease-out' : 'none' }}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
         {children}
       </div>
@@ -149,7 +172,7 @@ function CountdownCard({ task, onToggleComplete }) {
     clearActiveTimer();
   }, [onToggleComplete, clearActiveTimer]);
 
-  const { formatted, isRunning, start, pause } = useCountdown(totalSeconds, handleComplete);
+  const { secondsLeft, formatted, isRunning, start, pause } = useCountdown(totalSeconds, handleComplete);
 
   useEffect(() => {
     if (activeTimerId !== id && isRunning) pause();
@@ -171,7 +194,10 @@ function CountdownCard({ task, onToggleComplete }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
-        <TimerDisplay formatted={formatted} />
+        {!isRunning && secondsLeft === totalSeconds
+          ? <p className="text-sm text-slate-400 mt-0.5">{duration ?? 30} {durationUnit ?? 'min'}</p>
+          : <TimerDisplay formatted={formatted} />
+        }
       </div>
       <div className="flex flex-col items-center gap-2">
         {!completed && (
@@ -250,15 +276,18 @@ function PomodoroCard({ task, onToggleComplete }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
-        <TimerDisplay
-          formatted={
-            isDone               ? 'Done!'       :
-            phase === 'work_done'  ? 'Work done!'  :
-            phase === 'break_done' ? 'Break done!' :
-            formatted
-          }
-          phase={phase} currentSet={currentSet} totalSets={totalSets}
-        />
+        {phase === 'idle'
+          ? <p className="text-sm text-slate-400 mt-0.5">{workMin ?? 25} min · {breakMin ?? 5} min break</p>
+          : <TimerDisplay
+              formatted={
+                isDone               ? 'Done!'       :
+                phase === 'work_done'  ? 'Work done!'  :
+                phase === 'break_done' ? 'Break done!' :
+                formatted
+              }
+              phase={phase} currentSet={currentSet} totalSets={totalSets}
+            />
+        }
       </div>
       <div className="flex flex-col items-center gap-2">
         {!completed && !isDone && (() => {
