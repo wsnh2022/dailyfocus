@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCountdown } from '../../hooks/useCountdown';
 import { usePomodoro } from '../../hooks/usePomodoro';
@@ -9,22 +9,59 @@ import { todayStr } from '../../utils/dateHelpers';
 import { soundBreakStart, soundWorkResume, soundAllDone } from '../../utils/sound';
 import TimerDisplay from './TimerDisplay';
 
-const LONG_PRESS_MS = 600;
+const ACTION_WIDTH = 80;
 
-function useLongPress(onLongPress) {
-  const timerRef = useRef(null);
-  const start = useCallback(() => {
-    timerRef.current = setTimeout(onLongPress, LONG_PRESS_MS);
-  }, [onLongPress]);
-  const end = useCallback(() => clearTimeout(timerRef.current), []);
-  return { start, end };
+function useSwipeLeft() {
+  const [offset, setOffset]           = useState(0);
+  const [isOpen, setIsOpen]           = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const startX   = useRef(null);
+  const startY   = useRef(null);
+  const isHoriz  = useRef(false);
+
+  const onTouchStart = useCallback((e) => {
+    setTransitioning(false);
+    startX.current  = e.touches[0].clientX;
+    startY.current  = e.touches[0].clientY;
+    isHoriz.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    if (startX.current === null) return;
+    const dx = e.touches[0].clientX - startX.current;
+    const dy = e.touches[0].clientY - startY.current;
+    if (!isHoriz.current) {
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      if (Math.abs(dy) >= Math.abs(dx)) { startX.current = null; return; }
+      isHoriz.current = true;
+    }
+    const base = isOpen ? -ACTION_WIDTH : 0;
+    setOffset(Math.max(-ACTION_WIDTH, Math.min(0, base + dx)));
+  }, [isOpen]);
+
+  const onTouchEnd = useCallback(() => {
+    if (!isHoriz.current) return;
+    setTransitioning(true);
+    setOffset(prev => {
+      const snap = prev < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
+      setIsOpen(snap < 0);
+      return snap;
+    });
+    startX.current = null;
+  }, []);
+
+  const close = useCallback(() => {
+    setTransitioning(true);
+    setOffset(0);
+    setIsOpen(false);
+  }, []);
+
+  return { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close };
 }
 
 function Checkbox({ c, completed, onToggle }) {
   return (
     <button
-      onMouseDown={e => e.stopPropagation()}
-      onTouchStart={e => e.stopPropagation()}
       onClick={onToggle}
       className={`w-8 h-8 rounded-lg border-2 ${c.border} flex items-center justify-center flex-shrink-0 transition-colors ${
         completed ? c.bg : 'bg-white'
@@ -35,19 +72,53 @@ function Checkbox({ c, completed, onToggle }) {
   );
 }
 
+function SwipeCard({ taskId, completed, children }) {
+  const navigate = useNavigate();
+  const { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close } = useSwipeLeft();
+
+  return (
+    <div className={`relative overflow-hidden rounded-2xl shadow-sm select-none ${completed ? 'opacity-60' : ''}`}>
+      {/* Edit action revealed on swipe */}
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 flex items-center justify-center">
+        <button
+          onClick={() => { close(); navigate(`/editor/${taskId}`); }}
+          className="flex flex-col items-center gap-1 text-white"
+        >
+          <span className="text-xl">✏️</span>
+          <span className="text-xs font-medium">Edit</span>
+        </button>
+      </div>
+
+      {/* Sliding card content */}
+      <div
+        className="bg-white p-4 flex items-center gap-3"
+        style={{ transform: `translateX(${offset}px)`, transition: transitioning ? 'transform 0.2s ease-out' : 'none' }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {children}
+      </div>
+
+      {/* Overlay when open: tapping card area closes without firing buttons */}
+      {isOpen && (
+        <div
+          className="absolute inset-0"
+          style={{ right: `${ACTION_WIDTH}px` }}
+          onClick={close}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Checkbox card ─────────────────────────────────────────────────────────────
 function CheckboxCard({ task, onToggleComplete }) {
   const { emoji, name, color, duration, durationUnit, completed } = task;
   const c = getColor(color);
-  const navigate = useNavigate();
-  const lp = useLongPress(() => navigate(`/editor/${task.id}`));
 
   return (
-    <div
-      className={`flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm select-none transition-opacity ${completed ? 'opacity-60' : ''}`}
-      onMouseDown={lp.start} onMouseUp={lp.end} onMouseLeave={lp.end}
-      onTouchStart={lp.start} onTouchEnd={lp.end}
-    >
+    <SwipeCard taskId={task.id} completed={completed}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -56,7 +127,7 @@ function CheckboxCard({ task, onToggleComplete }) {
         <p className="text-sm text-slate-400 mt-0.5">{duration ? `${duration} ${durationUnit ?? 'min'}` : '—'}</p>
       </div>
       <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
-    </div>
+    </SwipeCard>
   );
 }
 
@@ -64,8 +135,6 @@ function CheckboxCard({ task, onToggleComplete }) {
 function CountdownCard({ task, onToggleComplete }) {
   const { id, emoji, name, color, duration, durationUnit, completed } = task;
   const c = getColor(color);
-  const navigate = useNavigate();
-  const lp = useLongPress(() => navigate(`/editor/${task.id}`));
 
   const activeTimerId    = useAppStore(s => s.activeTimerId);
   const setActiveTimer   = useAppStore(s => s.setActiveTimer);
@@ -82,16 +151,12 @@ function CountdownCard({ task, onToggleComplete }) {
 
   const { formatted, isRunning, start, pause } = useCountdown(totalSeconds, handleComplete);
 
-  // Pause when another timer becomes active
   useEffect(() => {
     if (activeTimerId !== id && isRunning) pause();
   }, [activeTimerId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Clear activeTimerId if we unmount while running
   useEffect(() => {
-    return () => {
-      if (useAppStore.getState().activeTimerId === id) clearActiveTimer();
-    };
+    return () => { if (useAppStore.getState().activeTimerId === id) clearActiveTimer(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleStartPause = () => {
@@ -100,11 +165,7 @@ function CountdownCard({ task, onToggleComplete }) {
   };
 
   return (
-    <div
-      className={`flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm select-none transition-opacity ${completed ? 'opacity-60' : ''}`}
-      onMouseDown={lp.start} onMouseUp={lp.end} onMouseLeave={lp.end}
-      onTouchStart={lp.start} onTouchEnd={lp.end}
-    >
+    <SwipeCard taskId={id} completed={completed}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -115,8 +176,6 @@ function CountdownCard({ task, onToggleComplete }) {
       <div className="flex flex-col items-center gap-2">
         {!completed && (
           <button
-            onMouseDown={e => e.stopPropagation()}
-            onTouchStart={e => e.stopPropagation()}
             onClick={handleStartPause}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
               isRunning ? 'bg-slate-200 text-slate-700' : `${c.bg} ${c.text}`
@@ -127,7 +186,7 @@ function CountdownCard({ task, onToggleComplete }) {
         )}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
       </div>
-    </div>
+    </SwipeCard>
   );
 }
 
@@ -135,8 +194,6 @@ function CountdownCard({ task, onToggleComplete }) {
 function PomodoroCard({ task, onToggleComplete }) {
   const { id, emoji, name, color, workMin, breakMin, sets, completed } = task;
   const c = getColor(color);
-  const navigate = useNavigate();
-  const lp = useLongPress(() => navigate(`/editor/${task.id}`));
 
   const activeTimerId    = useAppStore(s => s.activeTimerId);
   const setActiveTimer   = useAppStore(s => s.setActiveTimer);
@@ -146,23 +203,16 @@ function PomodoroCard({ task, onToggleComplete }) {
   const handleSetComplete = useCallback(async (setNumber) => {
     try {
       await addSession({
-        date:        todayStr(),
-        taskId:      id,
-        taskName:    name,
-        setNumber,
-        totalSets:   sets ?? 4,
-        workMin:     workMin  ?? 25,
-        breakMin:    breakMin ?? 5,
+        date: todayStr(), taskId: id, taskName: name,
+        setNumber, totalSets: sets ?? 4,
+        workMin: workMin ?? 25, breakMin: breakMin ?? 5,
         completedAt: new Date().toISOString(),
       });
-    } catch (err) {
-      console.error('Failed to log pomodoro session:', err);
-    }
+    } catch (err) { console.error('Failed to log pomodoro session:', err); }
   }, [id, name, sets, workMin, breakMin]);
 
   const handleAllComplete = useCallback(() => {
-    onToggleComplete(true);
-    clearActiveTimer();
+    onToggleComplete(true); clearActiveTimer();
     soundAllDone(name);
     showToast('All sets done! Great work 🎉', 'pomodoro-done', 5000);
   }, [onToggleComplete, clearActiveTimer, showToast, name]);
@@ -174,42 +224,27 @@ function PomodoroCard({ task, onToggleComplete }) {
 
   const handleBreakEnd = useCallback(() => {
     soundWorkResume(name);
-    showToast(`Back to work 💪`, 'pomodoro-work', 4000);
+    showToast('Back to work 💪', 'pomodoro-work', 4000);
   }, [name, showToast]);
 
   const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } = usePomodoro({
-    taskId:        id,
-    workMin:       workMin  ?? 25,
-    breakMin:      breakMin ?? 5,
-    totalSets:     sets     ?? 4,
-    onSetComplete: handleSetComplete,
-    onAllComplete: handleAllComplete,
-    onBreakStart:  handleBreakStart,
-    onBreakEnd:    handleBreakEnd,
+    taskId: id, workMin: workMin ?? 25, breakMin: breakMin ?? 5, totalSets: sets ?? 4,
+    onSetComplete: handleSetComplete, onAllComplete: handleAllComplete,
+    onBreakStart: handleBreakStart, onBreakEnd: handleBreakEnd,
   });
 
   const isRunning = phase === 'work' || phase === 'break';
 
-  // Reset if another timer takes over
   useEffect(() => {
     if (activeTimerId !== id && isRunning) reset();
   }, [activeTimerId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Clear activeTimerId if we unmount while active
   useEffect(() => {
-    return () => {
-      if (useAppStore.getState().activeTimerId === id) clearActiveTimer();
-    };
+    return () => { if (useAppStore.getState().activeTimerId === id) clearActiveTimer(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleStart = () => { setActiveTimer(id); start(); };
-
   return (
-    <div
-      className={`flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm select-none transition-opacity ${completed ? 'opacity-60' : ''}`}
-      onMouseDown={lp.start} onMouseUp={lp.end} onMouseLeave={lp.end}
-      onTouchStart={lp.start} onTouchEnd={lp.end}
-    >
+    <SwipeCard taskId={id} completed={completed}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -222,31 +257,28 @@ function PomodoroCard({ task, onToggleComplete }) {
             phase === 'break_done' ? 'Break done!' :
             formatted
           }
-          phase={phase}
-          currentSet={currentSet}
-          totalSets={totalSets}
+          phase={phase} currentSet={currentSet} totalSets={totalSets}
         />
       </div>
       <div className="flex flex-col items-center gap-2">
         {!completed && !isDone && (() => {
-          const stop = (e) => { e.stopPropagation(); };
           if (phase === 'idle')
-            return <button onMouseDown={stop} onTouchStart={stop} onClick={handleStart}
+            return <button onClick={() => { setActiveTimer(id); start(); }}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${c.bg} ${c.text}`}>Start</button>;
           if (phase === 'work_done')
-            return <button onMouseDown={stop} onTouchStart={stop} onClick={beginBreak}
+            return <button onClick={beginBreak}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500 text-white">Break →</button>;
           if (phase === 'break_done')
-            return <button onMouseDown={stop} onTouchStart={stop} onClick={beginWork}
+            return <button onClick={beginWork}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500 text-white">Work →</button>;
-          if (phase === 'work' || phase === 'break')
-            return <button onMouseDown={stop} onTouchStart={stop} onClick={skipCurrent}
+          if (isRunning)
+            return <button onClick={skipCurrent}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700">Skip</button>;
           return null;
         })()}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
       </div>
-    </div>
+    </SwipeCard>
   );
 }
 
