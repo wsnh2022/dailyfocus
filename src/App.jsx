@@ -11,7 +11,7 @@ import SettingsScreen from './components/settings/SettingsScreen';
 export default function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <div className="min-h-screen bg-slate-50 max-w-md mx-auto relative pb-20 overflow-x-hidden">
           <Routes>
             <Route path="/"           element={<HomeScreen />} />

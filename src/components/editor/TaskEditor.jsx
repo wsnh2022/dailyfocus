@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { addTask, updateTask, deleteTask } from '../../db/queries';
+import { addTask, updateTask, deleteTask, saveLog } from '../../db/queries';
 import { useAppStore } from '../../store/useAppStore';
+import { todayStr, getISOWeek } from '../../utils/dateHelpers';
 import { getColor } from '../../constants/colors';
 import EmojiPicker from './EmojiPicker';
 import ColorPicker from './ColorPicker';
@@ -16,8 +17,23 @@ const VALIDATION = {
 };
 
 export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortOrder }) {
-  const showToast = useAppStore(s => s.showToast);
+  const showToast      = useAppStore(s => s.showToast);
+  const todayTasks     = useAppStore(s => s.todayTasks);
+  const setTodayTasks  = useAppStore(s => s.setTodayTasks);
+  const todayDayState  = useAppStore(s => s.todayDayState);
   const isEdit = !!task;
+
+  const persistToday = async (updatedTasks) => {
+    setTodayTasks(updatedTasks);
+    const today = todayStr();
+    await saveLog({
+      date:       today,
+      dayState:   todayDayState,
+      tasks:      updatedTasks,
+      weekNumber: getISOWeek(today),
+      createdAt:  new Date().toISOString(),
+    });
+  };
 
   const [name, setName]                     = useState(task?.name ?? '');
   const [emoji, setEmoji]                   = useState(task?.emoji ?? '🎯');
@@ -76,9 +92,13 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       if (isEdit) {
         await updateTask(task.id, data);
         showToast('Task updated');
+        const updated = todayTasks.map(t => t.id === task.id ? { ...t, ...data } : t);
+        await persistToday(updated);
       } else {
-        await addTask(data);
+        const newId = await addTask(data);
         showToast('Task added');
+        const updated = [...todayTasks, { ...data, id: newId, completed: false }];
+        await persistToday(updated);
       }
       onSave();
     } catch {
@@ -90,6 +110,8 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
     try {
       await deleteTask(task.id);
       showToast('Task deleted');
+      const updated = todayTasks.filter(t => t.id !== task.id);
+      await persistToday(updated);
       onDelete();
     } catch {
       showToast('Failed to delete task', 'error');
