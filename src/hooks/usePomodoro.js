@@ -3,11 +3,34 @@ import { vibratePattern, vibrateLong } from '../utils/vibrate';
 
 // phases: 'idle' | 'work' | 'work_done' | 'break' | 'break_done' | 'done'
 
-export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAllComplete, onBreakStart, onBreakEnd }) {
-  const [phase, setPhase]             = useState('idle');
-  const [currentSet, setCurrentSet]   = useState(1);
-  const [secondsLeft, setSecondsLeft] = useState(workMin * 60);
+function loadSaved(taskId) {
+  if (!taskId) return null;
+  try { return JSON.parse(localStorage.getItem(`df_pomo_${taskId}`)); } catch { return null; }
+}
+
+export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplete, onAllComplete, onBreakStart, onBreakEnd }) {
+  const saved = useRef(loadSaved(taskId)).current;
+  const storageKey = taskId ? `df_pomo_${taskId}` : null;
+
+  // Normalize: if page was refreshed mid-timer, treat as if that phase just ended
+  const savedPhase = saved?.phase;
+  const initPhase =
+    !savedPhase || savedPhase === 'idle' ? 'idle'       :
+    savedPhase === 'work'                ? 'work_done'  :
+    savedPhase === 'break'               ? 'break_done' :
+    savedPhase; // work_done | break_done | done
+
+  const [phase, setPhase]             = useState(initPhase);
+  const [currentSet, setCurrentSet]   = useState(saved?.currentSet ?? 1);
+  const [secondsLeft, setSecondsLeft] = useState(initPhase === 'idle' ? workMin * 60 : 0);
   const intervalRef = useRef(null);
+
+  // Persist phase + currentSet on every change
+  useEffect(() => {
+    if (!storageKey) return;
+    if (phase === 'idle') localStorage.removeItem(storageKey);
+    else localStorage.setItem(storageKey, JSON.stringify({ phase, currentSet }));
+  }, [phase, currentSet, storageKey]);
 
   const clearTimer = () => clearInterval(intervalRef.current);
 
@@ -17,7 +40,6 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     setSecondsLeft(durationMin * 60);
   }, []);
 
-  // Work timer finished — pause at work_done, wait for user to start break
   const finishWork = useCallback((completedSet) => {
     clearTimer();
     vibratePattern();
@@ -33,7 +55,6 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     }
   }, [totalSets, onSetComplete, onAllComplete, onBreakStart]);
 
-  // Break timer finished — pause at break_done, wait for user to start work
   const finishBreak = useCallback(() => {
     clearTimer();
     setPhase('break_done');
@@ -41,14 +62,12 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     onBreakEnd?.();
   }, [onBreakEnd]);
 
-  // User manually starts break after work_done
   const beginBreak = useCallback(() => {
     if (phase !== 'work_done') return;
     setCurrentSet(s => s + 1);
     startPhase('break', breakMin);
   }, [phase, breakMin, startPhase]);
 
-  // User manually starts next work set after break_done
   const beginWork = useCallback(() => {
     if (phase !== 'break_done') return;
     startPhase('work', workMin);
@@ -71,7 +90,8 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     setPhase('idle');
     setCurrentSet(1);
     setSecondsLeft(workMin * 60);
-  }, [workMin]);
+    if (storageKey) localStorage.removeItem(storageKey);
+  }, [workMin, storageKey]);
 
   useEffect(() => {
     if (phase !== 'work' && phase !== 'break') return;

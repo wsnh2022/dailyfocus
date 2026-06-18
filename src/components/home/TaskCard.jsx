@@ -180,6 +180,7 @@ function PomodoroCard({ task, onToggleComplete }) {
   }, [name, showToast]);
 
   const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } = usePomodoro({
+    taskId:        id,
     workMin:       workMin  ?? 25,
     breakMin:      breakMin ?? 5,
     totalSets:     sets     ?? 4,
