@@ -1,5 +1,6 @@
 import { useStreak } from '../../hooks/useStreak';
 import { generateMessage } from '../../utils/momentumMessage';
+import { useAppStore } from '../../store/useAppStore';
 
 const DOT_STYLES = {
   hit:     'bg-green-400',
@@ -21,6 +22,7 @@ const DOT_LABELS = {
 
 export default function MomentumBar() {
   const { data, loading } = useStreak();
+  const todayTasks = useAppStore(s => s.todayTasks);
 
   if (loading) {
     return (
@@ -30,6 +32,10 @@ export default function MomentumBar() {
 
   const { currentStreak, bestStreak, yesterdayRate, weeklyAvgRate, dots } = data;
   const message = generateMessage({ streak: currentStreak, weeklyAvgRate, yesterdayRate });
+
+  const total = todayTasks.length;
+  const done  = todayTasks.filter(t => t.completed).length;
+  const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm mb-3">
@@ -70,8 +76,22 @@ export default function MomentumBar() {
         </div>
       </div>
 
-      {/* Message */}
-      <p className="text-xs text-slate-500 italic leading-snug">{message}</p>
+      {/* Progress / message */}
+      {total > 0 ? (
+        <div className="flex items-center gap-2.5">
+          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-400 rounded-full transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
+            {done} / {total} done
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs text-slate-500 italic leading-snug">{message}</p>
+      )}
     </div>
   );
 }

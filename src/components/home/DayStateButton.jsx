@@ -8,6 +8,26 @@ import Modal from '../shared/Modal';
 
 const STATES = ['active', 'rest', 'pause'];
 
+function calcTotalMin(tasks) {
+  return tasks.reduce((sum, t) => {
+    if (t.taskType === 'pomodoro') return sum + (t.workMin ?? 25) * (t.sets ?? 4);
+    const dur = Number(t.duration);
+    if (!dur) return sum;
+    return sum + (t.durationUnit === 'hrs' ? dur * 60 : dur);
+  }, 0);
+}
+
+function formatDuration(min) {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+function todayLabel() {
+  return new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
 export default function DayStateButton() {
   const todayDayState    = useAppStore(s => s.todayDayState);
   const setTodayDayState = useAppStore(s => s.setTodayDayState);
@@ -42,11 +62,20 @@ export default function DayStateButton() {
     }
   };
 
-  const cfg = DAY_STATE_CONFIG[todayDayState] ?? DAY_STATE_CONFIG.active;
+  const cfg      = DAY_STATE_CONFIG[todayDayState] ?? DAY_STATE_CONFIG.active;
+  const totalMin = calcTotalMin(todayTasks);
 
   return (
     <>
-      <div className="flex justify-end mb-3">
+      <div className="flex items-center justify-between mb-3">
+        {/* Date + planned time */}
+        <div className="flex flex-col gap-0.5">
+          <p className="text-xs font-semibold text-slate-600">{todayLabel()}</p>
+          {totalMin > 0 && (
+            <p className="text-xs text-slate-400">{formatDuration(totalMin)} planned</p>
+          )}
+        </div>
+
         <button
           onClick={() => setShowPicker(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-sm border border-slate-200 text-sm font-medium text-slate-700"
