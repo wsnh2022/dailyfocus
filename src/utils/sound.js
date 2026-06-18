@@ -87,13 +87,26 @@ function stripEmoji(str) {
   return str.replace(/\p{Emoji_Presentation}/gu, '').replace(/\s+/g, ' ').trim();
 }
 
+function getBestVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  // Google voices on Android Chrome are far more natural
+  return (
+    voices.find(v => v.name.includes('Google') && v.lang === 'en-US') ||
+    voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => v.lang.startsWith('en')) ||
+    null
+  );
+}
+
 function doSpeak(text) {
   try {
     const synth = window.speechSynthesis;
     synth.cancel();
     const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.95;
-    utt.pitch = 1;
+    utt.voice  = getBestVoice();
+    utt.rate   = 0.92;
+    utt.pitch  = 1;
     utt.volume = 1;
     synth.speak(utt);
   } catch {}
