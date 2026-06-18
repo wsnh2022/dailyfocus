@@ -21,6 +21,7 @@ export default defineConfig(({ command }) => ({
         background_color: '#f8fafc',
         display: 'standalone',
         orientation: 'portrait',
+        id: '/dailyfocus/',
         scope: '/dailyfocus/',
         start_url: '/dailyfocus/',
         icons: [
