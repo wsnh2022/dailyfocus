@@ -179,7 +179,7 @@ function PomodoroCard({ task, onToggleComplete }) {
     showToast(`Back to work 💪`, 'pomodoro-work', 4000);
   }, [showToast]);
 
-  const { phase, currentSet, totalSets, formatted, start, skipCurrent, reset, isDone } = usePomodoro({
+  const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } = usePomodoro({
     workMin:       workMin  ?? 25,
     breakMin:      breakMin ?? 5,
     totalSets:     sets     ?? 4,
@@ -216,7 +216,12 @@ function PomodoroCard({ task, onToggleComplete }) {
       </div>
       <div className="flex-1 min-w-0">
         <TimerDisplay
-          formatted={isDone ? 'Done!' : formatted}
+          formatted={
+            isDone               ? 'Done!'      :
+            phase === 'work_done'  ? 'Work done!' :
+            phase === 'break_done' ? 'Break done!' :
+            formatted
+          }
           phase={phase}
           currentSet={currentSet}
           totalSets={totalSets}
@@ -224,21 +229,22 @@ function PomodoroCard({ task, onToggleComplete }) {
         <p className="text-sm text-slate-500 truncate mt-0.5">{name}</p>
       </div>
       <div className="flex flex-col items-center gap-2">
-        {!completed && !isDone && (
-          phase === 'idle'
-            ? <button
-                onMouseDown={e => e.stopPropagation()}
-                onTouchStart={e => e.stopPropagation()}
-                onClick={handleStart}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${c.bg} ${c.text}`}
-              >Start</button>
-            : <button
-                onMouseDown={e => e.stopPropagation()}
-                onTouchStart={e => e.stopPropagation()}
-                onClick={skipCurrent}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700"
-              >Skip</button>
-        )}
+        {!completed && !isDone && (() => {
+          const stop = (e) => { e.stopPropagation(); };
+          if (phase === 'idle')
+            return <button onMouseDown={stop} onTouchStart={stop} onClick={handleStart}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${c.bg} ${c.text}`}>Start</button>;
+          if (phase === 'work_done')
+            return <button onMouseDown={stop} onTouchStart={stop} onClick={beginBreak}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-teal-500 text-white">Break →</button>;
+          if (phase === 'break_done')
+            return <button onMouseDown={stop} onTouchStart={stop} onClick={beginWork}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500 text-white">Work →</button>;
+          if (phase === 'work' || phase === 'break')
+            return <button onMouseDown={stop} onTouchStart={stop} onClick={skipCurrent}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700">Skip</button>;
+          return null;
+        })()}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
       </div>
     </div>

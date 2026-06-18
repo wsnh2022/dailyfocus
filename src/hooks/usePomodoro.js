@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { vibratePattern, vibrateLong } from '../utils/vibrate';
 
+// phases: 'idle' | 'work' | 'work_done' | 'break' | 'break_done' | 'done'
+
 export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAllComplete, onBreakStart, onBreakEnd }) {
-  const [phase, setPhase]           = useState('idle'); // 'idle' | 'work' | 'break' | 'done'
-  const [currentSet, setCurrentSet] = useState(1);
+  const [phase, setPhase]             = useState('idle');
+  const [currentSet, setCurrentSet]   = useState(1);
   const [secondsLeft, setSecondsLeft] = useState(workMin * 60);
   const intervalRef = useRef(null);
 
@@ -15,7 +17,9 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     setSecondsLeft(durationMin * 60);
   }, []);
 
-  const advanceAfterWork = useCallback((completedSet) => {
+  // Work timer finished — pause at work_done, wait for user to start break
+  const finishWork = useCallback((completedSet) => {
+    clearTimer();
     vibratePattern();
     onSetComplete?.(completedSet);
     if (completedSet >= totalSets) {
@@ -23,11 +27,32 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
       vibrateLong();
       onAllComplete?.();
     } else {
-      setCurrentSet(s => s + 1);
-      startPhase('break', breakMin);
+      setPhase('work_done');
+      setSecondsLeft(0);
       onBreakStart?.();
     }
-  }, [totalSets, breakMin, startPhase, onSetComplete, onAllComplete, onBreakStart]);
+  }, [totalSets, onSetComplete, onAllComplete, onBreakStart]);
+
+  // Break timer finished — pause at break_done, wait for user to start work
+  const finishBreak = useCallback(() => {
+    clearTimer();
+    setPhase('break_done');
+    setSecondsLeft(0);
+    onBreakEnd?.();
+  }, [onBreakEnd]);
+
+  // User manually starts break after work_done
+  const beginBreak = useCallback(() => {
+    if (phase !== 'work_done') return;
+    setCurrentSet(s => s + 1);
+    startPhase('break', breakMin);
+  }, [phase, breakMin, startPhase]);
+
+  // User manually starts next work set after break_done
+  const beginWork = useCallback(() => {
+    if (phase !== 'break_done') return;
+    startPhase('work', workMin);
+  }, [phase, workMin, startPhase]);
 
   const start = useCallback(() => {
     if (phase === 'idle') startPhase('work', workMin);
@@ -35,9 +60,11 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
 
   const skipCurrent = useCallback(() => {
     clearTimer();
-    if (phase === 'work') advanceAfterWork(currentSet);
-    else if (phase === 'break') { startPhase('work', workMin); onBreakEnd?.(); }
-  }, [phase, currentSet, workMin, advanceAfterWork, startPhase]);
+    if      (phase === 'work')       finishWork(currentSet);
+    else if (phase === 'work_done')  { setCurrentSet(s => s + 1); startPhase('break', breakMin); }
+    else if (phase === 'break')      finishBreak();
+    else if (phase === 'break_done') startPhase('work', workMin);
+  }, [phase, currentSet, breakMin, workMin, finishWork, finishBreak, startPhase]);
 
   const reset = useCallback(() => {
     clearTimer();
@@ -51,19 +78,18 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => {
         if (prev <= 1) {
-          clearTimer();
-          if (phase === 'work') advanceAfterWork(currentSet);
-          else { startPhase('work', workMin); onBreakEnd?.(); }
+          if (phase === 'work') finishWork(currentSet);
+          else finishBreak();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return clearTimer;
-  }, [phase, currentSet, workMin, advanceAfterWork, startPhase]);
+  }, [phase, currentSet, finishWork, finishBreak]);
 
-  const mins      = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
-  const secs      = String(secondsLeft % 60).padStart(2, '0');
+  const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+  const secs = String(secondsLeft % 60).padStart(2, '0');
 
   return {
     phase,
@@ -71,6 +97,8 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     totalSets,
     formatted: `${mins}:${secs}`,
     start,
+    beginBreak,
+    beginWork,
     skipCurrent,
     reset,
     isDone: phase === 'done',

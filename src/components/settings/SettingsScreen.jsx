@@ -2,11 +2,19 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import { exportBackup, importBackup, clearAllData } from '../../utils/backupExport';
+import { SOUND_PROFILES, getSoundProfile, setSoundProfile, soundBreakStart } from '../../utils/sound';
 import Modal from '../shared/Modal';
 
 export default function SettingsScreen() {
   const showToast = useAppStore(s => s.showToast);
   const fileRef   = useRef(null);
+  const [soundProfile, setSoundProfileState] = useState(getSoundProfile);
+
+  const handleSoundChange = (id) => {
+    setSoundProfile(id);
+    setSoundProfileState(id);
+    if (id !== 'silent') soundBreakStart(); // preview the sound
+  };
 
   const [importing, setImporting]             = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -53,6 +61,32 @@ export default function SettingsScreen() {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold text-slate-800 mb-5">Settings</h1>
+
+      {/* Pomodoro sound */}
+      <section className="mb-4">
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+          Pomodoro Sound
+        </h2>
+        <div className="bg-white rounded-2xl shadow-sm p-3">
+          <div className="grid grid-cols-4 gap-2">
+            {SOUND_PROFILES.map(p => (
+              <button
+                key={p.id}
+                onClick={() => handleSoundChange(p.id)}
+                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+                  soundProfile === p.id
+                    ? 'bg-slate-800 text-white'
+                    : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+                }`}
+              >
+                <span className="text-lg leading-none">{p.emoji}</span>
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-slate-400 mt-2 text-center">Tap to preview</p>
+        </div>
+      </section>
 
       {/* Backup */}
       <section className="mb-4">
