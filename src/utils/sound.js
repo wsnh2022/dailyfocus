@@ -72,11 +72,42 @@ const C = {
 // ── Public API ─────────────────────────────────────────────────────────────
 function play(key) {
   const p = getSoundProfile();
-  if (p === 'bell')   B[key]();
+  if (p === 'bell')        B[key]();
   else if (p === 'chime')  C[key]();
   else if (p !== 'silent') T[key]();
 }
 
-export const soundBreakStart = () => play('breakStart');
-export const soundWorkResume = () => play('workResume');
-export const soundAllDone    = () => play('allDone');
+// ── Voice ──────────────────────────────────────────────────────────────────
+const VOICE_KEY = 'df_pomo_voice';
+
+export const getVoiceEnabled = () => localStorage.getItem(VOICE_KEY) !== 'false';
+export const setVoiceEnabled = (on) => localStorage.setItem(VOICE_KEY, String(on));
+
+function stripEmoji(str) {
+  return str.replace(/\p{Emoji_Presentation}/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+function speak(text) {
+  if (!getVoiceEnabled()) return;
+  if (!window.speechSynthesis) return;
+  setTimeout(() => {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.95;
+    utt.pitch = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utt);
+  }, 400);
+}
+
+export const soundBreakStart = (taskName, breakMin) => {
+  play('breakStart');
+  speak(`${stripEmoji(taskName ?? '')} completed. ${breakMin ?? 5} minute break.`);
+};
+export const soundWorkResume = (taskName) => {
+  play('workResume');
+  speak(`Time to ${stripEmoji(taskName ?? '')}.`);
+};
+export const soundAllDone = (taskName) => {
+  play('allDone');
+  speak(`${stripEmoji(taskName ?? '')} complete. All sets done!`);
+};

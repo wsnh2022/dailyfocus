@@ -165,19 +165,19 @@ function PomodoroCard({ task, onToggleComplete }) {
   const handleAllComplete = useCallback(() => {
     onToggleComplete(true);
     clearActiveTimer();
-    soundAllDone();
+    soundAllDone(name);
     showToast('All sets done! Great work 🎉', 'pomodoro-done', 5000);
-  }, [onToggleComplete, clearActiveTimer, showToast]);
+  }, [onToggleComplete, clearActiveTimer, showToast, name]);
 
   const handleBreakStart = useCallback(() => {
-    soundBreakStart();
+    soundBreakStart(name, breakMin);
     showToast(`Break time 🧘 — ${breakMin ?? 5} min`, 'pomodoro-break', 6000);
-  }, [breakMin, showToast]);
+  }, [name, breakMin, showToast]);
 
   const handleBreakEnd = useCallback(() => {
-    soundWorkResume();
+    soundWorkResume(name);
     showToast(`Back to work 💪`, 'pomodoro-work', 4000);
-  }, [showToast]);
+  }, [name, showToast]);
 
   const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } = usePomodoro({
     workMin:       workMin  ?? 25,

@@ -2,18 +2,19 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
 import { exportBackup, importBackup, clearAllData } from '../../utils/backupExport';
-import { SOUND_PROFILES, getSoundProfile, setSoundProfile, soundBreakStart } from '../../utils/sound';
+import { SOUND_PROFILES, getSoundProfile, setSoundProfile, soundBreakStart, getVoiceEnabled, setVoiceEnabled } from '../../utils/sound';
 import Modal from '../shared/Modal';
 
 export default function SettingsScreen() {
   const showToast = useAppStore(s => s.showToast);
   const fileRef   = useRef(null);
   const [soundProfile, setSoundProfileState] = useState(getSoundProfile);
+  const [voiceOn, setVoiceOn]               = useState(getVoiceEnabled);
 
   const handleSoundChange = (id) => {
     setSoundProfile(id);
     setSoundProfileState(id);
-    if (id !== 'silent') soundBreakStart(); // preview the sound
+    if (id !== 'silent') soundBreakStart('Sample task', 5); // preview
   };
 
   const [importing, setImporting]             = useState(false);
@@ -85,6 +86,18 @@ export default function SettingsScreen() {
             ))}
           </div>
           <p className="text-xs text-slate-400 mt-2 text-center">Tap to preview</p>
+          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-700">Voice announcements</p>
+              <p className="text-xs text-slate-400">Speaks task name &amp; break duration</p>
+            </div>
+            <button
+              onClick={() => { const next = !voiceOn; setVoiceEnabled(next); setVoiceOn(next); }}
+              className={`w-12 h-6 rounded-full transition-colors relative ${voiceOn ? 'bg-slate-800' : 'bg-slate-200'}`}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${voiceOn ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
         </div>
       </section>
 
