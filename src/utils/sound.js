@@ -87,16 +87,38 @@ function stripEmoji(str) {
   return str.replace(/\p{Emoji_Presentation}/gu, '').replace(/\s+/g, ' ').trim();
 }
 
-function speak(text) {
-  if (!getVoiceEnabled()) return;
-  if (!window.speechSynthesis) return;
-  setTimeout(() => {
+function doSpeak(text) {
+  try {
+    const synth = window.speechSynthesis;
+    synth.cancel();
     const utt = new SpeechSynthesisUtterance(text);
     utt.rate = 0.95;
     utt.pitch = 1;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utt);
+    utt.volume = 1;
+    synth.speak(utt);
+  } catch {}
+}
+
+function speak(text) {
+  if (!getVoiceEnabled()) return;
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  setTimeout(() => {
+    const voices = synth.getVoices();
+    if (voices.length > 0) {
+      doSpeak(text);
+    } else {
+      synth.onvoiceschanged = () => {
+        synth.onvoiceschanged = null;
+        doSpeak(text);
+      };
+    }
   }, 400);
+}
+
+export function prewarmSpeech() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.getVoices();
 }
 
 export const soundBreakStart = (taskName, breakMin) => {

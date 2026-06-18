@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getAllTasks, getTaskById } from '../../db/queries';
 import { useAppStore } from '../../store/useAppStore';
 import { MAX_TASKS } from '../../constants/dayStates';
@@ -9,6 +9,8 @@ import TaskEditor from './TaskEditor';
 export default function EditorScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromHome = location.state?.fromHome === true;
   const showToast = useAppStore(s => s.showToast);
 
   const [tasks, setTasks]           = useState([]);
@@ -24,6 +26,11 @@ export default function EditorScreen() {
   };
 
   useEffect(() => { loadTasks(); }, []);
+
+  // Auto-open add form when navigated directly from home
+  useEffect(() => {
+    if (fromHome && !id) setShowAddForm(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!id) { setEditingTask(null); return; }
@@ -59,9 +66,9 @@ export default function EditorScreen() {
     return (
       <TaskEditor
         task={null}
-        onSave={() => { loadTasks(); setShowAddForm(false); }}
+        onSave={() => { fromHome ? navigate('/') : (loadTasks(), setShowAddForm(false)); }}
         onDelete={() => {}}
-        onCancel={() => setShowAddForm(false)}
+        onCancel={() => fromHome ? navigate('/') : setShowAddForm(false)}
         nextSortOrder={tasks.length}
       />
     );

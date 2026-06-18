@@ -74,25 +74,33 @@ export default function HomeScreen() {
         <div className="text-center py-16">
           <div className="text-5xl mb-4">🎯</div>
           <p className="text-slate-500 font-medium mb-1">No tasks yet.</p>
-          <p className="text-sm text-slate-400 mb-6">Tap + to add your first task.</p>
+          <p className="text-sm text-slate-400 mb-6">Add your first task to get started.</p>
           <button
-            onClick={() => navigate('/editor')}
+            onClick={() => navigate('/editor', { state: { fromHome: true } })}
             className="px-8 py-3 bg-slate-800 text-white rounded-2xl font-semibold text-sm"
           >
-            + Add Tasks
+            + Add Task
           </button>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {todayTasks.map(task => (
-            <li key={task.id}>
-              <TaskCard
-                task={task}
-                onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-3">
+            {todayTasks.map(task => (
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
+                />
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => navigate('/editor', { state: { fromHome: true } })}
+            className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
+          >
+            + Add task
+          </button>
+        </>
       )}
     </div>
   );
