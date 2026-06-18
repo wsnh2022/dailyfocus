@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { addTask, updateTask, deleteTask, saveLog } from '../../db/queries';
 import { useAppStore } from '../../store/useAppStore';
 import { todayStr, getISOWeek } from '../../utils/dateHelpers';
 import { getColor } from '../../constants/colors';
-import EmojiPicker from './EmojiPicker';
 import ColorPicker from './ColorPicker';
 import TimerTypeSelect from './TimerTypeSelect';
 import Modal from '../shared/Modal';
@@ -44,8 +43,24 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [workMin, setWorkMin]               = useState(task?.workMin ?? 25);
   const [breakMin, setBreakMin]             = useState(task?.breakMin ?? 5);
   const [sets, setSets]                     = useState(task?.sets ?? 4);
-  const [showEmojiPicker, setShowEmojiPicker]     = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const emojiInputRef = useRef(null);
+
+  const handleEmojiInput = (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    let first = val;
+    try {
+      const segs = [...new Intl.Segmenter().segment(val)];
+      if (segs.length) first = segs[0].segment;
+    } catch {
+      first = [...val][0] ?? val[0];
+    }
+    setEmoji(first);
+    e.target.value = '';
+    e.target.blur();
+  };
 
   const validate = () => {
     if (name.trim().length < VALIDATION.name.min) {
@@ -131,12 +146,21 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       <div className="space-y-5">
         {/* Emoji + Name */}
         <div className="flex gap-3 items-start">
-          <button
-            onClick={() => setShowEmojiPicker(true)}
-            className={`w-14 h-14 rounded-2xl ${colorObj.bg} flex items-center justify-center text-2xl flex-shrink-0 active:scale-95 transition-transform`}
-          >
-            {emoji}
-          </button>
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => emojiInputRef.current?.focus()}
+              className={`w-14 h-14 rounded-2xl ${colorObj.bg} flex items-center justify-center text-2xl active:scale-95 transition-transform`}
+            >
+              {emoji}
+            </button>
+            <input
+              ref={emojiInputRef}
+              type="text"
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+              onChange={handleEmojiInput}
+              onBlur={e => { e.target.value = ''; }}
+            />
+          </div>
           <div className="flex-1">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Task Name</label>
             <input
@@ -232,14 +256,6 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           </button>
         )}
       </div>
-
-      {showEmojiPicker && (
-        <EmojiPicker
-          selected={emoji}
-          onSelect={e => { setEmoji(e); setShowEmojiPicker(false); }}
-          onClose={() => setShowEmojiPicker(false)}
-        />
-      )}
 
       {showDeleteConfirm && (
         <Modal onClose={() => setShowDeleteConfirm(false)}>
