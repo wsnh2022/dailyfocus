@@ -1,11 +1,30 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import './db/schema';
+import ErrorBoundary from './components/shared/ErrorBoundary';
+import BottomNav from './components/shared/BottomNav';
+import Toast from './components/shared/Toast';
+import HomeScreen from './components/home/HomeScreen';
+import EditorScreen from './components/editor/EditorScreen';
+import HistoryScreen from './components/history/HistoryScreen';
+import SettingsScreen from './components/settings/SettingsScreen';
+
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-5xl mb-4">🎯</div>
-        <h1 className="text-2xl font-bold text-slate-800">DailyFocus</h1>
-        <p className="text-slate-500 mt-2 text-sm">Phase 0 — scaffold ready</p>
-      </div>
-    </div>
-  )
+    <ErrorBoundary>
+      <BrowserRouter>
+        <div className="min-h-screen bg-slate-50 max-w-md mx-auto relative pb-20 overflow-x-hidden">
+          <Routes>
+            <Route path="/"           element={<HomeScreen />} />
+            <Route path="/editor"     element={<EditorScreen />} />
+            <Route path="/editor/:id" element={<EditorScreen />} />
+            <Route path="/history"    element={<HistoryScreen />} />
+            <Route path="/settings"   element={<SettingsScreen />} />
+            <Route path="*"           element={<Navigate to="/" replace />} />
+          </Routes>
+          <BottomNav />
+          <Toast />
+        </div>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
 }

@@ -1,0 +1,244 @@
+import { useState } from 'react';
+import { addTask, updateTask, deleteTask } from '../../db/queries';
+import { useAppStore } from '../../store/useAppStore';
+import { getColor } from '../../constants/colors';
+import EmojiPicker from './EmojiPicker';
+import ColorPicker from './ColorPicker';
+import TimerTypeSelect from './TimerTypeSelect';
+import Modal from '../shared/Modal';
+
+const VALIDATION = {
+  name:     { min: 1, max: 30 },
+  duration: { min: 1, max: 999 },
+  workMin:  { min: 1, max: 120 },
+  breakMin: { min: 1, max: 60 },
+  sets:     { min: 1, max: 10 },
+};
+
+export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortOrder }) {
+  const showToast = useAppStore(s => s.showToast);
+  const isEdit = !!task;
+
+  const [name, setName]                     = useState(task?.name ?? '');
+  const [emoji, setEmoji]                   = useState(task?.emoji ?? '🎯');
+  const [color, setColor]                   = useState(task?.color ?? 'green');
+  const [taskType, setTaskType]             = useState(task?.taskType ?? 'checkbox');
+  const [duration, setDuration]             = useState(task?.duration ?? 30);
+  const [durationUnit, setDurationUnit]     = useState(task?.durationUnit ?? 'min');
+  const [workMin, setWorkMin]               = useState(task?.workMin ?? 25);
+  const [breakMin, setBreakMin]             = useState(task?.breakMin ?? 5);
+  const [sets, setSets]                     = useState(task?.sets ?? 4);
+  const [showEmojiPicker, setShowEmojiPicker]     = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const validate = () => {
+    if (name.trim().length < VALIDATION.name.min) {
+      showToast('Task name is required', 'error'); return false;
+    }
+    if (name.trim().length > VALIDATION.name.max) {
+      showToast('Name must be 30 characters or less', 'error'); return false;
+    }
+    if (taskType === 'countdown') {
+      const d = Number(duration);
+      if (d < VALIDATION.duration.min || d > VALIDATION.duration.max) {
+        showToast('Duration must be between 1 and 999', 'error'); return false;
+      }
+    }
+    if (taskType === 'pomodoro') {
+      if (Number(workMin) < VALIDATION.workMin.min || Number(workMin) > VALIDATION.workMin.max) {
+        showToast('Work minutes must be between 1 and 120', 'error'); return false;
+      }
+      if (Number(breakMin) < VALIDATION.breakMin.min || Number(breakMin) > VALIDATION.breakMin.max) {
+        showToast('Break minutes must be between 1 and 60', 'error'); return false;
+      }
+      if (Number(sets) < VALIDATION.sets.min || Number(sets) > VALIDATION.sets.max) {
+        showToast('Sets must be between 1 and 10', 'error'); return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!validate()) return;
+    try {
+      const data = {
+        name: name.trim(),
+        emoji,
+        color,
+        taskType,
+        duration:     taskType === 'countdown' ? Number(duration) : null,
+        durationUnit: taskType === 'countdown' ? durationUnit : null,
+        workMin:      taskType === 'pomodoro'  ? Number(workMin) : null,
+        breakMin:     taskType === 'pomodoro'  ? Number(breakMin) : null,
+        sets:         taskType === 'pomodoro'  ? Number(sets) : null,
+        sortOrder:    task?.sortOrder ?? nextSortOrder,
+      };
+      if (isEdit) {
+        await updateTask(task.id, data);
+        showToast('Task updated');
+      } else {
+        await addTask(data);
+        showToast('Task added');
+      }
+      onSave();
+    } catch {
+      showToast('Failed to save task', 'error');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task.id);
+      showToast('Task deleted');
+      onDelete();
+    } catch {
+      showToast('Failed to delete task', 'error');
+    }
+  };
+
+  const colorObj = getColor(color);
+
+  return (
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-6">
+        <button onClick={onCancel} className="text-slate-500 text-sm font-medium">← Back</button>
+        <h1 className="text-lg font-bold text-slate-800">{isEdit ? 'Edit Task' : 'New Task'}</h1>
+        <div className="w-12" />
+      </div>
+
+      <div className="space-y-5">
+        {/* Emoji + Name */}
+        <div className="flex gap-3 items-start">
+          <button
+            onClick={() => setShowEmojiPicker(true)}
+            className={`w-14 h-14 rounded-2xl ${colorObj.bg} flex items-center justify-center text-2xl flex-shrink-0 active:scale-95 transition-transform`}
+          >
+            {emoji}
+          </button>
+          <div className="flex-1">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Task Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              maxLength={30}
+              placeholder="e.g. Morning Run"
+              className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+            />
+            <p className="text-xs text-slate-300 mt-1 text-right">{name.length}/30</p>
+          </div>
+        </div>
+
+        {/* Color */}
+        <div>
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Color</label>
+          <ColorPicker selected={color} onChange={setColor} />
+        </div>
+
+        {/* Type */}
+        <div>
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Type</label>
+          <TimerTypeSelect value={taskType} onChange={setTaskType} />
+        </div>
+
+        {/* Countdown duration */}
+        {taskType === 'countdown' && (
+          <div>
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Duration</label>
+            <div className="flex gap-2 mt-1">
+              <input
+                type="number"
+                value={duration}
+                onChange={e => setDuration(e.target.value)}
+                min={1}
+                max={999}
+                className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+              />
+              <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+                {['min', 'hrs'].map(u => (
+                  <button
+                    key={u}
+                    onClick={() => setDurationUnit(u)}
+                    className={`px-4 py-2.5 text-sm font-medium transition-colors ${
+                      durationUnit === u ? 'bg-slate-800 text-white' : 'bg-white text-slate-500'
+                    }`}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pomodoro fields */}
+        {taskType === 'pomodoro' && (
+          <div className="space-y-3">
+            {[
+              { label: 'Work (minutes)',  value: workMin,  onChange: setWorkMin,  min: 1, max: 120 },
+              { label: 'Break (minutes)', value: breakMin, onChange: setBreakMin, min: 1, max: 60  },
+              { label: 'Number of Sets',  value: sets,     onChange: setSets,     min: 1, max: 10  },
+            ].map(({ label, value, onChange, min, max }) => (
+              <div key={label}>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</label>
+                <input
+                  type="number"
+                  value={value}
+                  onChange={e => onChange(e.target.value)}
+                  min={min}
+                  max={max}
+                  className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          onClick={handleSave}
+          className="w-full py-3.5 rounded-2xl bg-slate-800 text-white font-semibold text-sm active:scale-[0.98] transition-transform"
+        >
+          {isEdit ? 'Save Changes' : 'Add Task'}
+        </button>
+
+        {isEdit && (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-full py-3 rounded-2xl border border-red-200 text-red-500 font-medium text-sm"
+          >
+            Delete Task
+          </button>
+        )}
+      </div>
+
+      {showEmojiPicker && (
+        <EmojiPicker
+          selected={emoji}
+          onSelect={e => { setEmoji(e); setShowEmojiPicker(false); }}
+          onClose={() => setShowEmojiPicker(false)}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <Modal onClose={() => setShowDeleteConfirm(false)}>
+          <h2 className="text-lg font-bold text-slate-800 mb-2">Delete this task?</h2>
+          <p className="text-sm text-slate-500 mb-6">This removes it from your task list. History data is preserved.</p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold text-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
