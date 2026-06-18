@@ -97,8 +97,8 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         emoji,
         color,
         taskType,
-        duration:     taskType === 'countdown' ? Number(duration) : null,
-        durationUnit: taskType === 'countdown' ? durationUnit : null,
+        duration:     (taskType === 'countdown' || taskType === 'checkbox') ? (Number(duration) || null) : null,
+        durationUnit: (taskType === 'countdown' || taskType === 'checkbox') ? durationUnit : null,
         workMin:      taskType === 'pomodoro'  ? Number(workMin) : null,
         breakMin:     taskType === 'pomodoro'  ? Number(breakMin) : null,
         sets:         taskType === 'pomodoro'  ? Number(sets) : null,
@@ -188,10 +188,12 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           <TimerTypeSelect value={taskType} onChange={setTaskType} />
         </div>
 
-        {/* Countdown duration */}
-        {taskType === 'countdown' && (
+        {/* Duration — required for countdown, optional for checkbox */}
+        {(taskType === 'countdown' || taskType === 'checkbox') && (
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Duration</label>
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              Duration{taskType === 'checkbox' && <span className="normal-case font-normal text-slate-300 ml-1">(optional)</span>}
+            </label>
             <div className="flex gap-2 mt-1">
               <input
                 type="number"
