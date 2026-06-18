@@ -99,6 +99,15 @@ function doSpeak(text) {
   } catch {}
 }
 
+// Delay voice until after the tone finishes (profile-dependent longest note)
+function voiceDelay() {
+  const p = getSoundProfile();
+  if (p === 'bell')   return 1800; // bell allDone lasts ~1620ms
+  if (p === 'chime')  return 1200; // chime allDone lasts ~1010ms
+  if (p === 'silent') return 200;  // no tone
+  return 1100;                     // tones allDone lasts ~990ms
+}
+
 function speak(text) {
   if (!getVoiceEnabled()) return;
   const synth = window.speechSynthesis;
@@ -113,7 +122,7 @@ function speak(text) {
         doSpeak(text);
       };
     }
-  }, 400);
+  }, voiceDelay());
 }
 
 export function prewarmSpeech() {

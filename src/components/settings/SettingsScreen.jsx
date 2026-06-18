@@ -95,7 +95,7 @@ export default function SettingsScreen() {
               onClick={() => { const next = !voiceOn; setVoiceEnabled(next); setVoiceOn(next); }}
               className={`w-12 h-6 rounded-full transition-colors relative ${voiceOn ? 'bg-slate-800' : 'bg-slate-200'}`}
             >
-              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${voiceOn ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${voiceOn ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
           </div>
         </div>
