@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { vibratePattern, vibrateLong } from '../utils/vibrate';
 
-export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAllComplete }) {
+export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAllComplete, onBreakStart, onBreakEnd }) {
   const [phase, setPhase]           = useState('idle'); // 'idle' | 'work' | 'break' | 'done'
   const [currentSet, setCurrentSet] = useState(1);
   const [secondsLeft, setSecondsLeft] = useState(workMin * 60);
@@ -25,8 +25,9 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
     } else {
       setCurrentSet(s => s + 1);
       startPhase('break', breakMin);
+      onBreakStart?.();
     }
-  }, [totalSets, breakMin, startPhase, onSetComplete, onAllComplete]);
+  }, [totalSets, breakMin, startPhase, onSetComplete, onAllComplete, onBreakStart]);
 
   const start = useCallback(() => {
     if (phase === 'idle') startPhase('work', workMin);
@@ -35,7 +36,7 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
   const skipCurrent = useCallback(() => {
     clearTimer();
     if (phase === 'work') advanceAfterWork(currentSet);
-    else if (phase === 'break') startPhase('work', workMin);
+    else if (phase === 'break') { startPhase('work', workMin); onBreakEnd?.(); }
   }, [phase, currentSet, workMin, advanceAfterWork, startPhase]);
 
   const reset = useCallback(() => {
@@ -52,7 +53,7 @@ export function usePomodoro({ workMin, breakMin, totalSets, onSetComplete, onAll
         if (prev <= 1) {
           clearTimer();
           if (phase === 'work') advanceAfterWork(currentSet);
-          else startPhase('work', workMin);
+          else { startPhase('work', workMin); onBreakEnd?.(); }
           return 0;
         }
         return prev - 1;

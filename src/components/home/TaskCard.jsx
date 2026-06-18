@@ -6,6 +6,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { addSession } from '../../db/queries';
 import { getColor } from '../../constants/colors';
 import { todayStr } from '../../utils/dateHelpers';
+import { soundBreakStart, soundWorkResume, soundAllDone } from '../../utils/sound';
 import TimerDisplay from './TimerDisplay';
 
 const LONG_PRESS_MS = 600;
@@ -142,6 +143,7 @@ function PomodoroCard({ task, onToggleComplete }) {
   const activeTimerId    = useAppStore(s => s.activeTimerId);
   const setActiveTimer   = useAppStore(s => s.setActiveTimer);
   const clearActiveTimer = useAppStore(s => s.clearActiveTimer);
+  const showToast        = useAppStore(s => s.showToast);
 
   const handleSetComplete = useCallback(async (setNumber) => {
     try {
@@ -163,7 +165,19 @@ function PomodoroCard({ task, onToggleComplete }) {
   const handleAllComplete = useCallback(() => {
     onToggleComplete(true);
     clearActiveTimer();
-  }, [onToggleComplete, clearActiveTimer]);
+    soundAllDone();
+    showToast('All sets done! Great work 🎉', 'pomodoro-done', 5000);
+  }, [onToggleComplete, clearActiveTimer, showToast]);
+
+  const handleBreakStart = useCallback(() => {
+    soundBreakStart();
+    showToast(`Break time 🧘 — ${breakMin ?? 5} min`, 'pomodoro-break', 6000);
+  }, [breakMin, showToast]);
+
+  const handleBreakEnd = useCallback(() => {
+    soundWorkResume();
+    showToast(`Back to work 💪`, 'pomodoro-work', 4000);
+  }, [showToast]);
 
   const { phase, currentSet, totalSets, formatted, start, skipCurrent, reset, isDone } = usePomodoro({
     workMin:       workMin  ?? 25,
@@ -171,6 +185,8 @@ function PomodoroCard({ task, onToggleComplete }) {
     totalSets:     sets     ?? 4,
     onSetComplete: handleSetComplete,
     onAllComplete: handleAllComplete,
+    onBreakStart:  handleBreakStart,
+    onBreakEnd:    handleBreakEnd,
   });
 
   const isRunning = phase === 'work' || phase === 'break';

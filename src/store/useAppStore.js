@@ -30,8 +30,8 @@ export const useAppStore = create((set) => ({
 
   // Toast notifications
   toast: null,
-  showToast: (message, type = 'success') => {
+  showToast: (message, type = 'success', duration = 3000) => {
     set({ toast: { message, type } });
-    setTimeout(() => set({ toast: null }), 3000);
+    setTimeout(() => set({ toast: null }), duration);
   },
 }));
