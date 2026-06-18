@@ -52,10 +52,8 @@ function CheckboxCard({ task, onToggleComplete }) {
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xl font-bold text-slate-800 leading-tight">
-          {duration ? `${duration} ${durationUnit ?? 'min'}` : '—'}
-        </p>
-        <p className="text-sm text-slate-500 truncate mt-0.5">{name}</p>
+        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
+        <p className="text-sm text-slate-400 mt-0.5">{duration ? `${duration} ${durationUnit ?? 'min'}` : '—'}</p>
       </div>
       <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
     </div>
@@ -111,8 +109,8 @@ function CountdownCard({ task, onToggleComplete }) {
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
+        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
         <TimerDisplay formatted={formatted} />
-        <p className="text-sm text-slate-500 truncate mt-0.5">{name}</p>
       </div>
       <div className="flex flex-col items-center gap-2">
         {!completed && (
@@ -216,10 +214,11 @@ function PomodoroCard({ task, onToggleComplete }) {
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
+        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
         <TimerDisplay
           formatted={
-            isDone               ? 'Done!'      :
-            phase === 'work_done'  ? 'Work done!' :
+            isDone               ? 'Done!'       :
+            phase === 'work_done'  ? 'Work done!'  :
             phase === 'break_done' ? 'Break done!' :
             formatted
           }
@@ -227,7 +226,6 @@ function PomodoroCard({ task, onToggleComplete }) {
           currentSet={currentSet}
           totalSets={totalSets}
         />
-        <p className="text-sm text-slate-500 truncate mt-0.5">{name}</p>
       </div>
       <div className="flex flex-col items-center gap-2">
         {!completed && !isDone && (() => {
