@@ -67,6 +67,12 @@ export const addTaskToDateLog = async (dateStr, taskData) => {
 export const getUpcomingLogs = () =>
   db.daily_logs.where('date').aboveOrEqual(tomorrowStr()).toArray();
 
+export const removeTaskFromLog = async (dateStr, taskId) => {
+  const log = await getLogByDate(dateStr);
+  if (!log) return;
+  return saveLog({ ...log, tasks: (log.tasks ?? []).filter(t => t.id !== taskId) });
+};
+
 // --- Pomodoro Sessions ---
 export const addSession = (session) =>
   db.pomodoro_sessions.add(session);

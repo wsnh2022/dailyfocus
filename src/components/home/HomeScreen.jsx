@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { saveLog, reorderTasks, getUpcomingLogs, getLogByDate } from '../../db/queries';
+import { saveLog, reorderTasks, getUpcomingLogs, getLogByDate, removeTaskFromLog } from '../../db/queries';
 import { useMidnightArchive } from '../../hooks/useMidnightArchive';
 import { todayStr, getISOWeek } from '../../utils/dateHelpers';
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -85,6 +85,15 @@ export default function HomeScreen() {
       createdAt:  new Date().toISOString(),
     });
   }, [setTodayTasks]);
+
+  const handleDeleteFutureTask = useCallback(async (taskId) => {
+    await removeTaskFromLog(selectedDate, taskId);
+    setFutureTasks(prev => prev.filter(t => t.id !== taskId));
+    setTaskCountByDate(prev => ({
+      ...prev,
+      [selectedDate]: Math.max(0, (prev[selectedDate] ?? 1) - 1),
+    }));
+  }, [selectedDate]);
 
   const handleToggleComplete = useCallback(async (taskId, completed) => {
     updateTaskCompletion(taskId, completed);
@@ -219,7 +228,11 @@ export default function HomeScreen() {
                 <li key={task.id} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm">
                   <span className="text-xl leading-none">{task.emoji}</span>
                   <span className="flex-1 text-sm font-medium text-slate-700">{task.name}</span>
-                  <span className="text-slate-300 text-sm">○</span>
+                  <button
+                    onClick={() => handleDeleteFutureTask(task.id)}
+                    className="w-7 h-7 rounded-full text-slate-300 text-base flex items-center justify-center active:scale-95 active:text-red-400 transition-all shrink-0"
+                    aria-label="Remove planned task"
+                  >✕</button>
                 </li>
               ))}
             </ul>
