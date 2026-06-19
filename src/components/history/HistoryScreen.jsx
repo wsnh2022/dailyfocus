@@ -3,7 +3,6 @@ import { getAllLogs } from '../../db/queries';
 import { calculateStreaks } from '../../utils/streakCalc';
 import MonthCalendar from './MonthCalendar';
 import WeekView from './WeekView';
-import DayDetail from './DayDetail';
 
 const LEGEND = [
   { color: 'bg-green-400',  label: 'Complete' },
@@ -15,10 +14,9 @@ const LEGEND = [
 ];
 
 export default function HistoryScreen() {
-  const [logs, setLogs]               = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [view, setView]               = useState('month');
+  const [logs, setLogs]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [view, setView]   = useState('month');
 
   useEffect(() => {
     getAllLogs().then(l => { setLogs(l); setLoading(false); });
@@ -80,9 +78,9 @@ export default function HistoryScreen() {
         {loading ? (
           <div className="h-64 rounded-xl bg-slate-100 animate-pulse" />
         ) : view === 'month' ? (
-          <MonthCalendar logs={logs} onSelectDay={setSelectedDate} />
+          <MonthCalendar logs={logs} />
         ) : (
-          <WeekView logs={logs} onSelectDay={setSelectedDate} />
+          <WeekView logs={logs} />
         )}
 
         <div className="flex items-center gap-x-3 gap-y-1.5 mt-4 flex-wrap">
@@ -95,9 +93,6 @@ export default function HistoryScreen() {
         </div>
       </div>
 
-      {selectedDate && (
-        <DayDetail date={selectedDate} onClose={() => setSelectedDate(null)} />
-      )}
     </div>
   );
 }

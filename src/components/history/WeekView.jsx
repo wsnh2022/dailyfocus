@@ -25,6 +25,8 @@ const STATE_TEXT = {
   future:  'text-slate-300',
 };
 
+const STATE_EMOJI = { rest: '🌿', pause: '⏸️' };
+
 function getDayState(log, isFuture) {
   if (isFuture) return (log && (log.tasks ?? []).length > 0) ? 'planned' : 'future';
   if (!log) return 'none';
@@ -56,7 +58,62 @@ function formatWeekLabel(mondayStr) {
   return `${fmt(mondayStr)} – ${fmt(endStr)}`;
 }
 
-export default function WeekView({ logs, onSelectDay }) {
+function WeekTaskList({ days, logMap }) {
+  const pastDays = days.filter(d => !d.isFuture);
+  if (pastDays.length === 0) return (
+    <p className="text-center text-sm text-slate-400 py-6">No data for this week yet.</p>
+  );
+
+  return (
+    <div className="space-y-3">
+      {days.map(day => {
+        const log   = logMap[day.dateStr];
+        const tasks = log?.tasks ?? [];
+        const done  = tasks.filter(t => t.completed).length;
+        const label = new Date(day.dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+        if (day.isFuture && tasks.length === 0) return null;
+
+        return (
+          <div key={day.dateStr}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${STATE_BG[day.state]} ${STATE_TEXT[day.state]}`}>
+                {STATE_EMOJI[day.state] ?? label}
+              </span>
+              {!STATE_EMOJI[day.state] && (
+                <span className="text-[10px] text-slate-400">{label}</span>
+              )}
+              {!day.isFuture && tasks.length > 0 && (
+                <span className="ml-auto text-[10px] font-semibold text-slate-400">{done}/{tasks.length}</span>
+              )}
+            </div>
+            {tasks.length === 0 ? (
+              <p className="text-xs text-slate-300 pl-1 pb-1">
+                {day.isFuture ? 'Planned: no tasks yet' : 'No tasks logged'}
+              </p>
+            ) : (
+              <ul className="space-y-1">
+                {tasks.map((task, i) => (
+                  <li key={task.id ?? i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50">
+                    <span className="text-sm leading-none">{task.emoji}</span>
+                    <span className={`flex-1 text-xs ${task.completed ? 'text-slate-700' : 'text-slate-400 line-through'}`}>
+                      {task.name}
+                    </span>
+                    <span className={`text-xs font-medium ${task.completed ? 'text-green-500' : 'text-slate-300'}`}>
+                      {task.completed ? '✓' : '○'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function WeekView({ logs }) {
   const today = todayStr();
   const [weekStart, setWeekStart] = useState(() => getMondayOf(today));
 
@@ -95,28 +152,32 @@ export default function WeekView({ logs, onSelectDay }) {
         >›</button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1.5 mb-5">
         {days.map(day => (
           <button
             key={day.dateStr}
-            onClick={() => day.state !== 'future' && onSelectDay(day.dateStr)}
             className={[
-              'flex flex-col items-center gap-1 py-3 rounded-2xl transition-opacity',
+              'flex flex-col items-center gap-1 py-3 rounded-2xl',
               STATE_BG[day.state],
               STATE_TEXT[day.state],
               day.isToday ? 'ring-2 ring-slate-700 ring-offset-1' : '',
-              day.state !== 'future' ? 'active:opacity-70' : 'cursor-default',
             ].join(' ')}
           >
             <span className="text-[10px] font-medium opacity-75 leading-none">{day.abbr}</span>
             <span className="text-base font-bold leading-none">{day.num}</span>
-            {day.total > 0 && !day.isFuture ? (
+            {STATE_EMOJI[day.state] ? (
+              <span className="text-[11px] leading-none">{STATE_EMOJI[day.state]}</span>
+            ) : day.total > 0 && !day.isFuture ? (
               <span className="text-[9px] leading-none opacity-75">{day.done}/{day.total}</span>
             ) : (
               <span className="text-[9px] opacity-0 leading-none">·</span>
             )}
           </button>
         ))}
+      </div>
+
+      <div className="pt-4 border-t border-slate-100">
+        <WeekTaskList days={days} logMap={logMap} />
       </div>
     </div>
   );
