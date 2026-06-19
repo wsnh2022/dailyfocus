@@ -69,17 +69,24 @@ export function importBackup(file) {
 export async function exportCsv() {
   const logs = await db.daily_logs.orderBy('date').toArray();
 
-  const rows = [['Date', 'Day State', 'Task Name', 'Task Type', 'Completed']];
+  const rows = [['Date', 'Day State', 'Task Name', 'Task Type', 'Duration', 'Completed']];
   for (const log of logs) {
     if (!log.tasks?.length) {
-      rows.push([log.date, log.dayState ?? '', '', '', '']);
+      rows.push([log.date, log.dayState ?? '', '', '', '', '']);
     } else {
       for (const task of log.tasks) {
+        let duration = '';
+        if (task.taskType === 'pomodoro') {
+          duration = `${task.workMin ?? 25}min work / ${task.breakMin ?? 5}min break × ${task.sets ?? 4} sets`;
+        } else if (task.duration) {
+          duration = `${task.duration} ${task.durationUnit ?? 'min'}`;
+        }
         rows.push([
           log.date,
           log.dayState ?? '',
           task.name ?? '',
           task.taskType ?? '',
+          duration,
           task.completed ? 'true' : 'false',
         ]);
       }
