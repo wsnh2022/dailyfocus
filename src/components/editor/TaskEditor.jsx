@@ -15,7 +15,7 @@ const VALIDATION = {
   sets:     { min: 1, max: 10 },
 };
 
-export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortOrder }) {
+export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortOrder, initialTargetDate = null }) {
   const showToast      = useAppStore(s => s.showToast);
   const todayTasks     = useAppStore(s => s.todayTasks);
   const setTodayTasks  = useAppStore(s => s.setTodayTasks);
@@ -47,7 +47,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [breakMin, setBreakMin]             = useState(task?.breakMin ?? 5);
   const [sets, setSets]                     = useState(task?.sets ?? 4);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [targetDate, setTargetDate]         = useState(today);
+  const [targetDate, setTargetDate]         = useState(initialTargetDate ?? today);
   const [showDateInput, setShowDateInput]   = useState(false);
   const [templates, setTemplates]           = useState([]);
 

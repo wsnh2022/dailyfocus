@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { saveLog, reorderTasks, getUpcomingLogs } from '../../db/queries';
+import { saveLog, reorderTasks, getUpcomingLogs, getLogByDate } from '../../db/queries';
 import { useMidnightArchive } from '../../hooks/useMidnightArchive';
-import { todayStr, tomorrowStr, getISOWeek } from '../../utils/dateHelpers';
+import { todayStr, getISOWeek } from '../../utils/dateHelpers';
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import SortableTaskCard from './SortableTaskCard';
 import MomentumBar from './MomentumBar';
 import DayStateButton from './DayStateButton';
 import HeroTitle from './HeroTitle';
+import DateStrip from './DateStrip';
 
 function BackupBanner({ onDismiss, onGoBackup }) {
   return (
@@ -40,13 +41,25 @@ export default function HomeScreen() {
   const showBackupPrompt     = useAppStore(s => s.showBackupPrompt);
   const setShowBackupPrompt  = useAppStore(s => s.setShowBackupPrompt);
 
-  const [upcomingLogs, setUpcomingLogs]   = useState([]);
-  const [showCompleted, setShowCompleted] = useState(false);
-  const tomorrow = tomorrowStr();
+  const today = todayStr();
+
+  const [showCompleted, setShowCompleted]   = useState(false);
+  const [selectedDate, setSelectedDate]     = useState(today);
+  const [futureTasks, setFutureTasks]       = useState([]);
+  const [taskCountByDate, setTaskCountByDate] = useState({});
 
   useEffect(() => {
-    getUpcomingLogs().then(logs => setUpcomingLogs(logs.filter(l => l.tasks?.length > 0)));
+    getUpcomingLogs().then(logs => {
+      const counts = {};
+      logs.forEach(l => { if (l.tasks?.length) counts[l.date] = l.tasks.length; });
+      setTaskCountByDate(counts);
+    });
   }, []);
+
+  useEffect(() => {
+    if (selectedDate === today) { setFutureTasks([]); return; }
+    getLogByDate(selectedDate).then(log => setFutureTasks(log?.tasks ?? []));
+  }, [selectedDate, today]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -100,6 +113,8 @@ export default function HomeScreen() {
     return <div className="p-4 text-sm text-slate-400">Loading…</div>;
   }
 
+  const isToday = selectedDate === today;
+
   return (
     <div className="p-4">
       <HeroTitle />
@@ -112,9 +127,16 @@ export default function HomeScreen() {
         />
       )}
 
-      <DayStateButton />
+      <DateStrip
+        selected={selectedDate}
+        onSelect={date => { setSelectedDate(date); setShowCompleted(false); }}
+        taskCountByDate={{ [today]: todayTasks.length, ...taskCountByDate }}
+      />
 
-      {todayTasks.length === 0 ? (
+      {isToday && <DayStateButton />}
+
+      {/* ── Today view ── */}
+      {isToday && (todayTasks.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-5xl mb-4">🎯</div>
           <p className="text-slate-500 font-medium mb-1">No tasks yet.</p>
@@ -146,7 +168,6 @@ export default function HomeScreen() {
                 </SortableContext>
               </DndContext>
             )}
-
             {completedTasks.length > 0 && (
               <div className="mt-2">
                 <button
@@ -159,26 +180,20 @@ export default function HomeScreen() {
                 {showCompleted && (
                   <ul className="space-y-2">
                     {completedTasks.map(task => (
-                      <li
-                        key={task.id}
-                        className="flex items-center gap-3 bg-white rounded-2xl px-3 py-2.5 shadow-sm opacity-70"
-                      >
+                      <li key={task.id} className="flex items-center gap-3 bg-white rounded-2xl px-3 py-2.5 shadow-sm opacity-70">
                         <span className="text-xl leading-none">{task.emoji}</span>
                         <span className="flex-1 text-sm text-slate-400 line-through">{task.name}</span>
                         <button
                           onClick={() => handleToggleComplete(task.id, false)}
                           className="w-6 h-6 rounded-full bg-green-100 text-green-500 text-xs flex items-center justify-center shrink-0"
                           aria-label="Mark incomplete"
-                        >
-                          ✓
-                        </button>
+                        >✓</button>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
             )}
-
             <button
               onClick={() => navigate('/editor', { state: { fromHome: true } })}
               className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
@@ -187,28 +202,34 @@ export default function HomeScreen() {
             </button>
           </>
         );
-      })()}
+      })())}
 
-      {upcomingLogs.length > 0 && (
-        <div className="mt-5">
-          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Upcoming</h2>
-          <div className="space-y-2">
-            {upcomingLogs.map(log => (
-              <div key={log.date} className="bg-white rounded-2xl p-3 shadow-sm">
-                <p className="text-xs font-semibold text-slate-400 mb-2">
-                  📅 {log.date === tomorrow ? 'Tomorrow' : log.date}
-                </p>
-                <div className="space-y-1.5">
-                  {(log.tasks ?? []).map(t => (
-                    <div key={t.id} className="flex items-center gap-2">
-                      <span className="text-base leading-none">{t.emoji}</span>
-                      <span className="text-sm text-slate-700 font-medium">{t.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── Future date view ── */}
+      {!isToday && (
+        <div className="mt-3">
+          {futureTasks.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-3">📅</div>
+              <p className="text-slate-500 font-medium mb-1">Nothing planned yet.</p>
+              <p className="text-sm text-slate-400 mb-5">Add tasks for this day below.</p>
+            </div>
+          ) : (
+            <ul className="space-y-3 mb-3">
+              {futureTasks.map(task => (
+                <li key={task.id} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm">
+                  <span className="text-xl leading-none">{task.emoji}</span>
+                  <span className="flex-1 text-sm font-medium text-slate-700">{task.name}</span>
+                  <span className="text-slate-300 text-sm">○</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            onClick={() => navigate('/editor', { state: { fromHome: true, targetDate: selectedDate } })}
+            className="w-full py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
+          >
+            + Add task for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </button>
         </div>
       )}
     </div>

@@ -8,7 +8,8 @@ export default function EditorScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const fromHome = location.state?.fromHome === true;
+  const fromHome   = location.state?.fromHome === true;
+  const targetDate = location.state?.targetDate ?? null;
   const showToast = useAppStore(s => s.showToast);
 
   const [taskCount, setTaskCount]     = useState(0);
@@ -29,6 +30,7 @@ export default function EditorScreen() {
       return (
         <TaskEditor
           task={null}
+          initialTargetDate={targetDate}
           onSave={() => navigate('/')}
           onDelete={() => {}}
           onCancel={() => navigate('/')}
