@@ -40,7 +40,8 @@ export default function HomeScreen() {
   const showBackupPrompt     = useAppStore(s => s.showBackupPrompt);
   const setShowBackupPrompt  = useAppStore(s => s.setShowBackupPrompt);
 
-  const [upcomingLogs, setUpcomingLogs] = useState([]);
+  const [upcomingLogs, setUpcomingLogs]   = useState([]);
+  const [showCompleted, setShowCompleted] = useState(false);
   const tomorrow = tomorrowStr();
 
   useEffect(() => {
@@ -54,9 +55,12 @@ export default function HomeScreen() {
 
   const handleDragEnd = useCallback(async ({ active, over }) => {
     if (!over || active.id === over.id) return;
-    const oldIndex = todayTasks.findIndex(t => t.id === active.id);
-    const newIndex = todayTasks.findIndex(t => t.id === over.id);
-    const reordered = arrayMove(todayTasks, oldIndex, newIndex);
+    const current   = useAppStore.getState().todayTasks;
+    const pending   = current.filter(t => !t.completed);
+    const completed = current.filter(t =>  t.completed);
+    const oldIndex  = pending.findIndex(t => t.id === active.id);
+    const newIndex  = pending.findIndex(t => t.id === over.id);
+    const reordered = [...arrayMove(pending, oldIndex, newIndex), ...completed];
     setTodayTasks(reordered);
     await reorderTasks(reordered.map(t => t.id));
     const today = todayStr();
@@ -67,7 +71,7 @@ export default function HomeScreen() {
       weekNumber: getISOWeek(today),
       createdAt:  new Date().toISOString(),
     });
-  }, [todayTasks, setTodayTasks]);
+  }, [setTodayTasks]);
 
   const handleToggleComplete = useCallback(async (taskId, completed) => {
     updateTaskCompletion(taskId, completed);
@@ -122,29 +126,68 @@ export default function HomeScreen() {
             + Add Task
           </button>
         </div>
-      ) : (
-        <>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={todayTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-              <ul className="space-y-3">
-                {todayTasks.map(task => (
-                  <SortableTaskCard
-                    key={task.id}
-                    task={task}
-                    onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
-                  />
-                ))}
-              </ul>
-            </SortableContext>
-          </DndContext>
-          <button
-            onClick={() => navigate('/editor', { state: { fromHome: true } })}
-            className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
-          >
-            + Add task
-          </button>
-        </>
-      )}
+      ) : (() => {
+        const pendingTasks   = todayTasks.filter(t => !t.completed);
+        const completedTasks = todayTasks.filter(t =>  t.completed);
+        return (
+          <>
+            {pendingTasks.length > 0 && (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                  <ul className="space-y-3">
+                    {pendingTasks.map(task => (
+                      <SortableTaskCard
+                        key={task.id}
+                        task={task}
+                        onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
+                      />
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+            )}
+
+            {completedTasks.length > 0 && (
+              <div className="mt-2">
+                <button
+                  onClick={() => setShowCompleted(v => !v)}
+                  className="flex items-center gap-1.5 w-full py-2 text-sm text-slate-400 font-medium"
+                >
+                  <span className={`text-base leading-none transition-transform duration-200 inline-block ${showCompleted ? 'rotate-90' : ''}`}>›</span>
+                  Completed ({completedTasks.length})
+                </button>
+                {showCompleted && (
+                  <ul className="space-y-2">
+                    {completedTasks.map(task => (
+                      <li
+                        key={task.id}
+                        className="flex items-center gap-3 bg-white rounded-2xl px-3 py-2.5 shadow-sm opacity-70"
+                      >
+                        <span className="text-xl leading-none">{task.emoji}</span>
+                        <span className="flex-1 text-sm text-slate-400 line-through">{task.name}</span>
+                        <button
+                          onClick={() => handleToggleComplete(task.id, false)}
+                          className="w-6 h-6 rounded-full bg-green-100 text-green-500 text-xs flex items-center justify-center shrink-0"
+                          aria-label="Mark incomplete"
+                        >
+                          ✓
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={() => navigate('/editor', { state: { fromHome: true } })}
+              className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
+            >
+              + Add task
+            </button>
+          </>
+        );
+      })()}
 
       {upcomingLogs.length > 0 && (
         <div className="mt-5">
