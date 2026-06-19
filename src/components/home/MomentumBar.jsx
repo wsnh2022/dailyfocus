@@ -62,6 +62,15 @@ export default function MomentumBar() {
               </div>
             </>
           )}
+          {total > 0 && (
+            <>
+              <div className="w-px h-8 bg-slate-100" />
+              <div className="text-center">
+                <div className="text-lg font-bold text-slate-800 leading-none">{pct}%</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">today</div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 7-day dots */}
