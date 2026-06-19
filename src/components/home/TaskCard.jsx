@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useCountdown } from '../../hooks/useCountdown';
 import { usePomodoro } from '../../hooks/usePomodoro';
 import { useAppStore } from '../../store/useAppStore';
-import { addSession } from '../../db/queries';
+import { addSession, deleteTask, saveLog } from '../../db/queries';
 import { getColor } from '../../constants/colors';
-import { todayStr } from '../../utils/dateHelpers';
+import { todayStr, getISOWeek } from '../../utils/dateHelpers';
 import { soundBreakStart, soundWorkResume, soundAllDone } from '../../utils/sound';
 import TimerDisplay from './TimerDisplay';
 
 const ACTION_WIDTH = 80;
 
-function useSwipeLeft() {
+function useSwipeCard() {
   const [offset, setOffset]               = useState(0);
-  const [isOpen, setIsOpen]               = useState(false);
+  const [isOpenLeft, setIsOpenLeft]       = useState(false); // edit (swipe left, negative offset)
+  const [isOpenRight, setIsOpenRight]     = useState(false); // delete (swipe right, positive offset)
   const [transitioning, setTransitioning] = useState(false);
   const startX       = useRef(null);
   const startY       = useRef(null);
@@ -29,7 +30,8 @@ function useSwipeLeft() {
     autoCloseRef.current = setTimeout(() => {
       setTransitioning(true);
       setOffset(0);
-      setIsOpen(false);
+      setIsOpenLeft(false);
+      setIsOpenRight(false);
     }, 1500);
   }, [cancelAutoClose]);
 
@@ -52,18 +54,20 @@ function useSwipeLeft() {
       if (Math.abs(dy) >= Math.abs(dx)) { startX.current = null; return; }
       isHoriz.current = true;
     }
-    const base = isOpen ? -ACTION_WIDTH : 0;
-    setOffset(Math.max(-ACTION_WIDTH, Math.min(0, base + dx)));
-  }, [isOpen]);
+    const base = isOpenLeft ? -ACTION_WIDTH : isOpenRight ? ACTION_WIDTH : 0;
+    setOffset(Math.max(-ACTION_WIDTH, Math.min(ACTION_WIDTH, base + dx)));
+  }, [isOpenLeft, isOpenRight]);
 
   const onTouchEnd = useCallback(() => {
     if (!isHoriz.current) return;
     setTransitioning(true);
     setOffset(prev => {
-      const snap       = prev < -ACTION_WIDTH / 2 ? -ACTION_WIDTH : 0;
-      const willBeOpen = snap < 0;
-      setIsOpen(willBeOpen);
-      if (willBeOpen) scheduleAutoClose();
+      const snap = prev < -ACTION_WIDTH / 2 ? -ACTION_WIDTH
+                 : prev > ACTION_WIDTH / 2  ?  ACTION_WIDTH
+                 : 0;
+      setIsOpenLeft(snap < 0);
+      setIsOpenRight(snap > 0);
+      if (snap !== 0) scheduleAutoClose();
       return snap;
     });
     startX.current = null;
@@ -73,10 +77,11 @@ function useSwipeLeft() {
     cancelAutoClose();
     setTransitioning(true);
     setOffset(0);
-    setIsOpen(false);
+    setIsOpenLeft(false);
+    setIsOpenRight(false);
   }, [cancelAutoClose]);
 
-  return { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close };
+  return { offset, isOpenLeft, isOpenRight, transitioning, onTouchStart, onTouchMove, onTouchEnd, close };
 }
 
 function Checkbox({ c, completed, onToggle }) {
@@ -93,18 +98,50 @@ function Checkbox({ c, completed, onToggle }) {
 }
 
 function SwipeCard({ taskId, completed, children }) {
-  const navigate = useNavigate();
-  const { offset, isOpen, transitioning, onTouchStart, onTouchMove, onTouchEnd, close } = useSwipeLeft();
+  const navigate      = useNavigate();
+  const showToast     = useAppStore(s => s.showToast);
+  const todayTasks    = useAppStore(s => s.todayTasks);
+  const setTodayTasks = useAppStore(s => s.setTodayTasks);
+  const todayDayState = useAppStore(s => s.todayDayState);
+
+  const { offset, isOpenLeft, isOpenRight, transitioning, onTouchStart, onTouchMove, onTouchEnd, close } = useSwipeCard();
+
+  const handleDelete = async () => {
+    close();
+    try {
+      await deleteTask(taskId);
+      const today   = todayStr();
+      const updated = useAppStore.getState().todayTasks.filter(t => t.id !== taskId);
+      setTodayTasks(updated);
+      await saveLog({
+        date:       today,
+        dayState:   useAppStore.getState().todayDayState,
+        tasks:      updated,
+        weekNumber: getISOWeek(today),
+        createdAt:  new Date().toISOString(),
+      });
+      showToast('Task deleted');
+    } catch {
+      showToast('Failed to delete task', 'error');
+    }
+  };
 
   return (
-    // Touch handlers on the outer container so the overlay doesn't block swipe-right
     <div
       className={`relative overflow-hidden rounded-2xl shadow-sm select-none ${completed ? 'opacity-60' : ''}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Edit action revealed on swipe */}
+      {/* Delete action — revealed by swiping right */}
+      <div className="absolute left-0 top-0 bottom-0 w-20 bg-red-500 flex items-center justify-center">
+        <button onClick={handleDelete} className="flex flex-col items-center gap-1 text-white">
+          <span className="text-xl">🗑️</span>
+          <span className="text-xs font-medium">Delete</span>
+        </button>
+      </div>
+
+      {/* Edit action — revealed by swiping left */}
       <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 flex items-center justify-center">
         <button
           onClick={() => { close(); navigate(`/editor/${taskId}`); }}
@@ -123,13 +160,14 @@ function SwipeCard({ taskId, completed, children }) {
         {children}
       </div>
 
-      {/* Overlay when open: tapping card area closes without firing buttons */}
-      {isOpen && (
-        <div
-          className="absolute inset-0"
-          style={{ right: `${ACTION_WIDTH}px` }}
-          onClick={close}
-        />
+      {/* Overlay when edit is open — covers card area, not edit button */}
+      {isOpenLeft && (
+        <div className="absolute inset-0" style={{ right: `${ACTION_WIDTH}px` }} onClick={close} />
+      )}
+
+      {/* Overlay when delete is open — covers card area, not delete button */}
+      {isOpenRight && (
+        <div className="absolute inset-0" style={{ left: `${ACTION_WIDTH}px` }} onClick={close} />
       )}
     </div>
   );
