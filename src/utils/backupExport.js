@@ -77,9 +77,10 @@ export async function exportCsv() {
       for (const task of log.tasks) {
         let duration = '';
         if (task.taskType === 'pomodoro') {
-          duration = `${task.workMin ?? 25}-Work:${String(task.breakMin ?? 5).padStart(2, '0')}-Minbreak:${task.sets ?? 4}-sets`;
+          duration = `${task.workMin ?? 25}-Work:${String(task.breakMin ?? 5).padStart(2, '0')}-Break:${task.sets ?? 4}-Sets`;
         } else if (task.duration) {
-          duration = `${task.duration} ${task.durationUnit ?? 'min'}`;
+          const mins = task.durationUnit === 'hrs' ? task.duration * 60 : task.duration;
+          duration = `${mins}-Min`;
         }
         rows.push([
           log.date,
