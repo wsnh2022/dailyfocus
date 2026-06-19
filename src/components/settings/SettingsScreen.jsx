@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { exportBackup, importBackup, clearAllData } from '../../utils/backupExport';
+import { exportBackup, exportCsv, importBackup, clearAllData } from '../../utils/backupExport';
 import { SOUND_PROFILES, getSoundProfile, setSoundProfile, soundBreakStart, getVoiceEnabled, setVoiceEnabled } from '../../utils/sound';
 import Modal from '../shared/Modal';
 
@@ -30,6 +30,15 @@ export default function SettingsScreen() {
       showToast('Backup downloaded!');
     } catch {
       showToast('Export failed', 'error');
+    }
+  };
+
+  const handleExportCsv = async () => {
+    try {
+      await exportCsv();
+      showToast('CSV downloaded!');
+    } catch {
+      showToast('CSV export failed', 'error');
     }
   };
 
@@ -147,6 +156,18 @@ export default function SettingsScreen() {
             <div className="flex-1">
               <div className="text-sm font-medium text-slate-800">Export Backup</div>
               <div className="text-xs text-slate-400">Download all data as JSON</div>
+            </div>
+            <span className="text-slate-300">›</span>
+          </button>
+
+          <button
+            onClick={handleExportCsv}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50"
+          >
+            <span className="text-xl">📊</span>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-800">Export CSV</div>
+              <div className="text-xs text-slate-400">Download history as spreadsheet</div>
             </div>
             <span className="text-slate-300">›</span>
           </button>

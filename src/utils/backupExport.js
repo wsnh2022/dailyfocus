@@ -66,6 +66,39 @@ export function importBackup(file) {
   });
 }
 
+export async function exportCsv() {
+  const logs = await db.daily_logs.orderBy('date').toArray();
+
+  const rows = [['Date', 'Day State', 'Task Name', 'Task Type', 'Completed']];
+  for (const log of logs) {
+    if (!log.tasks?.length) {
+      rows.push([log.date, log.dayState ?? '', '', '', '']);
+    } else {
+      for (const task of log.tasks) {
+        rows.push([
+          log.date,
+          log.dayState ?? '',
+          task.name ?? '',
+          task.taskType ?? '',
+          task.completed ? 'true' : 'false',
+        ]);
+      }
+    }
+  }
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dailyfocus-export-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export async function clearAllData() {
   await db.transaction('rw', [db.task_templates, db.daily_logs, db.pomodoro_sessions], async () => {
     await db.task_templates.clear();
