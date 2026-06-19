@@ -6,6 +6,7 @@ const DOT_COLORS = {
   pause:   'bg-amber-300',
   none:    'bg-slate-200',
   future:  'bg-slate-100',
+  planned: 'bg-violet-200',
 };
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -40,7 +41,7 @@ function buildGrid(logs, weeksBack = 13) {
 
       let state = 'none';
       if (isFuture) {
-        state = 'future';
+        state = (log && (log.tasks ?? []).length > 0) ? 'planned' : 'future';
       } else if (log) {
         if (log.dayState === 'rest')        state = 'rest';
         else if (log.dayState === 'pause')  state = 'pause';
@@ -95,7 +96,7 @@ export default function CalendarHeatmap({ logs, onSelectDay }) {
                 <button
                   key={day.date}
                   onClick={() => day.state !== 'future' && onSelectDay(day.date)}
-                  title={day.date}
+                  title={day.state === 'planned' ? `${day.date} · Planned` : day.date}
                   className={[
                     'w-[18px] h-[18px] rounded-sm',
                     DOT_COLORS[day.state],

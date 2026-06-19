@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { saveLog, reorderTasks } from '../../db/queries';
+import { saveLog, reorderTasks, getUpcomingLogs } from '../../db/queries';
 import { useMidnightArchive } from '../../hooks/useMidnightArchive';
-import { todayStr, getISOWeek } from '../../utils/dateHelpers';
+import { todayStr, tomorrowStr, getISOWeek } from '../../utils/dateHelpers';
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import SortableTaskCard from './SortableTaskCard';
@@ -39,6 +39,13 @@ export default function HomeScreen() {
   const showToast            = useAppStore(s => s.showToast);
   const showBackupPrompt     = useAppStore(s => s.showBackupPrompt);
   const setShowBackupPrompt  = useAppStore(s => s.setShowBackupPrompt);
+
+  const [upcomingLogs, setUpcomingLogs] = useState([]);
+  const tomorrow = tomorrowStr();
+
+  useEffect(() => {
+    getUpcomingLogs().then(logs => setUpcomingLogs(logs.filter(l => l.tasks?.length > 0)));
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -137,6 +144,29 @@ export default function HomeScreen() {
             + Add task
           </button>
         </>
+      )}
+
+      {upcomingLogs.length > 0 && (
+        <div className="mt-5">
+          <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Upcoming</h2>
+          <div className="space-y-2">
+            {upcomingLogs.map(log => (
+              <div key={log.date} className="bg-white rounded-2xl p-3 shadow-sm">
+                <p className="text-xs font-semibold text-slate-400 mb-2">
+                  📅 {log.date === tomorrow ? 'Tomorrow' : log.date}
+                </p>
+                <div className="space-y-1.5">
+                  {(log.tasks ?? []).map(t => (
+                    <div key={t.id} className="flex items-center gap-2">
+                      <span className="text-base leading-none">{t.emoji}</span>
+                      <span className="text-sm text-slate-700 font-medium">{t.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

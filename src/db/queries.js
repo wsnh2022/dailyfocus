@@ -1,5 +1,5 @@
 import { db } from './schema';
-import { getISOWeek } from '../utils/dateHelpers';
+import { getISOWeek, tomorrowStr } from '../utils/dateHelpers';
 
 // --- Task Templates ---
 export const getAllTasks = () =>
@@ -63,6 +63,9 @@ export const addTaskToDateLog = async (dateStr, taskData) => {
     prePlanned: true,
   });
 };
+
+export const getUpcomingLogs = () =>
+  db.daily_logs.where('date').aboveOrEqual(tomorrowStr()).toArray();
 
 // --- Pomodoro Sessions ---
 export const addSession = (session) =>
