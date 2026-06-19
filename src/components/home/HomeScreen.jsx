@@ -64,20 +64,26 @@ export default function HomeScreen() {
 
   const handleToggleComplete = useCallback(async (taskId, completed) => {
     updateTaskCompletion(taskId, completed);
+    // Sink completed tasks to the bottom, keep relative order within each group
+    const latest = useAppStore.getState().todayTasks;
+    const sorted = [
+      ...latest.filter(t => !t.completed),
+      ...latest.filter(t =>  t.completed),
+    ];
+    setTodayTasks(sorted);
     try {
-      const today       = todayStr();
-      const latestTasks = useAppStore.getState().todayTasks;
+      const today = todayStr();
       await saveLog({
         date:       today,
         dayState:   useAppStore.getState().todayDayState,
-        tasks:      latestTasks,
+        tasks:      sorted,
         weekNumber: getISOWeek(today),
         createdAt:  new Date().toISOString(),
       });
     } catch {
       showToast('Failed to save progress', 'error');
     }
-  }, [updateTaskCompletion, showToast]);
+  }, [updateTaskCompletion, setTodayTasks, showToast]);
 
   if (loading) {
     return <div className="p-4 text-sm text-slate-400">Loading…</div>;
