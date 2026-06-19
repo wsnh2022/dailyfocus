@@ -6,10 +6,13 @@ import { SOUND_PROFILES, getSoundProfile, setSoundProfile, soundBreakStart, getV
 import Modal from '../shared/Modal';
 
 export default function SettingsScreen() {
-  const showToast = useAppStore(s => s.showToast);
-  const fileRef   = useRef(null);
+  const showToast      = useAppStore(s => s.showToast);
+  const heroSubtitle   = useAppStore(s => s.heroSubtitle);
+  const setHeroSubtitle = useAppStore(s => s.setHeroSubtitle);
+  const fileRef        = useRef(null);
   const [soundProfile, setSoundProfileState] = useState(getSoundProfile);
   const [voiceOn, setVoiceOn]               = useState(getVoiceEnabled);
+  const [subtitleDraft, setSubtitleDraft]   = useState(heroSubtitle);
 
   const handleSoundChange = (id) => {
     setSoundProfile(id);
@@ -62,6 +65,35 @@ export default function SettingsScreen() {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold text-slate-800 mb-5">Settings</h1>
+
+      {/* Dashboard */}
+      <section className="mb-4">
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+          Dashboard
+        </h2>
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Subtitle
+          </label>
+          <div className="flex gap-2 mt-1.5">
+            <input
+              type="text"
+              value={subtitleDraft}
+              onChange={e => setSubtitleDraft(e.target.value)}
+              maxLength={40}
+              placeholder="datacraft by yogi"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+            />
+            <button
+              onClick={() => { setHeroSubtitle(subtitleDraft.trim() || 'datacraft by yogi'); showToast('Dashboard updated'); }}
+              className="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold"
+            >
+              Save
+            </button>
+          </div>
+          <p className="text-xs text-slate-300 mt-1.5">Shown below "DailyFocus" on the home screen</p>
+        </div>
+      </section>
 
       {/* Pomodoro sound */}
       <section className="mb-4">

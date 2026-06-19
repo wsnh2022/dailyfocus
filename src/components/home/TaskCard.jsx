@@ -97,7 +97,7 @@ function Checkbox({ c, completed, onToggle }) {
   );
 }
 
-function SwipeCard({ taskId, completed, children }) {
+function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes }) {
   const navigate      = useNavigate();
   const showToast     = useAppStore(s => s.showToast);
   const todayTasks    = useAppStore(s => s.todayTasks);
@@ -157,6 +157,20 @@ function SwipeCard({ taskId, completed, children }) {
         className="bg-white p-4 flex items-center gap-3"
         style={{ transform: `translateX(${offset}px)`, transition: transitioning ? 'transform 0.2s ease-out' : 'none' }}
       >
+        {/* Drag handle */}
+        <button
+          {...dragListeners}
+          {...dragAttributes}
+          className="touch-none shrink-0 text-slate-300 cursor-grab active:cursor-grabbing px-0.5 -ml-1"
+          style={{ touchAction: 'none' }}
+          tabIndex={-1}
+        >
+          <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor">
+            <circle cx="4" cy="4"  r="1.8"/><circle cx="10" cy="4"  r="1.8"/>
+            <circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/>
+            <circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/>
+          </svg>
+        </button>
         {children}
       </div>
 
@@ -174,12 +188,12 @@ function SwipeCard({ taskId, completed, children }) {
 }
 
 // ── Checkbox card ─────────────────────────────────────────────────────────────
-function CheckboxCard({ task, onToggleComplete }) {
+function CheckboxCard({ task, onToggleComplete, dragListeners, dragAttributes }) {
   const { emoji, name, color, duration, durationUnit, completed } = task;
   const c = getColor(color);
 
   return (
-    <SwipeCard taskId={task.id} completed={completed}>
+    <SwipeCard taskId={task.id} completed={completed} dragListeners={dragListeners} dragAttributes={dragAttributes}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -193,7 +207,7 @@ function CheckboxCard({ task, onToggleComplete }) {
 }
 
 // ── Countdown card ────────────────────────────────────────────────────────────
-function CountdownCard({ task, onToggleComplete }) {
+function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }) {
   const { id, emoji, name, color, duration, durationUnit, completed } = task;
   const c = getColor(color);
 
@@ -226,7 +240,7 @@ function CountdownCard({ task, onToggleComplete }) {
   };
 
   return (
-    <SwipeCard taskId={id} completed={completed}>
+    <SwipeCard taskId={id} completed={completed} dragListeners={dragListeners} dragAttributes={dragAttributes}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -255,7 +269,7 @@ function CountdownCard({ task, onToggleComplete }) {
 }
 
 // ── Pomodoro card ─────────────────────────────────────────────────────────────
-function PomodoroCard({ task, onToggleComplete }) {
+function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes }) {
   const { id, emoji, name, color, workMin, breakMin, sets, completed } = task;
   const c = getColor(color);
 
@@ -308,7 +322,7 @@ function PomodoroCard({ task, onToggleComplete }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <SwipeCard taskId={id} completed={completed}>
+    <SwipeCard taskId={id} completed={completed} dragListeners={dragListeners} dragAttributes={dragAttributes}>
       <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
         {emoji}
       </div>
@@ -350,8 +364,8 @@ function PomodoroCard({ task, onToggleComplete }) {
 }
 
 // ── Dispatcher ────────────────────────────────────────────────────────────────
-export default function TaskCard({ task, onToggleComplete }) {
-  if (task.taskType === 'countdown') return <CountdownCard task={task} onToggleComplete={onToggleComplete} />;
-  if (task.taskType === 'pomodoro')  return <PomodoroCard  task={task} onToggleComplete={onToggleComplete} />;
-  return <CheckboxCard task={task} onToggleComplete={onToggleComplete} />;
+export default function TaskCard({ task, onToggleComplete, dragListeners, dragAttributes }) {
+  if (task.taskType === 'countdown') return <CountdownCard task={task} onToggleComplete={onToggleComplete} dragListeners={dragListeners} dragAttributes={dragAttributes} />;
+  if (task.taskType === 'pomodoro')  return <PomodoroCard  task={task} onToggleComplete={onToggleComplete} dragListeners={dragListeners} dragAttributes={dragAttributes} />;
+  return <CheckboxCard task={task} onToggleComplete={onToggleComplete} dragListeners={dragListeners} dragAttributes={dragAttributes} />;
 }

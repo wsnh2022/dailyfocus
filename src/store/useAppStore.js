@@ -32,6 +32,13 @@ export const useAppStore = create((set) => ({
   pomodoroRunning: false,
   setPomodoroRunning: (v) => set({ pomodoroRunning: v }),
 
+  // Hero subtitle (editable in Settings)
+  heroSubtitle: localStorage.getItem('df_hero_subtitle') ?? 'datacraft by yogi',
+  setHeroSubtitle: (v) => {
+    localStorage.setItem('df_hero_subtitle', v);
+    set({ heroSubtitle: v });
+  },
+
   // Toast notifications
   toast: null,
   showToast: (message, type = 'success', duration = 3000) => {

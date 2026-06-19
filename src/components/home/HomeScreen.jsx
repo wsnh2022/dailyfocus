@@ -1,12 +1,15 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/useAppStore';
-import { saveLog } from '../../db/queries';
+import { saveLog, reorderTasks } from '../../db/queries';
 import { useMidnightArchive } from '../../hooks/useMidnightArchive';
 import { todayStr, getISOWeek } from '../../utils/dateHelpers';
-import TaskCard from './TaskCard';
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import SortableTaskCard from './SortableTaskCard';
 import MomentumBar from './MomentumBar';
 import DayStateButton from './DayStateButton';
+import HeroTitle from './HeroTitle';
 
 function BackupBanner({ onDismiss, onGoBackup }) {
   return (
@@ -31,10 +34,33 @@ export default function HomeScreen() {
   const { loading } = useMidnightArchive();
 
   const todayTasks           = useAppStore(s => s.todayTasks);
+  const setTodayTasks        = useAppStore(s => s.setTodayTasks);
   const updateTaskCompletion = useAppStore(s => s.updateTaskCompletion);
   const showToast            = useAppStore(s => s.showToast);
   const showBackupPrompt     = useAppStore(s => s.showBackupPrompt);
   const setShowBackupPrompt  = useAppStore(s => s.setShowBackupPrompt);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  );
+
+  const handleDragEnd = useCallback(async ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = todayTasks.findIndex(t => t.id === active.id);
+    const newIndex = todayTasks.findIndex(t => t.id === over.id);
+    const reordered = arrayMove(todayTasks, oldIndex, newIndex);
+    setTodayTasks(reordered);
+    await reorderTasks(reordered.map(t => t.id));
+    const today = todayStr();
+    await saveLog({
+      date:       today,
+      dayState:   useAppStore.getState().todayDayState,
+      tasks:      reordered,
+      weekNumber: getISOWeek(today),
+      createdAt:  new Date().toISOString(),
+    });
+  }, [todayTasks, setTodayTasks]);
 
   const handleToggleComplete = useCallback(async (taskId, completed) => {
     updateTaskCompletion(taskId, completed);
@@ -59,6 +85,7 @@ export default function HomeScreen() {
 
   return (
     <div className="p-4">
+      <HeroTitle />
       <MomentumBar />
 
       {showBackupPrompt && (
@@ -84,16 +111,19 @@ export default function HomeScreen() {
         </div>
       ) : (
         <>
-          <ul className="space-y-3">
-            {todayTasks.map(task => (
-              <li key={task.id}>
-                <TaskCard
-                  task={task}
-                  onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
-                />
-              </li>
-            ))}
-          </ul>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={todayTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+              <ul className="space-y-3">
+                {todayTasks.map(task => (
+                  <SortableTaskCard
+                    key={task.id}
+                    task={task}
+                    onToggleComplete={(completed) => handleToggleComplete(task.id, completed)}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
           <button
             onClick={() => navigate('/editor', { state: { fromHome: true } })}
             className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
