@@ -4,7 +4,7 @@ const APPS = [
   {
     id:    'pomodoro',
     name:  'Pomodoro',
-    icon:  '/icons/pomodoro.png',
+    icon:  `${import.meta.env.BASE_URL}icons/pomodoro.png`,
     route: '/apps/pomodoro',
   },
 ];
