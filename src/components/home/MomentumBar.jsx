@@ -44,7 +44,7 @@ export default function MomentumBar() {
         <div className="flex items-center gap-3">
           <div className="text-center">
             <div className="text-lg font-bold text-slate-800 leading-none">
-              {currentStreak > 0 ? `🔥 ${currentStreak}` : '—'}
+              {currentStreak > 0 ? `🔥 ${currentStreak}` : '-'}
             </div>
             <div className="text-[10px] text-slate-400 mt-0.5">streak</div>
           </div>
