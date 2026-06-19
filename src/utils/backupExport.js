@@ -77,7 +77,7 @@ export async function exportCsv() {
       for (const task of log.tasks) {
         let duration = '';
         if (task.taskType === 'pomodoro') {
-          duration = `${task.workMin ?? 25}-Work:${String(task.breakMin ?? 5).padStart(2, '0')}-Break:${task.sets ?? 4}-Sets`;
+          duration = `${task.workMin ?? 25}-Work:${String(task.breakMin ?? 5).padStart(2, '0')}-Break:${String(task.sets ?? 4).padStart(2, '0')}-Sets`;
         } else if (task.duration) {
           const mins = task.durationUnit === 'hrs' ? task.duration * 60 : task.duration;
           duration = `${mins}-Min`;
