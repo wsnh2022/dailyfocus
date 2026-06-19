@@ -32,11 +32,25 @@ export function useMidnightArchive() {
           // Same day — restore existing state, merging with templates to pick up any field changes
           const templates   = await getAllTasks();
           const templateMap = new Map(templates.map(t => [t.id, t]));
-          const tasks = (todayLog.tasks ?? []).map(t => {
+          const mergedTasks = (todayLog.tasks ?? []).map(t => {
             const tmpl = templateMap.get(t.id);
-            if (!tmpl) return t; // task deleted from templates — keep snapshot as-is
+            if (!tmpl) return t; // snapshot (pre-planned or deleted template) — keep as-is
             return { ...tmpl, completed: t.completed ?? false };
           });
+
+          let tasks = mergedTasks;
+          if (todayLog.prePlanned) {
+            // Pre-planned log: also add templates not already present so recurring tasks still appear
+            const existingIds = new Set(mergedTasks.map(t => t.id));
+            const missing = templates
+              .filter(t => !existingIds.has(t.id))
+              .map(t => ({ ...t, completed: false }));
+            tasks = [...mergedTasks, ...missing];
+            // Persist merged result and clear the prePlanned flag
+            const today = todayStr();
+            await saveLog({ ...todayLog, date: today, tasks, prePlanned: false });
+          }
+
           setTodayTasks(tasks);
           setTodayDayState(todayLog.dayState ?? 'active');
         } else {

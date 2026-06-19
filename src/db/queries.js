@@ -1,4 +1,5 @@
 import { db } from './schema';
+import { getISOWeek } from '../utils/dateHelpers';
 
 // --- Task Templates ---
 export const getAllTasks = () =>
@@ -44,6 +45,24 @@ export const getAllLogs = () =>
 
 export const getLastNLogs = (n) =>
   db.daily_logs.orderBy('date').reverse().limit(n).toArray();
+
+export const addTaskToDateLog = async (dateStr, taskData) => {
+  const existing = await getLogByDate(dateStr);
+  const task = {
+    ...taskData,
+    id: `pp_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    completed: false,
+  };
+  const tasks = [...(existing?.tasks ?? []), task];
+  return saveLog({
+    date:       dateStr,
+    dayState:   existing?.dayState  ?? 'active',
+    tasks,
+    weekNumber: existing?.weekNumber ?? getISOWeek(dateStr),
+    createdAt:  existing?.createdAt  ?? new Date().toISOString(),
+    prePlanned: true,
+  });
+};
 
 // --- Pomodoro Sessions ---
 export const addSession = (session) =>

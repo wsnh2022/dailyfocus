@@ -8,6 +8,12 @@ export function yesterdayStr() {
   return d.toISOString().split('T')[0];
 }
 
+export function tomorrowStr() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
 export function getISOWeek(dateStr) {
   const d = new Date(dateStr);
   d.setHours(0, 0, 0, 0);

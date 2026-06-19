@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { addTask, updateTask, deleteTask, saveLog } from '../../db/queries';
+import { useState, useRef, useEffect } from 'react';
+import { addTask, updateTask, deleteTask, saveLog, getAllTasks, addTaskToDateLog } from '../../db/queries';
 import { useAppStore } from '../../store/useAppStore';
-import { todayStr, getISOWeek } from '../../utils/dateHelpers';
+import { todayStr, tomorrowStr, getISOWeek } from '../../utils/dateHelpers';
 import { getColor } from '../../constants/colors';
 import ColorPicker from './ColorPicker';
 import TimerTypeSelect from './TimerTypeSelect';
@@ -34,6 +34,9 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
     });
   };
 
+  const today    = todayStr();
+  const tomorrow = tomorrowStr();
+
   const [name, setName]                     = useState(task?.name ?? '');
   const [emoji, setEmoji]                   = useState(task?.emoji ?? '🎯');
   const [color, setColor]                   = useState(task?.color ?? 'green');
@@ -44,6 +47,13 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [breakMin, setBreakMin]             = useState(task?.breakMin ?? 5);
   const [sets, setSets]                     = useState(task?.sets ?? 4);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [targetDate, setTargetDate]         = useState(today);
+  const [showDateInput, setShowDateInput]   = useState(false);
+  const [templates, setTemplates]           = useState([]);
+
+  useEffect(() => {
+    if (!isEdit) getAllTasks().then(setTemplates).catch(() => {});
+  }, [isEdit]);
 
   const emojiInputRef = useRef(null);
 
@@ -104,6 +114,16 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         sets:         taskType === 'pomodoro'  ? Number(sets) : null,
         sortOrder:    task?.sortOrder ?? nextSortOrder,
       };
+
+      if (targetDate !== today) {
+        // Future date — save only as a one-time snapshot to that day's log, no template created
+        await addTaskToDateLog(targetDate, data);
+        const label = targetDate === tomorrow ? 'tomorrow' : targetDate;
+        showToast(`Task added for ${label}`);
+        onSave();
+        return;
+      }
+
       if (isEdit) {
         await updateTask(task.id, data);
         showToast('Task updated');
@@ -144,6 +164,77 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       </div>
 
       <div className="space-y-5">
+        {/* Date selector — create mode only */}
+        {!isEdit && (
+          <div>
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Schedule for</label>
+            <div className="flex gap-2 mt-1">
+              {[
+                { label: 'Today',    value: today },
+                { label: 'Tomorrow', value: tomorrow },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => { setTargetDate(opt.value); setShowDateInput(false); }}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    targetDate === opt.value && !showDateInput
+                      ? 'bg-slate-800 text-white'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              <button
+                onClick={() => setShowDateInput(v => !v)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                  showDateInput ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
+                }`}
+              >
+                📅 Pick
+              </button>
+            </div>
+            {showDateInput && (
+              <input
+                type="date"
+                min={tomorrow}
+                value={targetDate === today || targetDate === tomorrow ? '' : targetDate}
+                onChange={e => e.target.value && setTargetDate(e.target.value)}
+                className="mt-2 w-full px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Template quick-pick — shown when scheduling for a future date */}
+        {!isEdit && targetDate !== today && templates.length > 0 && (
+          <div>
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Quick assign from your tasks</label>
+            <div className="flex gap-2 mt-1 overflow-x-auto pb-1 -mx-1 px-1">
+              {templates.map(tmpl => (
+                <button
+                  key={tmpl.id}
+                  onClick={() => {
+                    setName(tmpl.name);
+                    setEmoji(tmpl.emoji);
+                    setColor(tmpl.color);
+                    setTaskType(tmpl.taskType);
+                    if (tmpl.duration)     setDuration(tmpl.duration);
+                    if (tmpl.durationUnit) setDurationUnit(tmpl.durationUnit);
+                    if (tmpl.workMin)      setWorkMin(tmpl.workMin);
+                    if (tmpl.breakMin)     setBreakMin(tmpl.breakMin);
+                    if (tmpl.sets)         setSets(tmpl.sets);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 whitespace-nowrap shrink-0 active:bg-slate-100"
+                >
+                  <span>{tmpl.emoji}</span>
+                  <span className="font-medium">{tmpl.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Hidden input for native emoji keyboard — sr-only keeps it focusable but invisible */}
         <input
           ref={emojiInputRef}
@@ -247,7 +338,11 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           onClick={handleSave}
           className="w-full py-3.5 rounded-2xl bg-slate-800 text-white font-semibold text-sm active:scale-[0.98] transition-transform"
         >
-          {isEdit ? 'Save Changes' : 'Add Task'}
+          {isEdit
+            ? 'Save Changes'
+            : targetDate === today
+              ? 'Add Task'
+              : `Add for ${targetDate === tomorrow ? 'Tomorrow' : targetDate}`}
         </button>
 
         {isEdit && (
