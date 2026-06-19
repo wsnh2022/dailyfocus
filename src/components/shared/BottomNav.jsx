@@ -1,12 +1,17 @@
 import { NavLink } from 'react-router-dom';
+import { useAppStore } from '../../store/useAppStore';
 
 const tabs = [
-  { to: '/',        icon: '🏠', label: 'Home'     },
-  { to: '/history', icon: '📅', label: 'History'   },
-  { to: '/settings',icon: '⚙️', label: 'Settings'  },
+  { to: '/',        icon: '🏠', label: 'Home'    },
+  { to: '/apps',    icon: '🧩', label: 'Apps'    },
+  { to: '/history', icon: '📅', label: 'History' },
+  { to: '/settings',icon: '⚙️', label: 'Settings'},
 ];
 
 export default function BottomNav() {
+  const pomodoroRunning = useAppStore(s => s.pomodoroRunning);
+  if (pomodoroRunning) return null;
+
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-slate-200 z-50">
       <ul className="flex">
@@ -17,9 +22,7 @@ export default function BottomNav() {
               end={to === '/'}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center py-2 text-xs gap-0.5 transition-colors ${
-                  isActive
-                    ? 'text-slate-900 font-semibold'
-                    : 'text-slate-400'
+                  isActive ? 'text-slate-900 font-semibold' : 'text-slate-400'
                 }`
               }
             >

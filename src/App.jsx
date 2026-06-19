@@ -8,6 +8,8 @@ import HomeScreen from './components/home/HomeScreen';
 import EditorScreen from './components/editor/EditorScreen';
 import HistoryScreen from './components/history/HistoryScreen';
 import SettingsScreen from './components/settings/SettingsScreen';
+import AppsScreen from './components/apps/AppsScreen';
+import PomodoroApp from './components/apps/PomodoroApp';
 
 prewarmSpeech();
 
@@ -20,9 +22,11 @@ export default function App() {
             <Route path="/"           element={<HomeScreen />} />
             <Route path="/editor"     element={<EditorScreen />} />
             <Route path="/editor/:id" element={<EditorScreen />} />
-            <Route path="/history"    element={<HistoryScreen />} />
-            <Route path="/settings"   element={<SettingsScreen />} />
-            <Route path="*"           element={<Navigate to="/" replace />} />
+            <Route path="/apps"           element={<AppsScreen />} />
+            <Route path="/apps/pomodoro"  element={<PomodoroApp />} />
+            <Route path="/history"        element={<HistoryScreen />} />
+            <Route path="/settings"       element={<SettingsScreen />} />
+            <Route path="*"               element={<Navigate to="/" replace />} />
           </Routes>
           <BottomNav />
           <Toast />
