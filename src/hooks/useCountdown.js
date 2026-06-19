@@ -24,6 +24,14 @@ export function useCountdown(totalSeconds, onComplete) {
     remainingRef.current = totalSeconds;
   }, [totalSeconds]);
 
+  // Sync secondsLeft when totalSeconds changes (e.g. task data refreshed from archive)
+  useEffect(() => {
+    if (!isRunning) {
+      setSecondsLeft(totalSeconds);
+      remainingRef.current = totalSeconds;
+    }
+  }, [totalSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Recalculate elapsed time when screen wakes from lock
   useEffect(() => {
     const handleVisibility = () => {

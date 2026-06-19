@@ -199,7 +199,6 @@ function CheckboxCard({ task, onToggleComplete, dragListeners, dragAttributes })
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
-        <p className="text-sm text-slate-400 mt-0.5">{duration ? `${duration} ${durationUnit ?? 'min'}` : '—'}</p>
       </div>
       <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
     </SwipeCard>
