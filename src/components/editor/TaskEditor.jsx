@@ -48,7 +48,6 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [sets, setSets]                     = useState(task?.sets ?? 4);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [targetDate, setTargetDate]         = useState(initialTargetDate ?? today);
-  const [showDateInput, setShowDateInput]   = useState(false);
   const [templates, setTemplates]           = useState([]);
 
   useEffect(() => {
@@ -164,45 +163,17 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       </div>
 
       <div className="space-y-5">
-        {/* Date selector — create mode only */}
+        {/* Date label — create mode only */}
         {!isEdit && (
-          <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Schedule for</label>
-            <div className="flex gap-2 mt-1">
-              {[
-                { label: 'Today',    value: today },
-                { label: 'Tomorrow', value: tomorrow },
-              ].map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => { setTargetDate(opt.value); setShowDateInput(false); }}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                    targetDate === opt.value && !showDateInput
-                      ? 'bg-slate-800 text-white'
-                      : 'bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-              <button
-                onClick={() => setShowDateInput(v => !v)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  showDateInput ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                📅 Pick
-              </button>
-            </div>
-            {showDateInput && (
-              <input
-                type="date"
-                min={tomorrow}
-                value={targetDate === today || targetDate === tomorrow ? '' : targetDate}
-                onChange={e => e.target.value && setTargetDate(e.target.value)}
-                className="mt-2 w-full px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
-              />
-            )}
+          <div className="flex items-center gap-2">
+            <span className="text-base">📅</span>
+            <span className="text-sm font-medium text-slate-600">
+              {targetDate === today
+                ? 'Today'
+                : targetDate === tomorrow
+                  ? 'Tomorrow'
+                  : new Date(targetDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </span>
           </div>
         )}
 
