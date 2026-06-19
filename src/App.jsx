@@ -12,6 +12,7 @@ import AppsScreen from './components/apps/AppsScreen';
 import PomodoroApp from './components/apps/PomodoroApp';
 
 prewarmSpeech();
+navigator.storage?.persist();
 
 export default function App() {
   return (
