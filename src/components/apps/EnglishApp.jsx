@@ -555,7 +555,7 @@ export default function EnglishApp() {
             </div>
           </div>
 
-          {/* Spotlight gradient — dims text above and below reading zone */}
+          {/* Spotlight gradient - fades text above and below reading zone */}
           <div className="absolute inset-0 pointer-events-none" style={{
             background: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 15%, rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.9) 85%, rgba(0,0,0,1) 100%)',
             zIndex: 2,
@@ -602,7 +602,7 @@ export default function EnglishApp() {
         </div>
         <div className="px-4 space-y-3">
           <input value={inputTitle} onChange={e => setInputTitle(e.target.value)}
-            placeholder="Passage title (optional — auto-fills from filename)"
+            placeholder="Passage title (optional, auto-fills from filename)"
             className="w-full bg-white/5 rounded-xl px-3 py-2.5 text-sm text-white/90 placeholder-white/20 border border-white/5 focus:outline-none focus:border-white/25 transition-colors" />
           <textarea value={inputText} onChange={e => setInputText(e.target.value)}
             placeholder="Paste your English text here..."
@@ -826,7 +826,7 @@ export default function EnglishApp() {
         )}
       </div>
 
-      {/* FAB — hidden in select mode */}
+      {/* FAB - hidden in select mode */}
       {!selectMode && (
         <button onClick={() => setView('add')}
           className="fixed bottom-24 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 shadow-lg flex items-center justify-center transition-colors active:scale-95"
@@ -974,8 +974,8 @@ export default function EnglishApp() {
             </div>
             <div className="px-4 pt-2">
               {[
-                { icon: <FileEdit size={16} />,    label: 'Import .txt files',           sub: 'Pick one or more .txt files — works on Android',        color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => txtFilesInputRef.current?.click(), 320); } },
-                { icon: <FolderInput size={16} />, label: 'Import folder',               sub: 'Pick a folder — subfolders become app folders (desktop)', color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
+                { icon: <FileEdit size={16} />,    label: 'Import .txt files',  sub: 'Pick .txt files, works on Android',              color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => txtFilesInputRef.current?.click(), 320); } },
+                { icon: <FolderInput size={16} />, label: 'Import folder',      sub: 'Subfolders become app folders (desktop only)',    color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
                 { icon: <Download size={16} />,    label: 'Export backup',               sub: 'Save all passages & folders to a JSON file',             color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
                 { icon: <Upload size={16} />,      label: 'Import backup',               sub: 'Restore passages from a previously exported JSON',        color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
               ].map(item => (
