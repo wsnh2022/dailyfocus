@@ -62,9 +62,11 @@ export default function EnglishApp() {
     });
   };
 
-  const [wordsToday, setWordsToday] = useState(0);
-  const [passages,   setPassages]   = useState([]);
-  const [folders,    setFolders]    = useState([]);
+  const [wordsToday,     setWordsToday]     = useState(0);
+  const [passages,       setPassages]       = useState([]);
+  const [folders,        setFolders]        = useState([]);
+  const [importing,      setImporting]      = useState(false);
+  const [importingCount, setImportingCount] = useState(0);
 
   const [expandedFolders, setExpandedFolders] = useState(() => new Set(['uncategorized']));
   const [showNewFolder,   setShowNewFolder]   = useState(false);
@@ -783,16 +785,31 @@ export default function EnglishApp() {
       {/* Hidden file inputs */}
       <input ref={folderInputRef} type="file" multiple className="hidden" onChange={async e => {
         if (!e.target.files?.length) return;
+        setImporting(true); setImportingCount(e.target.files.length);
         await importFolder(e.target.files); e.target.value = '';
+        setImporting(false);
       }} />
       <input ref={txtFilesInputRef} type="file" accept=".txt,.text" multiple className="hidden" onChange={async e => {
         if (!e.target.files?.length) return;
+        setImporting(true); setImportingCount(e.target.files.length);
         await importFolder(e.target.files); e.target.value = '';
+        setImporting(false);
       }} />
       <input ref={backupInputRef} type="file" accept=".json" className="hidden" onChange={e => {
         const file = e.target.files[0]; if (!file) return;
         importEnglishBackup(file); e.target.value = '';
       }} />
+
+      {/* Import loading overlay */}
+      {importing && (
+        <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 200, background: 'rgba(0,0,0,0.75)' }}>
+          <div className="bg-gray-900 border border-white/10 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 mx-6">
+            <div className="w-7 h-7 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <p className="text-white text-sm font-semibold">Importing files…</p>
+            <p className="text-white/40 text-xs">{importingCount} file{importingCount !== 1 ? 's' : ''} selected</p>
+          </div>
+        </div>
+      )}
 
       {/* Library ··· bottom sheet */}
       {libraryMenuOpen && (
