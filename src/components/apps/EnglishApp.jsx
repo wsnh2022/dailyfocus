@@ -65,8 +65,9 @@ export default function EnglishApp() {
   const [wordsToday,     setWordsToday]     = useState(0);
   const [passages,       setPassages]       = useState([]);
   const [folders,        setFolders]        = useState([]);
-  const [importing,      setImporting]      = useState(false);
-  const [importingCount, setImportingCount] = useState(0);
+  const [importing,         setImporting]         = useState(false);
+  const [importingCount,    setImportingCount]    = useState(0);
+  const [importingProgress, setImportingProgress] = useState(0);
   const [selectMode,     setSelectMode]     = useState(false);
   const [selectedIds,    setSelectedIds]    = useState(() => new Set());
 
@@ -394,6 +395,8 @@ export default function EnglishApp() {
   const importFolder = async (files) => {
     const txtFiles = Array.from(files).filter(f => /\.(txt|text)$/i.test(f.name));
     if (txtFiles.length === 0) { showToast('No .txt files found in folder', 'error'); return; }
+    setImportingCount(txtFiles.length);
+    setImportingProgress(0);
     let idCounter = Date.now();
     const newFolders = [...folders];
     const folderIdByName = {};
@@ -411,8 +414,10 @@ export default function EnglishApp() {
     }
     const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
     const newPassages = [];
-    for (const file of txtFiles) {
+    for (let i = 0; i < txtFiles.length; i++) {
+      const file = txtFiles[i];
       const text = await file.text();
+      setImportingProgress(i + 1);
       const segments = file.webkitRelativePath.split('/');
       const title = file.name.replace(/\.[^/.]+$/, '').trim();
       if (existingTitles.has(title.toLowerCase())) continue;
@@ -854,13 +859,13 @@ export default function EnglishApp() {
       {/* Hidden file inputs */}
       <input ref={folderInputRef} type="file" multiple className="hidden" onChange={async e => {
         if (!e.target.files?.length) return;
-        setImporting(true); setImportingCount(e.target.files.length);
+        setImporting(true); setImportingProgress(0); setImportingCount(e.target.files.length);
         await importFolder(e.target.files); e.target.value = '';
         setImporting(false);
       }} />
       <input ref={txtFilesInputRef} type="file" accept=".txt,.text" multiple className="hidden" onChange={async e => {
         if (!e.target.files?.length) return;
-        setImporting(true); setImportingCount(e.target.files.length);
+        setImporting(true); setImportingProgress(0); setImportingCount(e.target.files.length);
         await importFolder(e.target.files); e.target.value = '';
         setImporting(false);
       }} />
@@ -872,10 +877,18 @@ export default function EnglishApp() {
       {/* Import loading overlay */}
       {importing && (
         <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 200, background: 'rgba(0,0,0,0.75)' }}>
-          <div className="bg-gray-900 border border-white/10 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 mx-6">
+          <div className="bg-gray-900 border border-white/10 rounded-2xl px-8 py-6 flex flex-col items-center gap-4 mx-6 w-64">
             <div className="w-7 h-7 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-            <p className="text-white text-sm font-semibold">Importing files…</p>
-            <p className="text-white/40 text-xs">{importingCount} file{importingCount !== 1 ? 's' : ''} selected</p>
+            <div className="w-full flex flex-col items-center gap-2">
+              <p className="text-white text-sm font-semibold">
+                Reading {importingProgress} of {importingCount}…
+              </p>
+              <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-400 rounded-full transition-all duration-150"
+                  style={{ width: `${importingCount > 0 ? (importingProgress / importingCount) * 100 : 0}%` }} />
+              </div>
+              <p className="text-white/30 text-xs">{importingCount} file{importingCount !== 1 ? 's' : ''} selected</p>
+            </div>
           </div>
         </div>
       )}
