@@ -71,7 +71,9 @@ export async function exportCsv() {
 
   const rows = [['Date', 'Day State', 'Task Name', 'Task Type', 'Duration', 'Completed']];
   for (const log of logs) {
-    if (!log.tasks?.length) {
+    if (log.dayState === 'rest' || log.dayState === 'pause') {
+      rows.push([log.date, log.dayState, '', '', '', '']);
+    } else if (!log.tasks?.length) {
       rows.push([log.date, log.dayState ?? '', '', '', '', '']);
     } else {
       for (const task of log.tasks) {
