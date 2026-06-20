@@ -93,6 +93,7 @@ export default function EnglishApp() {
   const [libraryMenuOpen,  setLibraryMenuOpen]  = useState(false);
   const [librarySheetOpen, setLibrarySheetOpen] = useState(false);
   const [confirmClearAll,  setConfirmClearAll]  = useState(false);
+  const [clearAllInput,    setClearAllInput]    = useState('');
 
   const [menuPassageId,       setMenuPassageId]       = useState(null);
   const [sheetOpen,           setSheetOpen]           = useState(false);
@@ -221,7 +222,7 @@ export default function EnglishApp() {
   };
   const closeLibraryMenu = () => {
     setLibrarySheetOpen(false);
-    setTimeout(() => { setLibraryMenuOpen(false); setConfirmClearAll(false); }, 280);
+    setTimeout(() => { setLibraryMenuOpen(false); setConfirmClearAll(false); setClearAllInput(''); }, 280);
   };
 
   const clearAllData = () => {
@@ -990,14 +991,23 @@ export default function EnglishApp() {
               ))}
               <div className="border-t border-white/8 mt-2 pt-2">
                 {confirmClearAll ? (
-                  <div className="px-3 py-3 space-y-2">
+                  <div className="px-3 py-3 space-y-3">
                     <p className="text-red-400 text-sm font-semibold">Delete all {passages.length} passage{passages.length !== 1 ? 's' : ''} and {folders.length} folder{folders.length !== 1 ? 's' : ''}?</p>
-                    <p className="text-white/30 text-xs">This cannot be undone. Export a backup first if needed.</p>
-                    <div className="flex gap-2 pt-1">
-                      <button onClick={() => setConfirmClearAll(false)}
+                    <p className="text-white/30 text-xs">Type <span className="text-white/60 font-bold">DELETE</span> to confirm. This cannot be undone.</p>
+                    <input
+                      autoFocus
+                      value={clearAllInput}
+                      onChange={e => setClearAllInput(e.target.value)}
+                      placeholder="Type DELETE to confirm"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-red-400/50 transition-colors"
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={() => { setConfirmClearAll(false); setClearAllInput(''); }}
                         className="flex-1 py-2 rounded-xl text-sm text-white/50 bg-white/5 hover:bg-white/10 transition-colors">Cancel</button>
-                      <button onClick={clearAllData}
-                        className="flex-1 py-2 rounded-xl text-sm font-semibold text-red-400 bg-red-400/15 hover:bg-red-400/25 active:bg-red-400/35 transition-colors">Delete all</button>
+                      <button onClick={clearAllData} disabled={clearAllInput !== 'DELETE'}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${clearAllInput === 'DELETE' ? 'text-red-400 bg-red-400/15 hover:bg-red-400/25 active:bg-red-400/35' : 'text-white/20 bg-white/5 cursor-not-allowed'}`}>
+                        Delete all
+                      </button>
                     </div>
                   </div>
                 ) : (
