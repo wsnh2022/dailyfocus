@@ -12,12 +12,8 @@ function countWords(text) {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
-function chunkText(text, size = 6) {
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  const chunks = [];
-  for (let i = 0; i < words.length; i += size)
-    chunks.push(words.slice(i, i + size).join(' '));
-  return chunks;
+function splitParagraphs(text) {
+  return text.split(/\n{2,}/).map(p => p.replace(/\n/g, ' ').trim()).filter(Boolean);
 }
 
 function generateTitle() {
@@ -87,8 +83,25 @@ export default function EnglishApp() {
   const speedRef       = useRef(speed);
   const folderInputRef = useRef(null);
   const backupInputRef = useRef(null);
+  const exitCalledRef  = useRef(false);
   useEffect(() => { speedRef.current = speed; }, [speed]);
   useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, []);
+
+  // Intercept hardware back button while in reading view
+  useEffect(() => {
+    if (view !== 'reading') return;
+    exitCalledRef.current = false;
+    window.history.pushState({ englishReading: true }, '');
+    const handler = () => {
+      if (exitCalledRef.current) return;
+      exitCalledRef.current = true;
+      setIsPlaying(false);
+      posRef.current = 0; setScrollProgress(0);
+      setView('home');
+    };
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, [view]);
 
   // animate sheet in after menuPassageId is set
   useEffect(() => {
@@ -185,10 +198,13 @@ export default function EnglishApp() {
   };
 
   const exitReader = () => {
+    if (exitCalledRef.current) return;
+    exitCalledRef.current = true;
     setIsPlaying(false);
     if (scrollProgress > 0.05) addWords(Math.round(countWords(content) * scrollProgress));
     posRef.current = 0; setScrollProgress(0);
     setView('home');
+    window.history.back(); // pop the dummy entry we pushed on entering reading
   };
 
   const createFolder = () => {
@@ -347,8 +363,8 @@ export default function EnglishApp() {
         </div>
         <div ref={scrollRef} className="flex-1 overflow-hidden" style={{ touchAction: 'none', userSelect: 'none' }}>
           <div style={{ paddingTop: '85vh', paddingBottom: '85vh', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
-            {chunkText(content).map((chunk, i) => (
-              <p key={i} className="text-white text-3xl font-extrabold text-center leading-snug mb-2 tracking-wide">{chunk}</p>
+            {splitParagraphs(content).map((para, i) => (
+              <p key={i} className="text-white text-xl font-bold text-center leading-relaxed mb-8 tracking-wide">{para}</p>
             ))}
           </div>
         </div>
