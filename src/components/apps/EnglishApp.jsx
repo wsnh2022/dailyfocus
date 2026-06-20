@@ -34,8 +34,9 @@ export default function EnglishApp() {
   const navigate   = useNavigate();
   const showToast  = useAppStore(s => s.showToast);
 
-  const [view,    setView]    = useState('home');
-  const [content, setContent] = useState('');
+  const [view,         setView]         = useState('home');
+  const [content,      setContent]      = useState('');
+  const [readingTitle, setReadingTitle] = useState('');
 
   // add-content form
   const [inputText,    setInputText]    = useState('');
@@ -200,6 +201,7 @@ export default function EnglishApp() {
   const startReading = (text, title, folderId) => {
     autoSavePassage(text, title ?? inputTitle, folderId ?? saveFolderId);
     setContent(text);
+    setReadingTitle(title ?? inputTitle ?? '');
     posRef.current = 0; setScrollProgress(0); setIsPlaying(false);
     setMenuPassageId(null);
     setView('reading');
@@ -360,9 +362,10 @@ export default function EnglishApp() {
   if (view === 'reading') {
     return (
       <div className="fixed inset-0 bg-black flex flex-col" style={{ zIndex: 100 }}>
-        <div className="shrink-0 px-4 pt-3 pb-1 flex items-center justify-between">
-          <button onClick={exitReader} className="text-white/40 hover:text-white/70 transition-colors text-xl">✕</button>
-          <div className="text-white/30 text-xs">{Math.round(scrollProgress * 100)}%</div>
+        <div className="shrink-0 px-4 pt-3 pb-1 flex items-center gap-3">
+          <button onClick={exitReader} className="text-white/40 hover:text-white/70 transition-colors text-xl shrink-0">✕</button>
+          <p className="flex-1 text-white/50 text-sm font-medium truncate">{readingTitle}</p>
+          <div className="text-white/30 text-xs shrink-0">{Math.round(scrollProgress * 100)}%</div>
         </div>
         <div ref={scrollRef} className="flex-1 overflow-hidden" style={{ touchAction: 'none', userSelect: 'none' }}>
           <div style={{ paddingTop: '85vh', paddingBottom: '85vh', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
