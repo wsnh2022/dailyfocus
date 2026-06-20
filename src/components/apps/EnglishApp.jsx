@@ -67,6 +67,8 @@ export default function EnglishApp() {
   const [folders,        setFolders]        = useState([]);
   const [importing,      setImporting]      = useState(false);
   const [importingCount, setImportingCount] = useState(0);
+  const [selectMode,     setSelectMode]     = useState(false);
+  const [selectedIds,    setSelectedIds]    = useState(() => new Set());
 
   const [expandedFolders, setExpandedFolders] = useState(() => new Set(['uncategorized']));
   const [showNewFolder,   setShowNewFolder]   = useState(false);
@@ -97,6 +99,7 @@ export default function EnglishApp() {
   const backupInputRef  = useRef(null);
   const txtFilesInputRef = useRef(null);
   const exitCalledRef   = useRef(false);
+  const longPressRef    = useRef(null);
   const pausePointsRef  = useRef([]);
   const nextPauseIdxRef = useRef(0);
   const pauseUntilRef   = useRef(0);
@@ -311,6 +314,31 @@ export default function EnglishApp() {
   };
 
   const deletePassage = (id) => { persistPassages(passages.filter(p => p.id !== id)); closeSheet(); };
+
+  const startLongPress = (id) => {
+    longPressRef.current = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(50);
+      setSelectMode(true);
+      setSelectedIds(new Set([id]));
+    }, 400);
+  };
+  const cancelLongPress = () => clearTimeout(longPressRef.current);
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+  const exitSelectMode = () => { setSelectMode(false); setSelectedIds(new Set()); };
+  const selectAll = () => setSelectedIds(new Set(passages.map(p => p.id)));
+  const deleteSelected = () => {
+    const count = selectedIds.size;
+    persistPassages(passages.filter(p => !selectedIds.has(p.id)));
+    exitSelectMode();
+    showToast(`Deleted ${count} passage${count !== 1 ? 's' : ''}`, 'success');
+  };
 
   const deleteFolder = (folderId, deleteContents = false) => {
     if (deleteContents) {
@@ -661,26 +689,44 @@ export default function EnglishApp() {
                   {isOpen && section.items.length === 0 && (
                     <p className="pl-10 pr-4 py-2.5 text-xs text-white/20 border-t border-white/5 italic">Empty folder</p>
                   )}
-                  {isOpen && section.items.map(p => (
-                    <div key={p.id} className="flex items-center gap-2 pl-10 pr-3 py-2.5 border-t border-white/5">
-                      <div className="flex-1 min-w-0">
-                        {editingId === p.id ? (
-                          <input autoFocus value={editingTitle}
-                            onChange={e => setEditingTitle(e.target.value)}
-                            onBlur={() => saveRename(p.id)}
-                            onKeyDown={e => { if (e.key === 'Enter') saveRename(p.id); if (e.key === 'Escape') setEditingId(null); }}
-                            className="w-full bg-white/10 rounded px-2 py-0.5 text-sm text-white border border-white/20 focus:outline-none" />
-                        ) : (
-                          <p className="text-sm text-white/80 truncate">{p.title}</p>
+                  {isOpen && section.items.map(p => {
+                    const isSelected = selectedIds.has(p.id);
+                    return (
+                      <div key={p.id}
+                        className={`flex items-center gap-2 pr-3 py-2.5 border-t border-white/5 transition-colors ${selectMode ? 'pl-4 cursor-pointer' : 'pl-10'} ${isSelected ? 'bg-red-400/8' : ''}`}
+                        onTouchStart={() => !selectMode && startLongPress(p.id)}
+                        onTouchEnd={cancelLongPress}
+                        onTouchMove={cancelLongPress}
+                        onClick={selectMode ? () => toggleSelect(p.id) : undefined}
+                      >
+                        {selectMode && (
+                          <div className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mr-1 transition-colors ${isSelected ? 'bg-red-400 border-red-400' : 'border-white/30'}`}>
+                            {isSelected && <span className="text-white font-bold" style={{ fontSize: '9px' }}>✓</span>}
+                          </div>
                         )}
-                        <p className="text-xs text-white/25 mt-0.5">{countWords(p.content)} words</p>
+                        <div className="flex-1 min-w-0">
+                          {!selectMode && editingId === p.id ? (
+                            <input autoFocus value={editingTitle}
+                              onChange={e => setEditingTitle(e.target.value)}
+                              onBlur={() => saveRename(p.id)}
+                              onKeyDown={e => { if (e.key === 'Enter') saveRename(p.id); if (e.key === 'Escape') setEditingId(null); }}
+                              className="w-full bg-white/10 rounded px-2 py-0.5 text-sm text-white border border-white/20 focus:outline-none" />
+                          ) : (
+                            <p className="text-sm text-white/80 truncate">{p.title}</p>
+                          )}
+                          <p className="text-xs text-white/25 mt-0.5">{countWords(p.content)} words</p>
+                        </div>
+                        {!selectMode && (
+                          <>
+                            <button onClick={e => { e.stopPropagation(); startReading(p.content, p.title, p.folderId); }}
+                              className="shrink-0 px-2.5 py-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg text-xs font-semibold transition-colors">▶</button>
+                            <button onClick={e => { e.stopPropagation(); setSheetOpen(false); setMovingId(null); setMenuPassageId(p.id); }}
+                              className="shrink-0 w-7 h-7 flex items-center justify-center text-white/25 hover:text-white/60 rounded-lg hover:bg-white/5 transition-colors text-sm tracking-widest">···</button>
+                          </>
+                        )}
                       </div>
-                      <button onClick={() => startReading(p.content, p.title, p.folderId)}
-                        className="shrink-0 px-2.5 py-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg text-xs font-semibold transition-colors">▶</button>
-                      <button onClick={() => { setSheetOpen(false); setMovingId(null); setMenuPassageId(p.id); }}
-                        className="shrink-0 w-7 h-7 flex items-center justify-center text-white/25 hover:text-white/60 rounded-lg hover:bg-white/5 transition-colors text-sm tracking-widest">···</button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               );
             })}
@@ -710,12 +756,35 @@ export default function EnglishApp() {
         )}
       </div>
 
-      {/* FAB */}
-      <button onClick={() => setView('add')}
-        className="fixed bottom-24 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 shadow-lg flex items-center justify-center transition-colors active:scale-95"
-        style={{ zIndex: 50, right: 'max(1.5rem, calc(50vw - 14rem + 1.5rem))' }}>
-        <span className="text-white text-2xl font-light leading-none">+</span>
-      </button>
+      {/* FAB — hidden in select mode */}
+      {!selectMode && (
+        <button onClick={() => setView('add')}
+          className="fixed bottom-24 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 shadow-lg flex items-center justify-center transition-colors active:scale-95"
+          style={{ zIndex: 50, right: 'max(1.5rem, calc(50vw - 14rem + 1.5rem))' }}>
+          <span className="text-white text-2xl font-light leading-none">+</span>
+        </button>
+      )}
+
+      {/* Multi-select action bar */}
+      {selectMode && (
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-white/10"
+          style={{ zIndex: 90, maxWidth: '448px', margin: '0 auto', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="flex items-center gap-2 px-4 py-3">
+            <button onClick={exitSelectMode}
+              className="text-white/50 text-sm font-medium px-3 py-2 rounded-xl hover:bg-white/5 transition-colors">
+              Cancel
+            </button>
+            <button onClick={selectAll}
+              className="flex-1 text-white/40 text-xs text-center py-2 hover:text-white/60 transition-colors">
+              Select all ({passages.length})
+            </button>
+            <button onClick={deleteSelected} disabled={selectedIds.size === 0}
+              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-colors ${selectedIds.size > 0 ? 'text-red-400 bg-red-400/10 active:bg-red-400/20' : 'text-white/20 bg-white/5'}`}>
+              Delete{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Passage ··· bottom sheet */}
       {menuPassage && (
