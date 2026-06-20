@@ -450,7 +450,8 @@ export default function EnglishApp() {
       }
     }
 
-    const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
+    // Deduplicate by title+folderId so same filename in different folders is allowed
+    const existingKeys = new Set(passages.map(p => `${p.title.toLowerCase()}|${p.folderId}`));
     const newPassages = [];
     let done = 0;
     const contents = await Promise.all(
@@ -460,9 +461,9 @@ export default function EnglishApp() {
       const file = txtFiles[i];
       const text = contents[i];
       const title = file.name.replace(/\.[^/.]+$/, '').trim();
-      if (existingTitles.has(title.toLowerCase())) continue;
       const key = getFolderKey(file);
       const folderId = key ? (folderIdByName[key.toLowerCase()] ?? null) : null;
+      if (existingKeys.has(`${title.toLowerCase()}|${folderId}`)) continue;
       newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
     }
     if (newFolders.length !== folders.length) persistFolders(newFolders);
