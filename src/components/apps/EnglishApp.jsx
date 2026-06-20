@@ -46,6 +46,15 @@ export default function EnglishApp() {
   const [speed,          setSpeed]          = useState(1.0);
   const [isPlaying,      setIsPlaying]      = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [fontSize,       setFontSize]       = useState(() => Number(localStorage.getItem('df_english_font_size') || 28));
+
+  const changeFontSize = (delta) => {
+    setFontSize(prev => {
+      const next = Math.min(48, Math.max(16, prev + delta));
+      localStorage.setItem('df_english_font_size', String(next));
+      return next;
+    });
+  };
 
   // data
   const [wordsToday, setWordsToday] = useState(0);
@@ -364,7 +373,7 @@ export default function EnglishApp() {
         <div ref={scrollRef} className="flex-1 overflow-hidden" style={{ touchAction: 'none', userSelect: 'none' }}>
           <div style={{ paddingTop: '85vh', paddingBottom: '85vh', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
             {splitParagraphs(content).map((para, i) => (
-              <p key={i} className="text-white text-xl font-bold text-center leading-relaxed mb-8 tracking-wide">{para}</p>
+              <p key={i} style={{ fontSize: `${fontSize}px` }} className="text-white font-bold text-center leading-relaxed mb-8 tracking-wide">{para}</p>
             ))}
           </div>
         </div>
@@ -372,10 +381,19 @@ export default function EnglishApp() {
           <div className="w-full h-0.5 bg-white/10 rounded-full overflow-hidden">
             <div className="h-full bg-white/60 rounded-full" style={{ width: `${scrollProgress * 100}%`, transition: 'width 0.2s linear' }} />
           </div>
-          <button onClick={() => setIsPlaying(p => !p)} className="w-14 h-14 rounded-full bg-white flex items-center justify-center active:scale-95 transition-transform">
-            <span className="text-black text-xl select-none">{isPlaying ? '⏸' : '▶'}</span>
-          </button>
-          <p className="text-white/30 text-xs">{wordsToday} / {goal} words today</p>
+          <div className="flex items-center gap-5">
+            <button onClick={() => changeFontSize(-2)}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center text-white/60 font-bold transition-colors select-none"
+              style={{ fontSize: '15px' }}>A−</button>
+            <button onClick={() => setIsPlaying(p => !p)}
+              className="w-14 h-14 rounded-full bg-white flex items-center justify-center active:scale-95 transition-transform">
+              <span className="text-black text-xl select-none">{isPlaying ? '⏸' : '▶'}</span>
+            </button>
+            <button onClick={() => changeFontSize(2)}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center text-white/60 font-bold transition-colors select-none"
+              style={{ fontSize: '17px' }}>A+</button>
+          </div>
+          <p className="text-white/30 text-xs">{wordsToday} / {goal} words today · {fontSize}px</p>
         </div>
       </div>
     );
