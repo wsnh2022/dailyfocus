@@ -359,7 +359,11 @@ export default function EnglishApp() {
   const selectAll = () => setSelectedIds(new Set(passages.map(p => p.id)));
   const deleteSelected = () => {
     const count = selectedIds.size;
-    persistPassages(passages.filter(p => !selectedIds.has(p.id)));
+    const remaining = passages.filter(p => !selectedIds.has(p.id));
+    const usedFolderIds = new Set(remaining.map(p => p.folderId).filter(Boolean));
+    const cleanedFolders = folders.filter(f => usedFolderIds.has(f.id));
+    if (cleanedFolders.length !== folders.length) persistFolders(cleanedFolders);
+    persistPassages(remaining);
     exitSelectMode();
     showToast(`Deleted ${count} passage${count !== 1 ? 's' : ''}`, 'success');
   };
