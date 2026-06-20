@@ -13,14 +13,28 @@ function countWords(text) {
 }
 
 function parseContent(text) {
-  return text.split(/\n{2,}/).map(block => {
+  const clean = text.replace(/^﻿/, ''); // strip Windows BOM
+  const BULLET = /^[-•*]\s/;
+  return clean.split(/\n{2,}/).flatMap(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    if (lines.length === 0) return null;
-    if (lines.every(l => /^-\s/.test(l))) {
-      return { type: 'list', items: lines.map(l => l.replace(/^-\s+/, '')) };
+    if (lines.length === 0) return [];
+    if (!lines.some(l => BULLET.test(l))) return [{ type: 'para', text: lines.join(' ') }];
+    // Split mixed blocks (title line + bullets) into separate para/list segments
+    const out = [];
+    let bullets = [], textLines = [];
+    for (const line of lines) {
+      if (BULLET.test(line)) {
+        if (textLines.length) { out.push({ type: 'para', text: textLines.join(' ') }); textLines = []; }
+        bullets.push(line.replace(/^[-•*]\s+/, ''));
+      } else {
+        if (bullets.length) { out.push({ type: 'list', items: [...bullets] }); bullets = []; }
+        textLines.push(line);
+      }
     }
-    return { type: 'para', text: lines.join(' ') };
-  }).filter(Boolean);
+    if (bullets.length) out.push({ type: 'list', items: bullets });
+    if (textLines.length) out.push({ type: 'para', text: textLines.join(' ') });
+    return out;
+  });
 }
 
 function generateTitle() {
@@ -433,20 +447,24 @@ export default function EnglishApp() {
 
     const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
     const newPassages = [];
+    // Read all files in parallel — much faster on Android storage
+    let done = 0;
+    const contents = await Promise.all(
+      txtFiles.map(f => f.text().then(t => { setImportingProgress(++done); return t.replace(/^﻿/, ''); }))
+    );
     for (let i = 0; i < txtFiles.length; i++) {
       const file = txtFiles[i];
-      const text = await file.text();
-      setImportingProgress(i + 1);
+      const text = contents[i];
       const segments = file.webkitRelativePath?.split('/') ?? [''];
       const title = file.name.replace(/\.[^/.]+$/, '').trim();
       if (existingTitles.has(title.toLowerCase())) continue;
       let folderId = null;
       if (!hasWebkitPaths) {
-        folderId = null; // no path info (Android plain picker) → Uncategorized
+        folderId = null;
       } else if (!hasSubfolderFiles) {
-        folderId = folderIdByName[segments[0].toLowerCase()] ?? null; // leaf: use root folder name
+        folderId = folderIdByName[segments[0].toLowerCase()] ?? null;
       } else {
-        folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null; // parent: use subfolder name
+        folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null;
       }
       newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
     }
