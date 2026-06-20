@@ -4,7 +4,7 @@ import { calculateStreaks } from '../../utils/streakCalc';
 import MonthCalendar from './MonthCalendar';
 import WeekView from './WeekView';
 
-const LEGEND = [
+export const LEGEND = [
   { color: 'bg-green-400',  label: 'Complete' },
   { color: 'bg-green-200',  label: 'Partial'  },
   { color: 'bg-red-300',    label: 'Missed'   },
@@ -12,6 +12,19 @@ const LEGEND = [
   { color: 'bg-amber-300',  label: 'Pause'    },
   { color: 'bg-violet-200', label: 'Planned'  },
 ];
+
+export function CalendarLegend() {
+  return (
+    <div className="flex items-center gap-x-3 gap-y-1.5 mt-3 mb-1 flex-wrap">
+      {LEGEND.map(({ color, label }) => (
+        <div key={label} className="flex items-center gap-1">
+          <div className={`w-2.5 h-2.5 rounded-sm ${color}`} />
+          <span className="text-[10px] text-slate-400">{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function HistoryScreen() {
   const [logs, setLogs]   = useState([]);
@@ -83,14 +96,6 @@ export default function HistoryScreen() {
           <WeekView logs={logs} />
         )}
 
-        <div className="flex items-center gap-x-3 gap-y-1.5 mt-4 flex-wrap">
-          {LEGEND.map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-1">
-              <div className={`w-2.5 h-2.5 rounded-sm ${color}`} />
-              <span className="text-[10px] text-slate-400">{label}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
     </div>

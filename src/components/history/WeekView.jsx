@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { todayStr } from '../../utils/dateHelpers';
+import { CalendarLegend } from './HistoryScreen';
 
 const DAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -175,6 +176,8 @@ export default function WeekView({ logs }) {
           </button>
         ))}
       </div>
+
+      <CalendarLegend />
 
       <div className="pt-4 border-t border-slate-100">
         <WeekTaskList days={days} logMap={logMap} />

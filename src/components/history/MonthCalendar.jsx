@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { todayStr } from '../../utils/dateHelpers';
+import { CalendarLegend } from './HistoryScreen';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_HEADERS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -187,6 +188,8 @@ export default function MonthCalendar({ logs, onSelectDay }) {
           )
         )}
       </div>
+
+      <CalendarLegend />
 
       {selectedDate ? (
         <InlineDayDetail
