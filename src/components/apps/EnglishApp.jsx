@@ -500,9 +500,13 @@ export default function EnglishApp() {
     sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
   );
 
+  const sortedFolders = [...folders].sort((a, b) =>
+    sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+  );
+
   const sections = [
     { id: 'uncategorized', name: 'Uncategorized', items: sortItems(passages.filter(p => !p.folderId)) },
-    ...folders.map(f => ({ id: f.id, name: f.name, items: sortItems(passages.filter(p => p.folderId === f.id)) })),
+    ...sortedFolders.map(f => ({ id: f.id, name: f.name, items: sortItems(passages.filter(p => p.folderId === f.id)) })),
   ].filter(s => s.id === 'uncategorized' ? s.items.length > 0 || folders.length === 0 : true);
 
   // ── Reading view ───────────────────────────────────────────
