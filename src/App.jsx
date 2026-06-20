@@ -10,6 +10,7 @@ import HistoryScreen from './components/history/HistoryScreen';
 import SettingsScreen from './components/settings/SettingsScreen';
 import AppsScreen from './components/apps/AppsScreen';
 import PomodoroApp from './components/apps/PomodoroApp';
+import EnglishApp from './components/apps/EnglishApp';
 
 prewarmSpeech();
 navigator.storage?.persist();
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/editor/:id" element={<EditorScreen />} />
             <Route path="/apps"           element={<AppsScreen />} />
             <Route path="/apps/pomodoro"  element={<PomodoroApp />} />
+            <Route path="/apps/english"   element={<EnglishApp />} />
             <Route path="/history"        element={<HistoryScreen />} />
             <Route path="/settings"       element={<SettingsScreen />} />
             <Route path="*"               element={<Navigate to="/" replace />} />

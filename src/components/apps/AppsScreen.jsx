@@ -7,6 +7,12 @@ const APPS = [
     icon:  `${import.meta.env.BASE_URL}icons/pomodoro.png`,
     route: '/apps/pomodoro',
   },
+  {
+    id:    'english',
+    name:  'English Reader',
+    emoji: '📖',
+    route: '/apps/english',
+  },
 ];
 
 export default function AppsScreen() {
@@ -22,7 +28,10 @@ export default function AppsScreen() {
             onClick={() => navigate(app.route)}
             className="bg-white rounded-2xl shadow-sm p-5 flex flex-col items-center gap-3 active:scale-95 transition-transform"
           >
-            <img src={app.icon} alt={app.name} className="w-16 h-16 rounded-2xl object-cover" />
+            {app.icon
+              ? <img src={app.icon} alt={app.name} className="w-16 h-16 rounded-2xl object-cover" />
+              : <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-4xl">{app.emoji}</div>
+            }
             <span className="text-sm font-semibold text-slate-700">{app.name}</span>
           </button>
         ))}
