@@ -290,21 +290,9 @@ export default function EnglishApp() {
   if (view === 'add') {
     return (
       <div className="min-h-screen bg-gray-950 text-white pb-10">
-        <div className="px-4 pt-6 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => { setView('home'); setEditingPassageId(null); }} className="text-white/50 hover:text-white/80 transition-colors text-lg">←</button>
-            <h1 className="text-lg font-bold">{editingPassageId ? 'Edit Content' : 'Add Content'}</h1>
-          </div>
-          {!editingPassageId && <label className="flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 active:bg-white/30 px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
-            📄 Load .txt
-            <input type="file" accept=".txt,.text" className="hidden" onChange={e => {
-              const file = e.target.files[0]; if (!file) return;
-              setInputTitle(file.name.replace(/\.[^/.]+$/, '').trim());
-              const reader = new FileReader();
-              reader.onload = ev => setInputText(ev.target.result || '');
-              reader.readAsText(file); e.target.value = '';
-            }} />
-          </label>}
+        <div className="px-4 pt-6 pb-4 flex items-center gap-3">
+          <button onClick={() => { setView('home'); setEditingPassageId(null); }} className="text-white/50 hover:text-white/80 transition-colors text-lg">←</button>
+          <h1 className="text-lg font-bold">{editingPassageId ? 'Edit Content' : 'Add Content'}</h1>
         </div>
         <div className="px-4 space-y-3">
           <input value={inputTitle} onChange={e => setInputTitle(e.target.value)}
@@ -345,15 +333,13 @@ export default function EnglishApp() {
           </div>
           {inputText.trim() && (
             <div className="flex gap-2">
-              {editingPassageId && (
-                <button onClick={() => { autoSavePassage(inputText, inputTitle, saveFolderId); setEditingPassageId(null); setInputTitle(''); setInputText(''); setView('home'); }}
-                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl font-bold text-sm text-white transition-colors">
-                  Save changes
-                </button>
-              )}
+              <button onClick={() => { autoSavePassage(inputText, inputTitle, saveFolderId); setEditingPassageId(null); setInputTitle(''); setInputText(''); setView('home'); }}
+                className="flex-1 py-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl font-bold text-sm text-white transition-colors">
+                {editingPassageId ? 'Save changes' : 'Save'}
+              </button>
               <button onClick={() => { startReading(inputText, inputTitle, saveFolderId); setInputTitle(''); setEditingPassageId(null); }}
                 className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 rounded-xl font-bold text-sm transition-colors">
-                ▶ Start Reading · {countWords(inputText)} words
+                ▶ Read · {countWords(inputText)} words
               </button>
             </div>
           )}
