@@ -387,12 +387,12 @@ export default function EnglishApp() {
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center text-white/60 font-bold transition-colors select-none"
               style={{ fontSize: '17px' }}>A+</button>
           </div>
-          <div className="w-full flex items-center gap-3 px-1">
-            <span className="text-white/25 text-xs shrink-0">Speed</span>
-            <input type="range" min="0.1" max="2.0" step="0.05" value={speed}
-              onChange={e => setSpeed(Number(e.target.value))}
-              className="flex-1 accent-white h-1 cursor-pointer" />
-            <span className="text-white/40 text-xs shrink-0 w-8 text-right">{speed.toFixed(2)}×</span>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSpeed(s => Math.max(0.1, +( s - 0.1).toFixed(1)))}
+              className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 active:bg-white/20 flex items-center justify-center text-white/40 hover:text-white/70 text-lg transition-colors select-none">−</button>
+            <span className="text-white/35 text-xs w-16 text-center">{speed.toFixed(1)}× speed</span>
+            <button onClick={() => setSpeed(s => Math.min(2.0, +(s + 0.1).toFixed(1)))}
+              className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 active:bg-white/20 flex items-center justify-center text-white/40 hover:text-white/70 text-lg transition-colors select-none">+</button>
           </div>
           <p className="text-white/25 text-xs">{wordsToday} / {goal} words today · {fontSize}px</p>
         </div>
