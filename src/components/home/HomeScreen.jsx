@@ -35,6 +35,7 @@ export default function HomeScreen() {
   const { loading } = useMidnightArchive();
 
   const todayTasks           = useAppStore(s => s.todayTasks);
+  const todayDayState        = useAppStore(s => s.todayDayState);
   const setTodayTasks        = useAppStore(s => s.setTodayTasks);
   const updateTaskCompletion = useAppStore(s => s.updateTaskCompletion);
   const showToast            = useAppStore(s => s.showToast);
@@ -144,8 +145,23 @@ export default function HomeScreen() {
 
       {isToday && <DayStateButton />}
 
+      {/* ── Rest / Pause screen ── */}
+      {isToday && (todayDayState === 'rest' || todayDayState === 'pause') && (
+        <div className="text-center py-16">
+          <div className="text-5xl mb-4">{todayDayState === 'rest' ? '🌿' : '⏸️'}</div>
+          <p className="text-slate-700 font-semibold mb-1">
+            {todayDayState === 'rest' ? 'Rest Day' : 'Pause Day'}
+          </p>
+          <p className="text-sm text-slate-400">
+            {todayDayState === 'rest'
+              ? 'Recharge today. Tasks resume tomorrow.'
+              : 'Taking a break. See you soon.'}
+          </p>
+        </div>
+      )}
+
       {/* ── Today view ── */}
-      {isToday && (todayTasks.length === 0 ? (
+      {isToday && todayDayState === 'active' && (todayTasks.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-5xl mb-4">🎯</div>
           <p className="text-slate-500 font-medium mb-1">No tasks yet.</p>
@@ -158,6 +174,7 @@ export default function HomeScreen() {
           </button>
         </div>
       ) : (() => {
+
         const pendingTasks   = todayTasks.filter(t => !t.completed);
         const completedTasks = todayTasks.filter(t =>  t.completed);
         return (
