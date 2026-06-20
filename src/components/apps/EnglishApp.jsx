@@ -61,6 +61,10 @@ export default function EnglishApp() {
   const [showNewFolder,   setShowNewFolder]   = useState(false);
   const [newFolderName,   setNewFolderName]   = useState('');
 
+  // library menu sheet
+  const [libraryMenuOpen,  setLibraryMenuOpen]  = useState(false);
+  const [librarySheetOpen, setLibrarySheetOpen] = useState(false);
+
   // passage actions
   const [menuPassageId, setMenuPassageId] = useState(null);
   const [sheetOpen,     setSheetOpen]     = useState(false);
@@ -78,10 +82,11 @@ export default function EnglishApp() {
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput,   setGoalInput]   = useState('');
 
-  const scrollRef    = useRef(null);
-  const posRef       = useRef(0);
-  const speedRef     = useRef(speed);
+  const scrollRef      = useRef(null);
+  const posRef         = useRef(0);
+  const speedRef       = useRef(speed);
   const folderInputRef = useRef(null);
+  const backupInputRef = useRef(null);
   useEffect(() => { speedRef.current = speed; }, [speed]);
   useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, []);
 
@@ -96,6 +101,15 @@ export default function EnglishApp() {
   const closeSheet = () => {
     setSheetOpen(false);
     setTimeout(() => { setMenuPassageId(null); setMovingId(null); setCopyingId(null); }, 280);
+  };
+
+  const openLibraryMenu = () => {
+    setLibraryMenuOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setLibrarySheetOpen(true)));
+  };
+  const closeLibraryMenu = () => {
+    setLibrarySheetOpen(false);
+    setTimeout(() => setLibraryMenuOpen(false), 280);
   };
 
   // ── Hydrate ────────────────────────────────────────────────
@@ -419,10 +433,14 @@ export default function EnglishApp() {
       {/* Header */}
       <div className="px-4 pt-6 pb-4 flex items-center gap-3">
         <button onClick={() => navigate('/apps')} className="text-white/50 hover:text-white/80 transition-colors text-lg">←</button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-lg font-bold leading-tight">English Reader</h1>
           <p className="text-white/40 text-xs">Teleprompter reading practice</p>
         </div>
+        <button onClick={openLibraryMenu}
+          className="w-9 h-9 flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 rounded-xl transition-colors text-lg tracking-widest">
+          ···
+        </button>
       </div>
 
       <div className="px-4 space-y-4">
@@ -452,35 +470,6 @@ export default function EnglishApp() {
             <div className="h-full bg-emerald-400 rounded-full transition-all duration-500" style={{ width: `${goalPct}%` }} />
           </div>
           {goalPct >= 100 && <p className="text-emerald-400 text-xs text-center mt-1.5 font-medium">Goal reached today!</p>}
-        </div>
-
-        {/* Import .txt folder */}
-        <button onClick={() => folderInputRef.current?.click()}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 active:bg-emerald-500/25 rounded-xl text-xs text-emerald-400/70 hover:text-emerald-400 transition-colors">
-          <FolderInput size={13} />
-          Import folder of .txt files
-        </button>
-        <input ref={folderInputRef} type="file" multiple className="hidden" onChange={async e => {
-          if (!e.target.files?.length) return;
-          await importFolder(e.target.files);
-          e.target.value = '';
-        }} />
-
-        {/* Backup row */}
-        <div className="flex gap-2">
-          <button onClick={exportEnglishBackup}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl text-xs text-white/35 hover:text-white/60 transition-colors">
-            <Download size={12} />
-            Export backup
-          </button>
-          <label className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer">
-            <Upload size={12} />
-            Import backup
-            <input type="file" accept=".json" className="hidden" onChange={e => {
-              const file = e.target.files[0]; if (!file) return;
-              importEnglishBackup(file); e.target.value = '';
-            }} />
-          </label>
         </div>
 
         {/* Empty state */}
@@ -689,6 +678,47 @@ export default function EnglishApp() {
                 ))}
               </div>
             )}
+          </div>
+        </>
+      )}
+
+      {/* Hidden file inputs */}
+      <input ref={folderInputRef} type="file" multiple className="hidden" onChange={async e => {
+        if (!e.target.files?.length) return;
+        await importFolder(e.target.files); e.target.value = '';
+      }} />
+      <input ref={backupInputRef} type="file" accept=".json" className="hidden" onChange={e => {
+        const file = e.target.files[0]; if (!file) return;
+        importEnglishBackup(file); e.target.value = '';
+      }} />
+
+      {/* Library ··· bottom sheet */}
+      {libraryMenuOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/60 transition-opacity duration-300"
+            style={{ zIndex: 60, opacity: librarySheetOpen ? 1 : 0 }}
+            onClick={closeLibraryMenu} />
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-900 rounded-t-2xl pb-10 transition-transform duration-300 ease-out"
+            style={{ zIndex: 70, maxWidth: '448px', margin: '0 auto', transform: librarySheetOpen ? 'translateY(0)' : 'translateY(100%)' }}>
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-white/20 rounded-full" />
+            </div>
+            <div className="px-5 py-2 border-b border-white/10">
+              <p className="text-white/40 text-xs font-medium">Library options</p>
+            </div>
+            <div className="px-4 pt-2">
+              {[
+                { icon: <FolderInput size={16} />, label: 'Import folder of .txt files', color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
+                { icon: <Download size={16} />,    label: 'Export backup',               color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
+                { icon: <Upload size={16} />,      label: 'Import backup',               color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
+              ].map(item => (
+                <button key={item.label} onClick={item.action}
+                  className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl text-sm ${item.color} hover:bg-white/5 active:bg-white/10 transition-colors`}>
+                  <span className="w-5 flex items-center justify-center shrink-0">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </>
       )}
