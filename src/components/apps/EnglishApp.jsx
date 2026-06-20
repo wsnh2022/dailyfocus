@@ -92,6 +92,7 @@ export default function EnglishApp() {
 
   const [libraryMenuOpen,  setLibraryMenuOpen]  = useState(false);
   const [librarySheetOpen, setLibrarySheetOpen] = useState(false);
+  const [confirmClearAll,  setConfirmClearAll]  = useState(false);
 
   const [menuPassageId,       setMenuPassageId]       = useState(null);
   const [sheetOpen,           setSheetOpen]           = useState(false);
@@ -220,7 +221,14 @@ export default function EnglishApp() {
   };
   const closeLibraryMenu = () => {
     setLibrarySheetOpen(false);
-    setTimeout(() => setLibraryMenuOpen(false), 280);
+    setTimeout(() => { setLibraryMenuOpen(false); setConfirmClearAll(false); }, 280);
+  };
+
+  const clearAllData = () => {
+    persistPassages([]);
+    persistFolders([]);
+    closeLibraryMenu();
+    showToast('All files and folders deleted', 'success');
   };
 
   // Hydrate
@@ -975,6 +983,29 @@ export default function EnglishApp() {
                   </span>
                 </button>
               ))}
+              <div className="border-t border-white/8 mt-2 pt-2">
+                {confirmClearAll ? (
+                  <div className="px-3 py-3 space-y-2">
+                    <p className="text-red-400 text-sm font-semibold">Delete all {passages.length} passage{passages.length !== 1 ? 's' : ''} and {folders.length} folder{folders.length !== 1 ? 's' : ''}?</p>
+                    <p className="text-white/30 text-xs">This cannot be undone. Export a backup first if needed.</p>
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={() => setConfirmClearAll(false)}
+                        className="flex-1 py-2 rounded-xl text-sm text-white/50 bg-white/5 hover:bg-white/10 transition-colors">Cancel</button>
+                      <button onClick={clearAllData}
+                        className="flex-1 py-2 rounded-xl text-sm font-semibold text-red-400 bg-red-400/15 hover:bg-red-400/25 active:bg-red-400/35 transition-colors">Delete all</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => setConfirmClearAll(true)}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-red-400/5 active:bg-red-400/10 transition-colors">
+                    <span className="w-5 flex items-center justify-center shrink-0 text-red-400"><Trash2 size={16} /></span>
+                    <span className="flex flex-col items-start gap-0.5">
+                      <span className="text-sm text-red-400">Delete all files &amp; folders</span>
+                      <span className="text-xs text-white/30">Permanently removes all passages and folders</span>
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </>
