@@ -431,10 +431,11 @@ export default function EnglishApp() {
         folderIdByName[rootName.toLowerCase()] = id;
       }
     } else if (hasSubfolderFiles) {
-      // Parent folder selected — create app folders for each immediate subfolder
+      // Parent folder selected — create app folder for each unique IMMEDIATE PARENT of .txt files
+      // Use segments[length-2] so any depth works: depth-3 → segments[1], depth-4 → segments[2], etc.
       const subfolderNames = [...new Set(
         txtFiles.filter(f => f.webkitRelativePath.split('/').length >= 3)
-                 .map(f => f.webkitRelativePath.split('/')[1])
+                 .map(f => { const s = f.webkitRelativePath.split('/'); return s[s.length - 2]; })
       )];
       for (const name of subfolderNames) {
         if (!folderIdByName[name.toLowerCase()]) {
@@ -464,7 +465,9 @@ export default function EnglishApp() {
       } else if (!hasSubfolderFiles) {
         folderId = folderIdByName[segments[0].toLowerCase()] ?? null;
       } else {
-        folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null;
+        // Use immediate parent folder (segments[-2]) regardless of depth
+        const parentName = segments.length >= 3 ? segments[segments.length - 2] : null;
+        folderId = parentName ? (folderIdByName[parentName.toLowerCase()] ?? null) : null;
       }
       newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
     }
