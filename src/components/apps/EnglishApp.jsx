@@ -348,7 +348,7 @@ export default function EnglishApp() {
         <div ref={scrollRef} className="flex-1 overflow-hidden" style={{ touchAction: 'none', userSelect: 'none' }}>
           <div style={{ paddingTop: '85vh', paddingBottom: '85vh', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
             {chunkText(content).map((chunk, i) => (
-              <p key={i} className="text-white text-3xl font-extrabold text-center leading-snug mb-8 tracking-wide">{chunk}</p>
+              <p key={i} className="text-white text-3xl font-extrabold text-center leading-snug mb-2 tracking-wide">{chunk}</p>
             ))}
           </div>
         </div>
