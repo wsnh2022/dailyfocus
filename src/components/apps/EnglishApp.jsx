@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pencil, FileEdit, FolderInput, Copy, Download, Trash2 } from 'lucide-react';
+import { Play, Pencil, FileEdit, FolderInput, Copy, Download, Upload, Trash2 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
 const PASSAGES_KEY = 'df_english_passages';
@@ -243,6 +243,31 @@ export default function EnglishApp() {
     setGoal(val); localStorage.setItem(GOAL_KEY, String(val)); setEditingGoal(false);
   };
 
+  const exportEnglishBackup = () => {
+    const backup = { version: 1, exportedAt: new Date().toISOString(), passages, folders, goal };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `english-reader-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Backed up ${passages.length} passages`, 'success');
+  };
+
+  const importEnglishBackup = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.version !== 1 || !Array.isArray(data.passages)) { showToast('Invalid backup file', 'error'); return; }
+        persistPassages(data.passages);
+        persistFolders(Array.isArray(data.folders) ? data.folders : []);
+        if (data.goal) { setGoal(data.goal); localStorage.setItem(GOAL_KEY, String(data.goal)); }
+        showToast(`Restored ${data.passages.length} passages`, 'success');
+      } catch { showToast('Could not read backup file', 'error'); }
+    };
+    reader.readAsText(file);
+  };
+
   const goalPct      = Math.min((wordsToday / goal) * 100, 100);
   const menuPassage  = menuPassageId ? passages.find(p => p.id === menuPassageId) : null;
 
@@ -387,6 +412,23 @@ export default function EnglishApp() {
             <div className="h-full bg-emerald-400 rounded-full transition-all duration-500" style={{ width: `${goalPct}%` }} />
           </div>
           {goalPct >= 100 && <p className="text-emerald-400 text-xs text-center mt-1.5 font-medium">Goal reached today!</p>}
+        </div>
+
+        {/* Backup row */}
+        <div className="flex gap-2">
+          <button onClick={exportEnglishBackup}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl text-xs text-white/35 hover:text-white/60 transition-colors">
+            <Download size={12} />
+            Export backup
+          </button>
+          <label className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer">
+            <Upload size={12} />
+            Import backup
+            <input type="file" accept=".json" className="hidden" onChange={e => {
+              const file = e.target.files[0]; if (!file) return;
+              importEnglishBackup(file); e.target.value = '';
+            }} />
+          </label>
         </div>
 
         {/* Empty state */}
