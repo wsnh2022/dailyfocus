@@ -401,27 +401,53 @@ export default function EnglishApp() {
     const newFolders = [...folders];
     const folderIdByName = {};
     folders.forEach(f => { folderIdByName[f.name.toLowerCase()] = f.id; });
-    const subfolderNames = [...new Set(
-      txtFiles.filter(f => f.webkitRelativePath.split('/').length >= 3)
-               .map(f => f.webkitRelativePath.split('/')[1])
-    )];
-    for (const name of subfolderNames) {
-      if (!folderIdByName[name.toLowerCase()]) {
+
+    // Detect if files have webkit path info at all
+    const hasWebkitPaths = txtFiles.some(f => f.webkitRelativePath?.includes('/'));
+    // Detect if user selected a parent folder (has subfolders = depth >= 3)
+    // vs a leaf folder (all files at depth 2 = directly inside selected folder)
+    const hasSubfolderFiles = hasWebkitPaths && txtFiles.some(f => f.webkitRelativePath.split('/').length >= 3);
+
+    if (hasWebkitPaths && !hasSubfolderFiles) {
+      // Leaf folder selected — create one app folder named after the selected folder
+      const rootName = txtFiles[0].webkitRelativePath.split('/')[0];
+      if (rootName && !folderIdByName[rootName.toLowerCase()]) {
         const id = idCounter++;
-        newFolders.push({ id, name });
-        folderIdByName[name.toLowerCase()] = id;
+        newFolders.push({ id, name: rootName });
+        folderIdByName[rootName.toLowerCase()] = id;
+      }
+    } else if (hasSubfolderFiles) {
+      // Parent folder selected — create app folders for each immediate subfolder
+      const subfolderNames = [...new Set(
+        txtFiles.filter(f => f.webkitRelativePath.split('/').length >= 3)
+                 .map(f => f.webkitRelativePath.split('/')[1])
+      )];
+      for (const name of subfolderNames) {
+        if (!folderIdByName[name.toLowerCase()]) {
+          const id = idCounter++;
+          newFolders.push({ id, name });
+          folderIdByName[name.toLowerCase()] = id;
+        }
       }
     }
+
     const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
     const newPassages = [];
     for (let i = 0; i < txtFiles.length; i++) {
       const file = txtFiles[i];
       const text = await file.text();
       setImportingProgress(i + 1);
-      const segments = file.webkitRelativePath.split('/');
+      const segments = file.webkitRelativePath?.split('/') ?? [''];
       const title = file.name.replace(/\.[^/.]+$/, '').trim();
       if (existingTitles.has(title.toLowerCase())) continue;
-      const folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null;
+      let folderId = null;
+      if (!hasWebkitPaths) {
+        folderId = null; // no path info (Android plain picker) → Uncategorized
+      } else if (!hasSubfolderFiles) {
+        folderId = folderIdByName[segments[0].toLowerCase()] ?? null; // leaf: use root folder name
+      } else {
+        folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null; // parent: use subfolder name
+      }
       newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
     }
     if (newFolders.length !== folders.length) persistFolders(newFolders);
