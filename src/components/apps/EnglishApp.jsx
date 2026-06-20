@@ -93,6 +93,7 @@ export default function EnglishApp() {
   const speedRef        = useRef(speed);
   const folderInputRef  = useRef(null);
   const backupInputRef  = useRef(null);
+  const txtFilesInputRef = useRef(null);
   const exitCalledRef   = useRef(false);
   const pausePointsRef  = useRef([]);
   const nextPauseIdxRef = useRef(0);
@@ -784,6 +785,10 @@ export default function EnglishApp() {
         if (!e.target.files?.length) return;
         await importFolder(e.target.files); e.target.value = '';
       }} />
+      <input ref={txtFilesInputRef} type="file" accept=".txt,.text" multiple className="hidden" onChange={async e => {
+        if (!e.target.files?.length) return;
+        await importFolder(e.target.files); e.target.value = '';
+      }} />
       <input ref={backupInputRef} type="file" accept=".json" className="hidden" onChange={e => {
         const file = e.target.files[0]; if (!file) return;
         importEnglishBackup(file); e.target.value = '';
@@ -805,9 +810,10 @@ export default function EnglishApp() {
             </div>
             <div className="px-4 pt-2">
               {[
-                { icon: <FolderInput size={16} />, label: 'Import folder of .txt files', sub: 'Pick a device folder — subfolders become app folders', color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
-                { icon: <Download size={16} />,    label: 'Export backup',               sub: 'Save all passages & folders to a JSON file',           color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
-                { icon: <Upload size={16} />,      label: 'Import backup',               sub: 'Restore passages from a previously exported JSON',      color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
+                { icon: <FileEdit size={16} />,    label: 'Import .txt files',           sub: 'Pick one or more .txt files — works on Android',        color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => txtFilesInputRef.current?.click(), 320); } },
+                { icon: <FolderInput size={16} />, label: 'Import folder',               sub: 'Pick a folder — subfolders become app folders (desktop)', color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
+                { icon: <Download size={16} />,    label: 'Export backup',               sub: 'Save all passages & folders to a JSON file',             color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
+                { icon: <Upload size={16} />,      label: 'Import backup',               sub: 'Restore passages from a previously exported JSON',        color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
               ].map(item => (
                 <button key={item.label} onClick={item.action}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors">
