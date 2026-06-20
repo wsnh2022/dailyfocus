@@ -122,7 +122,7 @@ export default function EnglishApp() {
   const lastTouchYRef   = useRef(0);
 
   useEffect(() => { speedRef.current = speed; }, [speed]);
-  useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, []);
+  useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, [view]);
 
   // Hardware back button interception in reading view
   useEffect(() => {
