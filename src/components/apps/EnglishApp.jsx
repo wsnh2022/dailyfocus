@@ -78,10 +78,12 @@ export default function EnglishApp() {
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput,   setGoalInput]   = useState('');
 
-  const scrollRef = useRef(null);
-  const posRef    = useRef(0);
-  const speedRef  = useRef(speed);
+  const scrollRef    = useRef(null);
+  const posRef       = useRef(0);
+  const speedRef     = useRef(speed);
+  const folderInputRef = useRef(null);
   useEffect(() => { speedRef.current = speed; }, [speed]);
+  useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, []);
 
   // animate sheet in after menuPassageId is set
   useEffect(() => {
@@ -241,6 +243,44 @@ export default function EnglishApp() {
   const saveGoal = () => {
     const val = Math.max(1, Number(goalInput) || goal);
     setGoal(val); localStorage.setItem(GOAL_KEY, String(val)); setEditingGoal(false);
+  };
+
+  const importFolder = async (files) => {
+    const txtFiles = Array.from(files).filter(f => /\.(txt|text)$/i.test(f.name));
+    if (txtFiles.length === 0) { showToast('No .txt files found in folder', 'error'); return; }
+
+    let idCounter = Date.now();
+    const newFolders = [...folders];
+    const folderIdByName = {};
+    folders.forEach(f => { folderIdByName[f.name.toLowerCase()] = f.id; });
+
+    const subfolderNames = [...new Set(
+      txtFiles
+        .filter(f => f.webkitRelativePath.split('/').length >= 3)
+        .map(f => f.webkitRelativePath.split('/')[1])
+    )];
+    for (const name of subfolderNames) {
+      if (!folderIdByName[name.toLowerCase()]) {
+        const id = idCounter++;
+        newFolders.push({ id, name });
+        folderIdByName[name.toLowerCase()] = id;
+      }
+    }
+
+    const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
+    const newPassages = [];
+    for (const file of txtFiles) {
+      const text = await file.text();
+      const segments = file.webkitRelativePath.split('/');
+      const title = file.name.replace(/\.[^/.]+$/, '').trim();
+      if (existingTitles.has(title.toLowerCase())) continue;
+      const folderId = segments.length >= 3 ? (folderIdByName[segments[1].toLowerCase()] ?? null) : null;
+      newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
+    }
+
+    if (newFolders.length !== folders.length) persistFolders(newFolders);
+    persistPassages([...newPassages, ...passages]);
+    showToast(`Imported ${newPassages.length} of ${txtFiles.length} files`, 'success');
   };
 
   const exportEnglishBackup = () => {
@@ -413,6 +453,18 @@ export default function EnglishApp() {
           </div>
           {goalPct >= 100 && <p className="text-emerald-400 text-xs text-center mt-1.5 font-medium">Goal reached today!</p>}
         </div>
+
+        {/* Import .txt folder */}
+        <button onClick={() => folderInputRef.current?.click()}
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 active:bg-emerald-500/25 rounded-xl text-xs text-emerald-400/70 hover:text-emerald-400 transition-colors">
+          <FolderInput size={13} />
+          Import folder of .txt files
+        </button>
+        <input ref={folderInputRef} type="file" multiple className="hidden" onChange={async e => {
+          if (!e.target.files?.length) return;
+          await importFolder(e.target.files);
+          e.target.value = '';
+        }} />
 
         {/* Backup row */}
         <div className="flex gap-2">
