@@ -708,14 +708,17 @@ export default function EnglishApp() {
             </div>
             <div className="px-4 pt-2">
               {[
-                { icon: <FolderInput size={16} />, label: 'Import folder of .txt files', color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
-                { icon: <Download size={16} />,    label: 'Export backup',               color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
-                { icon: <Upload size={16} />,      label: 'Import backup',               color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
+                { icon: <FolderInput size={16} />, label: 'Import folder of .txt files', sub: 'Pick a device folder — subfolders become app folders', color: 'text-emerald-400', action: () => { closeLibraryMenu(); setTimeout(() => folderInputRef.current?.click(), 320); } },
+                { icon: <Download size={16} />,    label: 'Export backup',               sub: 'Save all passages & folders to a JSON file',           color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(exportEnglishBackup, 320); } },
+                { icon: <Upload size={16} />,      label: 'Import backup',               sub: 'Restore passages from a previously exported JSON',      color: 'text-white/70',    action: () => { closeLibraryMenu(); setTimeout(() => backupInputRef.current?.click(), 320); } },
               ].map(item => (
                 <button key={item.label} onClick={item.action}
-                  className={`w-full flex items-center gap-3 px-3 py-3.5 rounded-xl text-sm ${item.color} hover:bg-white/5 active:bg-white/10 transition-colors`}>
-                  <span className="w-5 flex items-center justify-center shrink-0">{item.icon}</span>
-                  <span>{item.label}</span>
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors`}>
+                  <span className={`w-5 flex items-center justify-center shrink-0 ${item.color}`}>{item.icon}</span>
+                  <span className="flex flex-col items-start gap-0.5">
+                    <span className={`text-sm ${item.color}`}>{item.label}</span>
+                    <span className="text-xs text-white/30">{item.sub}</span>
+                  </span>
                 </button>
               ))}
             </div>
