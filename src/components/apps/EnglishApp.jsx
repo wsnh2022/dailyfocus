@@ -360,15 +360,9 @@ export default function EnglishApp() {
   if (view === 'reading') {
     return (
       <div className="fixed inset-0 bg-black flex flex-col" style={{ zIndex: 100 }}>
-        <div className="shrink-0 px-4 pt-3 pb-1">
-          <div className="flex items-center gap-3">
-            <button onClick={exitReader} className="text-white/40 hover:text-white/70 transition-colors text-xl shrink-0">✕</button>
-            <input type="range" min="0.1" max="2.0" step="0.05" value={speed}
-              onChange={e => setSpeed(Number(e.target.value))}
-              className="flex-1 accent-white h-1 cursor-pointer" />
-            <div className="text-white/30 text-xs shrink-0 w-8 text-right">{Math.round(scrollProgress * 100)}%</div>
-          </div>
-          <p className="text-center text-white/25 text-xs mt-1">Speed {speed.toFixed(2)}×</p>
+        <div className="shrink-0 px-4 pt-3 pb-1 flex items-center justify-between">
+          <button onClick={exitReader} className="text-white/40 hover:text-white/70 transition-colors text-xl">✕</button>
+          <div className="text-white/30 text-xs">{Math.round(scrollProgress * 100)}%</div>
         </div>
         <div ref={scrollRef} className="flex-1 overflow-hidden" style={{ touchAction: 'none', userSelect: 'none' }}>
           <div style={{ paddingTop: '85vh', paddingBottom: '85vh', paddingLeft: '1.25rem', paddingRight: '1.25rem' }}>
@@ -393,7 +387,14 @@ export default function EnglishApp() {
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center text-white/60 font-bold transition-colors select-none"
               style={{ fontSize: '17px' }}>A+</button>
           </div>
-          <p className="text-white/30 text-xs">{wordsToday} / {goal} words today · {fontSize}px</p>
+          <div className="w-full flex items-center gap-3 px-1">
+            <span className="text-white/25 text-xs shrink-0">Speed</span>
+            <input type="range" min="0.1" max="2.0" step="0.05" value={speed}
+              onChange={e => setSpeed(Number(e.target.value))}
+              className="flex-1 accent-white h-1 cursor-pointer" />
+            <span className="text-white/40 text-xs shrink-0 w-8 text-right">{speed.toFixed(2)}×</span>
+          </div>
+          <p className="text-white/25 text-xs">{wordsToday} / {goal} words today · {fontSize}px</p>
         </div>
       </div>
     );
