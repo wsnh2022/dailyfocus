@@ -67,6 +67,7 @@ export default function EnglishApp() {
   const [isPlaying,      setIsPlaying]      = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [fontSize,       setFontSize]       = useState(() => Number(localStorage.getItem('df_english_font_size') || 28));
+  const [sortOrder,      setSortOrder]      = useState(() => localStorage.getItem('df_english_sort') || 'asc');
 
   const changeFontSize = (delta) => {
     setFontSize(prev => {
@@ -416,39 +417,33 @@ export default function EnglishApp() {
     const folderIdByName = {};
     folders.forEach(f => { folderIdByName[f.name.toLowerCase()] = f.id; });
 
-    // Detect if files have webkit path info at all
     const hasWebkitPaths = txtFiles.some(f => f.webkitRelativePath?.includes('/'));
-    // Detect if user selected a parent folder (has subfolders = depth >= 3)
-    // vs a leaf folder (all files at depth 2 = directly inside selected folder)
-    const hasSubfolderFiles = hasWebkitPaths && txtFiles.some(f => f.webkitRelativePath.split('/').length >= 3);
 
-    if (hasWebkitPaths && !hasSubfolderFiles) {
-      // Leaf folder selected — create one app folder named after the selected folder
-      const rootName = txtFiles[0].webkitRelativePath.split('/')[0];
-      if (rootName && !folderIdByName[rootName.toLowerCase()]) {
-        const id = idCounter++;
-        newFolders.push({ id, name: rootName });
-        folderIdByName[rootName.toLowerCase()] = id;
-      }
-    } else if (hasSubfolderFiles) {
-      // Parent folder selected — create app folder for each unique IMMEDIATE PARENT of .txt files
-      // Use segments[length-2] so any depth works: depth-3 → segments[1], depth-4 → segments[2], etc.
-      const subfolderNames = [...new Set(
-        txtFiles.filter(f => f.webkitRelativePath.split('/').length >= 3)
-                 .map(f => { const s = f.webkitRelativePath.split('/'); return s[s.length - 2]; })
-      )];
-      for (const name of subfolderNames) {
-        if (!folderIdByName[name.toLowerCase()]) {
+    // Compute app folder key per file based on path depth:
+    //   depth 2 (Root/file.txt)           → "Root" (the selected folder itself)
+    //   depth 3 (Root/Sub/file.txt)        → "Sub"
+    //   depth 4+ (Root/Phase/Day/file.txt) → "Phase › Day" (preserves uniqueness across phases)
+    const getFolderKey = (file) => {
+      if (!file.webkitRelativePath?.includes('/')) return null;
+      const segs = file.webkitRelativePath.split('/');
+      if (segs.length === 2) return segs[0];
+      if (segs.length === 3) return segs[1];
+      return `${segs[segs.length - 3]} › ${segs[segs.length - 2]}`;
+    };
+
+    if (hasWebkitPaths) {
+      const keys = [...new Set(txtFiles.map(getFolderKey).filter(Boolean))];
+      for (const key of keys) {
+        if (!folderIdByName[key.toLowerCase()]) {
           const id = idCounter++;
-          newFolders.push({ id, name });
-          folderIdByName[name.toLowerCase()] = id;
+          newFolders.push({ id, name: key });
+          folderIdByName[key.toLowerCase()] = id;
         }
       }
     }
 
     const existingTitles = new Set(passages.map(p => p.title.toLowerCase()));
     const newPassages = [];
-    // Read all files in parallel — much faster on Android storage
     let done = 0;
     const contents = await Promise.all(
       txtFiles.map(f => f.text().then(t => { setImportingProgress(++done); return t.replace(/^﻿/, ''); }))
@@ -456,19 +451,10 @@ export default function EnglishApp() {
     for (let i = 0; i < txtFiles.length; i++) {
       const file = txtFiles[i];
       const text = contents[i];
-      const segments = file.webkitRelativePath?.split('/') ?? [''];
       const title = file.name.replace(/\.[^/.]+$/, '').trim();
       if (existingTitles.has(title.toLowerCase())) continue;
-      let folderId = null;
-      if (!hasWebkitPaths) {
-        folderId = null;
-      } else if (!hasSubfolderFiles) {
-        folderId = folderIdByName[segments[0].toLowerCase()] ?? null;
-      } else {
-        // Use immediate parent folder (segments[-2]) regardless of depth
-        const parentName = segments.length >= 3 ? segments[segments.length - 2] : null;
-        folderId = parentName ? (folderIdByName[parentName.toLowerCase()] ?? null) : null;
-      }
+      const key = getFolderKey(file);
+      const folderId = key ? (folderIdByName[key.toLowerCase()] ?? null) : null;
       newPassages.push({ id: idCounter++, title, content: text.trim(), folderId, createdAt: new Date().toISOString() });
     }
     if (newFolders.length !== folders.length) persistFolders(newFolders);
@@ -504,9 +490,19 @@ export default function EnglishApp() {
   const goalPct     = Math.min((wordsToday / goal) * 100, 100);
   const menuPassage = menuPassageId ? passages.find(p => p.id === menuPassageId) : null;
 
+  const toggleSort = () => setSortOrder(prev => {
+    const next = prev === 'asc' ? 'desc' : 'asc';
+    localStorage.setItem('df_english_sort', next);
+    return next;
+  });
+
+  const sortItems = (items) => [...items].sort((a, b) =>
+    sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+  );
+
   const sections = [
-    { id: 'uncategorized', name: 'Uncategorized', items: passages.filter(p => !p.folderId) },
-    ...folders.map(f => ({ id: f.id, name: f.name, items: passages.filter(p => p.folderId === f.id) })),
+    { id: 'uncategorized', name: 'Uncategorized', items: sortItems(passages.filter(p => !p.folderId)) },
+    ...folders.map(f => ({ id: f.id, name: f.name, items: sortItems(passages.filter(p => p.folderId === f.id)) })),
   ].filter(s => s.id === 'uncategorized' ? s.items.length > 0 || folders.length === 0 : true);
 
   // ── Reading view ───────────────────────────────────────────
@@ -650,6 +646,11 @@ export default function EnglishApp() {
           <h1 className="text-lg font-bold leading-tight">English Reader</h1>
           <p className="text-white/40 text-xs">Teleprompter reading practice</p>
         </div>
+        <button onClick={toggleSort}
+          className="w-9 h-9 flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 rounded-xl transition-colors text-xs font-bold"
+          title={sortOrder === 'asc' ? 'Sort A→Z (tap for Z→A)' : 'Sort Z→A (tap for A→Z)'}>
+          {sortOrder === 'asc' ? 'A↑' : 'A↓'}
+        </button>
         <button onClick={openLibraryMenu}
           className="w-9 h-9 flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 rounded-xl transition-colors text-lg tracking-widest">
           ···
