@@ -102,7 +102,6 @@ export default function EnglishApp() {
   const [editingId,           setEditingId]           = useState(null);
   const [editingTitle,        setEditingTitle]        = useState('');
   const [editingPassageId,    setEditingPassageId]    = useState(null);
-  const [confirmDeleteFolder, setConfirmDeleteFolder] = useState(null);
   const [addViewNewFolder,    setAddViewNewFolder]    = useState(false);
   const [addViewFolderName,   setAddViewFolderName]   = useState('');
 
@@ -338,7 +337,14 @@ export default function EnglishApp() {
     setAddViewFolderName(''); setAddViewNewFolder(false);
   };
 
-  const deletePassage = (id) => { persistPassages(passages.filter(p => p.id !== id)); closeSheet(); };
+  const deletePassage = (id) => {
+    const remaining = passages.filter(p => p.id !== id);
+    const usedFolderIds = new Set(remaining.map(p => p.folderId).filter(Boolean));
+    const cleanedFolders = folders.filter(f => usedFolderIds.has(f.id));
+    if (cleanedFolders.length !== folders.length) persistFolders(cleanedFolders);
+    persistPassages(remaining);
+    closeSheet();
+  };
 
   const startLongPress = (id) => {
     longPressRef.current = setTimeout(() => {
@@ -367,17 +373,6 @@ export default function EnglishApp() {
     persistPassages(remaining);
     exitSelectMode();
     showToast(`Deleted ${count} passage${count !== 1 ? 's' : ''}`, 'success');
-  };
-
-  const deleteFolder = (folderId, deleteContents = false) => {
-    if (deleteContents) {
-      persistPassages(passages.filter(p => p.folderId !== folderId));
-    } else {
-      const updatedPassages = passages.map(p => p.folderId === folderId ? { ...p, folderId: null } : p);
-      localStorage.setItem(PASSAGES_KEY, JSON.stringify(updatedPassages));
-      setPassages(updatedPassages);
-    }
-    persistFolders(folders.filter(f => f.id !== folderId));
   };
 
   const saveRename = (id) => {
@@ -722,40 +717,13 @@ export default function EnglishApp() {
               const isOpen = expandedFolders.has(section.id);
               return (
                 <div key={section.id} className={sIdx > 0 ? 'border-t border-white/5' : ''}>
-                  {confirmDeleteFolder === section.id ? (
-                    <div className="px-4 py-2.5 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">📁</span>
-                        <span className="flex-1 text-sm text-white/60 truncate">
-                          Delete "{section.name}"?
-                          {section.items.length > 0 && <span className="text-white/30 ml-1">· {section.items.length} file{section.items.length !== 1 ? 's' : ''} inside</span>}
-                        </span>
-                        <button onClick={() => setConfirmDeleteFolder(null)} className="text-xs text-white/30 hover:text-white/60 transition-colors">Cancel</button>
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => { deleteFolder(section.id, false); setConfirmDeleteFolder(null); }}
-                          className="flex-1 py-1.5 rounded-lg text-xs font-medium text-white/60 bg-white/5 hover:bg-white/10 transition-colors">Keep files</button>
-                        <button onClick={() => { deleteFolder(section.id, true); setConfirmDeleteFolder(null); }}
-                          className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-red-400 bg-red-400/10 hover:bg-red-400/20 transition-colors">Delete all files</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <button onClick={() => toggleFolder(section.id)}
-                        className="flex-1 flex items-center gap-2.5 px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors min-w-0">
-                        <span className="text-white/30 text-[10px] w-3 shrink-0">{isOpen ? '▼' : '▶'}</span>
-                        <span className="text-base">📁</span>
-                        <span className="flex-1 text-left text-sm text-white/70 font-medium truncate">{section.name}</span>
-                        <span className="text-xs text-white/25 ml-1">{section.items.length}</span>
-                      </button>
-                      {section.id !== 'uncategorized' && (
-                        <button onClick={() => setConfirmDeleteFolder(section.id)}
-                          className="shrink-0 w-9 h-9 flex items-center justify-center text-white/20 hover:text-red-400 active:text-red-500 transition-colors mr-2">
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  <button onClick={() => toggleFolder(section.id)}
+                    className="w-full flex items-center gap-2.5 px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors min-w-0">
+                    <span className="text-white/30 text-[10px] w-3 shrink-0">{isOpen ? '▼' : '▶'}</span>
+                    <span className="text-base">📁</span>
+                    <span className="flex-1 text-left text-sm text-white/70 font-medium line-clamp-2 break-words">{section.name}</span>
+                    <span className="text-xs text-white/25 ml-1">{section.items.length}</span>
+                  </button>
 
                   {isOpen && section.items.length === 0 && (
                     <p className="pl-10 pr-4 py-2.5 text-xs text-white/20 border-t border-white/5 italic">Empty folder</p>
