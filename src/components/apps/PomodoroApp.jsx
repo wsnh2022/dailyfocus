@@ -25,7 +25,7 @@ export default function PomodoroApp() {
 
   const handleBreakStart = useCallback(() => {
     speak(soundBreakStart, '', preset.breakMin);
-    showToast(`Break — ${preset.breakMin} min`, 'pomodoro-break', 6000);
+    showToast(`Break - ${preset.breakMin} min`, 'pomodoro-break', 6000);
   }, [speak, preset.breakMin, showToast]);
 
   const handleBreakEnd = useCallback(() => {
@@ -94,7 +94,7 @@ export default function PomodoroApp() {
         </button>
       </div>
 
-      {/* Preset selector — only shown when idle */}
+      {/* Preset selector - only shown when idle */}
       {phase === 'idle' && (
         <div className="flex gap-2 px-5 mt-4">
           {PRESETS.map((p, i) => (
@@ -114,7 +114,7 @@ export default function PomodoroApp() {
         </div>
       )}
 
-      {/* Timer — centre of screen */}
+      {/* Timer - centre of screen */}
       <div className="flex-1 flex flex-col items-center justify-center gap-6 px-5">
 
         {/* Phase badge */}

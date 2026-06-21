@@ -34,7 +34,7 @@ print(type(result))     # <class 'NoneType'>
 print(int("25"))        # 25
 print(float("3.14"))    # 3.14
 print(str(100))         # "100"
-print(int(3.9))         # 3  — truncates, does NOT round
+print(int(3.9))         # 3  - truncates, does NOT round
 print(bool(""))         # False
 print(bool("text"))     # True
 print(bool(0))          # False
@@ -76,10 +76,10 @@ if not None:    print("falsy")
 print(5 + 3)    # 8
 print(5 - 3)    # 2
 print(5 * 3)    # 15
-print(7 / 2)    # 3.5  — always float
-print(7 // 2)   # 3    — floor division, rounds down
-print(7 % 2)    # 1    — remainder
-print(2 ** 3)   # 8    — exponent
+print(7 / 2)    # 3.5  - always float
+print(7 // 2)   # 3    - floor division, rounds down
+print(7 % 2)    # 1    - remainder
+print(2 ** 3)   # 8    - exponent
 ```
 
 > ⚠️ `/` always returns a float in Python 3. `7 / 2` is `3.5`, never `3`. Use `//` if you want integer division.
@@ -107,15 +107,15 @@ print(5 >= 5)    # True
 print(3 <= 5)    # True
 
 x = 5
-print(0 < x < 10)   # True  — chained comparisons work in Python
+print(0 < x < 10)   # True  - chained comparisons work in Python
 ```
 
 ### Logical
 
 ```python
-print(True and False)   # False — both must be True
-print(True or False)    # True  — at least one must be True
-print(not True)         # False — flips the value
+print(True and False)   # False - both must be True
+print(True or False)    # True  - at least one must be True
+print(not True)         # False - flips the value
 ```
 
 ### Membership & Identity
@@ -129,7 +129,7 @@ print(x is None)            # True
 print(x is not None)        # False
 ```
 
-> ⚠️ Use `==` for value comparison. Use `is` only for `None`, `True`, `False`. Never do `x is 5` or `x is "hello"` — it may work sometimes due to Python internals but it is not guaranteed.
+> ⚠️ Use `==` for value comparison. Use `is` only for `None`, `True`, `False`. Never do `x is 5` or `x is "hello"` - it may work sometimes due to Python internals but it is not guaranteed.
 
 ---
 
@@ -157,10 +157,10 @@ ratio = 0.855
 num = 42
 salary = 75000
 
-print(f"{price:.2f}")    # 75000.50   — 2 decimal places
-print(f"{salary:,}")     # 75,000     — comma separator
-print(f"{num:05d}")      # 00042      — zero-padded to 5 digits
-print(f"{ratio:.1%}")    # 85.5%      — percentage
+print(f"{price:.2f}")    # 75000.50   - 2 decimal places
+print(f"{salary:,}")     # 75,000     - comma separator
+print(f"{num:05d}")      # 00042      - zero-padded to 5 digits
+print(f"{ratio:.1%}")    # 85.5%      - percentage
 ```
 
 ---
@@ -174,19 +174,19 @@ text = "Hello World"
 print(text.lower())              # hello world
 print(text.upper())              # HELLO WORLD
 print(text.replace("World", "Python"))  # Hello Python
-print(text)                      # Hello World  — unchanged
+print(text)                      # Hello World  - unchanged
 ```
 
 ### Accessing Characters
 
 ```python
 text = "Hello"
-print(text[0])      # H      — first character
-print(text[-1])     # o      — last character
-print(text[1:4])    # ell    — slice from index 1 to 3
-print(text[:3])     # Hel    — first 3 characters
-print(text[2:])     # llo    — from index 2 to end
-print(text[::-1])   # olleH  — reversed
+print(text[0])      # H      - first character
+print(text[-1])     # o      - last character
+print(text[1:4])    # ell    - slice from index 1 to 3
+print(text[:3])     # Hel    - first 3 characters
+print(text[2:])     # llo    - from index 2 to end
+print(text[::-1])   # olleH  - reversed
 print(len(text))    # 5
 ```
 
@@ -194,9 +194,9 @@ print(len(text))    # 5
 
 | Concept | Code | Output / Notes |
 |---|---|---|
-| Find position | `"hello".find("l")` | `2` — returns -1 if not found |
+| Find position | `"hello".find("l")` | `2` - returns -1 if not found |
 | Find from right | `"hello".rfind("l")` | `3` |
-| Index (strict) | `"hello".index("l")` | `2` — raises ValueError if not found |
+| Index (strict) | `"hello".index("l")` | `2` - raises ValueError if not found |
 | Count occurrences | `"hello".count("l")` | `2` |
 | Contains | `"ell" in "hello"` | `True` |
 | Starts with | `"hello".startswith("he")` | `True` |
@@ -222,7 +222,7 @@ print(len(text))    # 5
 ```python
 text = "one,two,three"
 print(text.split(","))          # ['one', 'two', 'three']
-print(text.split(",", 1))       # ['one', 'two,three']  — split at first only
+print(text.split(",", 1))       # ['one', 'two,three']  - split at first only
 
 words = ["one", "two", "three"]
 print(",".join(words))          # one,two,three
@@ -253,7 +253,7 @@ print("a=b".partition("="))     # ('a', '=', 'b')
 | `\'` | literal single quote |
 
 ```python
-path = r"C:\Users\name"   # raw string — backslashes treated literally
+path = r"C:\Users\name"   # raw string - backslashes treated literally
 print(path)               # C:\Users\name
 ```
 
@@ -269,7 +269,7 @@ print(pow(2, 3))            # 8
 print(max(5, 10, 3))        # 10
 print(min(5, 10, 3))        # 3
 print(sum([1, 2, 3]))       # 6
-print(divmod(7, 2))         # (3, 1)  — (quotient, remainder)
+print(divmod(7, 2))         # (3, 1)  - (quotient, remainder)
 print(bin(10))              # 0b1010
 print(hex(255))             # 0xff
 ```
@@ -277,9 +277,9 @@ print(hex(255))             # 0xff
 > ⚠️ `round(2.5)` returns `2`, not `3`. Python uses banker's rounding (round half to even). `round(3.5)` returns `4`. This surprises most people.
 
 ```python
-print(round(2.5))   # 2  — rounds to nearest even
-print(round(3.5))   # 4  — rounds to nearest even
-print(round(4.5))   # 4  — rounds to nearest even
+print(round(2.5))   # 2  - rounds to nearest even
+print(round(3.5))   # 4  - rounds to nearest even
+print(round(4.5))   # 4  - rounds to nearest even
 ```
 
 > ⚠️ Floating point is not exact. `0.1 + 0.2` does not equal `0.3` in Python (or any language using IEEE 754).
@@ -287,7 +287,7 @@ print(round(4.5))   # 4  — rounds to nearest even
 ```python
 print(0.1 + 0.2)            # 0.30000000000000004
 print(0.1 + 0.2 == 0.3)     # False
-print(round(0.1 + 0.2, 1) == 0.3)  # True  — workaround
+print(round(0.1 + 0.2, 1) == 0.3)  # True  - workaround
 ```
 
 ---
@@ -313,12 +313,12 @@ matrix = [[1,2], [3,4], [5,6]]      # nested list
 ```python
 scores = [85, 92, 78, 95, 88]
 print(scores[0])        # 85
-print(scores[-1])       # 88    — last item
+print(scores[-1])       # 88    - last item
 print(scores[1:4])      # [92, 78, 95]
 print(scores[:3])       # [85, 92, 78]
 print(scores[2:])       # [78, 95, 88]
 print(scores[-2:])      # [95, 88]
-print(scores[::-1])     # [88, 95, 78, 92, 85]  — reversed
+print(scores[::-1])     # [88, 95, 78, 92, 85]  - reversed
 
 matrix = [[1,2], [3,4]]
 print(matrix[0][1])     # 2
@@ -332,7 +332,7 @@ scores.append(91)           # [85, 92, 78, 91]
 scores.insert(0, 100)       # [100, 85, 92, 78, 91]
 scores.extend([96, 97])     # [100, 85, 92, 78, 91, 96, 97]
 
-combined = [1, 2] + [3, 4]  # [1, 2, 3, 4]  — creates new list
+combined = [1, 2] + [3, 4]  # [1, 2, 3, 4]  - creates new list
 ```
 
 ### Removing Items
@@ -377,10 +377,10 @@ print(sum(scores))          # 438
 ```python
 a = [1, 2, 3]
 
-# WRONG — this does NOT copy, both names point to same list
+# WRONG - this does NOT copy, both names point to same list
 b = a
 b.append(4)
-print(a)    # [1, 2, 3, 4]  — a changed too!
+print(a)    # [1, 2, 3, 4]  - a changed too!
 
 # CORRECT ways to copy
 b = a.copy()
@@ -415,8 +415,8 @@ print(x)                    # 10.5
 Tuples are faster than lists and can be used as dictionary keys (lists cannot).
 
 ```python
-location = {(10.5, 20.3): "office"}    # valid — tuple as dict key
-# {[10.5, 20.3]: "office"}             # TypeError — list is not hashable
+location = {(10.5, 20.3): "office"}    # valid - tuple as dict key
+# {[10.5, 20.3]: "office"}             # TypeError - list is not hashable
 ```
 
 ---
@@ -430,8 +430,8 @@ Unordered collections with no duplicates. Fast membership checks.
 ```python
 unique = {1, 2, 3}
 deduped = set([1, 2, 3, 2, 1])     # {1, 2, 3}
-empty = set()                        # NOT {} — that creates a dict
-chars = set("hello")                 # {'h', 'e', 'l', 'o'}  — 'l' appears once
+empty = set()                        # NOT {} - that creates a dict
+chars = set("hello")                 # {'h', 'e', 'l', 'o'}  - 'l' appears once
 ```
 
 > ⚠️ `{}` creates an empty dict, not a set. Use `set()` for empty sets.
@@ -442,8 +442,8 @@ chars = set("hello")                 # {'h', 'e', 'l', 'o'}  — 'l' appears onc
 s = {1, 2, 3}
 s.add(4)            # {1, 2, 3, 4}
 s.update([4,5,6])   # {1, 2, 3, 4, 5, 6}
-s.remove(2)         # removes 2 — raises KeyError if not found
-s.discard(99)       # safe remove — no error if 99 not in set
+s.remove(2)         # removes 2 - raises KeyError if not found
+s.discard(99)       # safe remove - no error if 99 not in set
 ```
 
 ### Set Operations
@@ -452,14 +452,14 @@ s.discard(99)       # safe remove — no error if 99 not in set
 a = {1, 2, 3, 4}
 b = {3, 4, 5, 6}
 
-print(a | b)    # {1, 2, 3, 4, 5, 6}  — union (all from both)
-print(a & b)    # {3, 4}              — intersection (common only)
-print(a - b)    # {1, 2}             — difference (in a but not b)
-print(a ^ b)    # {1, 2, 5, 6}       — symmetric difference (not common)
+print(a | b)    # {1, 2, 3, 4, 5, 6}  - union (all from both)
+print(a & b)    # {3, 4}              - intersection (common only)
+print(a - b)    # {1, 2}             - difference (in a but not b)
+print(a ^ b)    # {1, 2, 5, 6}       - symmetric difference (not common)
 
 print(a.issubset(b))     # False
 print(a.issuperset(b))   # False
-print(a.isdisjoint({7, 8}))  # True  — no overlap
+print(a.isdisjoint({7, 8}))  # True  - no overlap
 ```
 
 `in` checks on sets are much faster than on lists for large collections.
@@ -486,10 +486,10 @@ nested = {"emp1": {"name": "John", "score": 92}}
 employee = {"name": "John", "age": 30}
 
 print(employee["name"])             # John
-# print(employee["salary"])         # KeyError — key doesn't exist
+# print(employee["salary"])         # KeyError - key doesn't exist
 
-print(employee.get("salary"))       # None    — safe, no error
-print(employee.get("salary", 0))    # 0       — default if missing
+print(employee.get("salary"))       # None    - safe, no error
+print(employee.get("salary", 0))    # 0       - default if missing
 
 print(employee.keys())              # dict_keys(['name', 'age'])
 print(employee.values())            # dict_values(['John', 30])
@@ -519,8 +519,8 @@ employee.clear()                    # {}
 
 ```python
 employee = {"name": "John", "age": 30}
-print("name" in employee)           # True   — checks keys
-print("John" in employee.values())  # True   — checks values
+print("name" in employee)           # True   - checks keys
+print("John" in employee.values())  # True   - checks values
 print(len(employee))                # 2
 ```
 
@@ -718,7 +718,7 @@ for item in items:
     if item == 99:
         break
 else:
-    print("99 not found")   # prints — loop finished without break
+    print("99 not found")   # prints - loop finished without break
 ```
 
 ---
@@ -794,13 +794,13 @@ print(evens)            # {2, 4, 6}
 Same syntax as list comprehension but with `()`. Produces values one at a time instead of building the entire list in memory.
 
 ```python
-# List comprehension — builds entire list in memory
+# List comprehension - builds entire list in memory
 squares_list = [x ** 2 for x in range(1000000)]
 
-# Generator — produces one value at a time
+# Generator - produces one value at a time
 squares_gen = (x ** 2 for x in range(1000000))
 
-# Use directly in functions — no extra memory
+# Use directly in functions - no extra memory
 total = sum(x * 2 for x in range(100))
 print(total)        # 9900
 
@@ -845,15 +845,15 @@ def greet(name="World"):
 
 greet()             # Hello World
 greet("John")       # Hello John
-greet(name="John")  # Hello John — keyword argument
+greet(name="John")  # Hello John - keyword argument
 
-# *args — variable number of positional arguments
+# *args - variable number of positional arguments
 def total(*args):
     return sum(args)
 
 print(total(1, 2, 3, 4))    # 10
 
-# **kwargs — variable number of keyword arguments
+# **kwargs - variable number of keyword arguments
 def config(**kwargs):
     for k, v in kwargs.items():
         print(f"{k}: {v}")
@@ -864,14 +864,14 @@ config(host="localhost", port=3000)
 ```
 
 ```python
-# Keyword-only — must be passed by name
+# Keyword-only - must be passed by name
 def connect(*, host, port):
     print(f"{host}:{port}")
 
 connect(host="localhost", port=3000)    # works
 # connect("localhost", 3000)            # TypeError
 
-# Positional-only — must be passed by position
+# Positional-only - must be passed by position
 def add(a, b, /):
     return a + b
 
@@ -891,7 +891,7 @@ print(add(3, 4))    # 7
 # Common use: as a sort key
 people = [{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}]
 people.sort(key=lambda p: p["age"])
-print(people[0]["name"])    # Bob — sorted by age ascending
+print(people[0]["name"])    # Bob - sorted by age ascending
 
 # map and filter
 numbers = [1, 2, 3, 4, 5]
@@ -944,9 +944,9 @@ print(list(map(str.upper, words)))          # ['BANANA', 'APPLE', 'KIWI']
 ```python
 result = None
 
-print(result is None)       # True   — use 'is', not '=='
+print(result is None)       # True   - use 'is', not '=='
 print(result is not None)   # False
-print(bool(None))           # False  — None is falsy
+print(bool(None))           # False  - None is falsy
 print(type(None))           # <class 'NoneType'>
 
 def log(msg):
@@ -954,11 +954,11 @@ def log(msg):
     # no return statement
 
 val = log("hello")
-print(val)      # None  — functions without return give None
+print(val)      # None  - functions without return give None
 ```
 
 ```python
-# Safe default pattern — avoids mutable default argument bug
+# Safe default pattern - avoids mutable default argument bug
 def append_to(item, lst=None):
     if lst is None:
         lst = []
@@ -1021,7 +1021,7 @@ for name, age in pairs:
 a = [1, 2, 3]
 b = a           # b is NOT a copy, both point to same list
 b.append(4)
-print(a)        # [1, 2, 3, 4]  — a changed too
+print(a)        # [1, 2, 3, 4]  - a changed too
 
 # Strings look mutable but aren't
 s = "hello"
@@ -1038,7 +1038,7 @@ import copy
 a = [1, 2, 3]
 b = a.copy()        # or a[:] or list(a)
 b.append(99)
-print(a)    # [1, 2, 3]  — unchanged
+print(a)    # [1, 2, 3]  - unchanged
 print(b)    # [1, 2, 3, 99]
 ```
 
@@ -1049,7 +1049,7 @@ a = [[1, 2], [3, 4]]
 b = a.copy()            # shallow copy
 
 b[0].append(99)
-print(a)    # [[1, 2, 99], [3, 4]]  — inner list is shared!
+print(a)    # [[1, 2, 99], [3, 4]]  - inner list is shared!
 print(b)    # [[1, 2, 99], [3, 4]]
 ```
 
@@ -1059,7 +1059,7 @@ a = [[1, 2], [3, 4]]
 b = copy.deepcopy(a)
 
 b[0].append(99)
-print(a)    # [[1, 2], [3, 4]]      — untouched
+print(a)    # [[1, 2], [3, 4]]      - untouched
 print(b)    # [[1, 2, 99], [3, 4]]
 ```
 
@@ -1074,7 +1074,7 @@ import os
 import os as operating_system        # alias
 from os import path                  # specific item
 from os import path, makedirs        # multiple items
-# from os import *                   # avoid — pollutes namespace
+# from os import *                   # avoid - pollutes namespace
 
 if __name__ == "__main__":
     print("running directly")
@@ -1094,10 +1094,10 @@ if __name__ == "__main__":
 
 ```python
 class Dog:
-    count = 0   # class variable — shared across all instances
+    count = 0   # class variable - shared across all instances
 
     def __init__(self, name, breed):
-        self.name = name        # instance variable — unique per dog
+        self.name = name        # instance variable - unique per dog
         self.breed = breed
         Dog.count += 1
 
@@ -1165,7 +1165,7 @@ class Employee:
         self._salary = value
 
 emp = Employee("Alice", 75000)
-print(emp.salary)       # 75000  — calls getter
+print(emp.salary)       # 75000  - calls getter
 emp.salary = 80000      # calls setter
 # emp.salary = -100     # ValueError
 ```
@@ -1177,7 +1177,7 @@ class MathHelper:
     base = 10
 
     @staticmethod
-    def square(x):          # no self, no cls — just a utility
+    def square(x):          # no self, no cls - just a utility
         return x ** 2
 
     @classmethod
@@ -1229,9 +1229,9 @@ with open("out.txt", "w") as f:
 | Mode | Meaning |
 |---|---|
 | `"r"` | read (default) |
-| `"w"` | write — overwrites existing content |
-| `"a"` | append — adds to end |
-| `"x"` | create — fails if file exists |
+| `"w"` | write - overwrites existing content |
+| `"a"` | append - adds to end |
+| `"x"` | create - fails if file exists |
 | `"rb"`, `"wb"` | binary read/write |
 | `"r+"` | read and write |
 
@@ -1316,7 +1316,7 @@ raise InsufficientFundsError("balance too low")
 The `with` statement. Handles setup and cleanup automatically.
 
 ```python
-# File — auto-closes
+# File - auto-closes
 with open("data.txt") as f:
     data = f.read()
 
@@ -1362,7 +1362,7 @@ print(list(count_up(5)))    # [0, 1, 2, 3, 4]
 ```
 
 ```python
-# Infinite generator — only safe because values are pulled one at a time
+# Infinite generator - only safe because values are pulled one at a time
 def integers_from(start):
     n = start
     while True:
@@ -1395,7 +1395,7 @@ print(next(it))     # 2
 print(next(it))     # 3
 # print(next(it))   # StopIteration
 
-print(next(it, "done"))     # "done"  — default instead of error
+print(next(it, "done"))     # "done"  - default instead of error
 ```
 
 | Iterable | Iterator |
@@ -1410,11 +1410,11 @@ nums = [1, 2, 3]
 
 # A list is iterable but not an iterator
 for n in nums: print(n)     # works
-for n in nums: print(n)     # works again — resets
+for n in nums: print(n)     # works again - resets
 
 it = iter(nums)
 for n in it: print(n)       # works
-for n in it: print(n)       # prints nothing — already exhausted
+for n in it: print(n)       # prints nothing - already exhausted
 ```
 
 ---
@@ -1472,14 +1472,14 @@ slow_sum(1000000)   # slow_sum took 0.0312s  (time varies)
 ```python
 import functools
 
-# Built-in cache decorator — remembers past results
+# Built-in cache decorator - remembers past results
 @functools.lru_cache(maxsize=None)
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n-1) + fibonacci(n-2)
 
-print(fibonacci(30))    # 832040  — fast because results are cached
+print(fibonacci(30))    # 832040  - fast because results are cached
 ```
 
 ---

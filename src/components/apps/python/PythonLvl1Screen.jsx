@@ -28,7 +28,7 @@ export default function PythonLvl1Screen() {
           aria-label="Back"
         >‹</button>
         <div className="flex-1">
-          <h1 className="text-lg font-semibold tracking-tight">Python lvl-1</h1>
+          <h1 className="text-xl font-bold tracking-tight">Python lvl-1</h1>
           <p className="text-xs text-white/40 mt-0.5">{statusLabel}</p>
         </div>
         <div className="text-right">
@@ -57,7 +57,7 @@ export default function PythonLvl1Screen() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-amber-300/70 font-medium uppercase tracking-wider">Pinned</span>
-              <span className="text-sm font-medium text-amber-50 truncate">Interview Essentials</span>
+              <span className="text-[15px] font-semibold text-amber-50 truncate">Interview Essentials</span>
             </div>
             <div className="text-[11px] text-amber-100/45 mt-0.5">13 must-remember gotchas</div>
           </div>
@@ -84,7 +84,7 @@ export default function PythonLvl1Screen() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-white/30 font-mono w-5">{String(idx + 1).padStart(2, '0')}</span>
-                  <span className="text-sm font-medium text-white/85 truncate">{section.title}</span>
+                  <span className="text-[15px] font-semibold text-white/90 truncate">{section.title}</span>
                 </div>
                 <div className="text-[11px] text-white/40 mt-0.5 ml-7">{section.concepts.length} concepts</div>
               </div>

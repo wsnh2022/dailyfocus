@@ -3,17 +3,23 @@ import { Highlight, themes } from 'prism-react-renderer';
 import { usePyodide, extractInputPrompts } from '../../../hooks/usePyodide';
 
 const SOOTHING_THEME = {
-  plain: { color: '#d4e8d4', backgroundColor: 'transparent' },
+  plain: { color: '#c5cee4', backgroundColor: 'transparent' },
   styles: [
-    { types: ['comment', 'prolog', 'doctype', 'cdata'], style: { color: '#6b7d6b', fontStyle: 'italic' } },
-    { types: ['string', 'attr-value'],                  style: { color: '#a3d9a5' } },
-    { types: ['keyword', 'control', 'directive', 'unit'], style: { color: '#f0b27a' } },
-    { types: ['function', 'function-name'],             style: { color: '#94c5e6' } },
-    { types: ['builtin', 'class-name'],                 style: { color: '#c5b8e6' } },
-    { types: ['number', 'boolean', 'constant'],         style: { color: '#e6b894' } },
-    { types: ['operator', 'punctuation'],               style: { color: '#9ab09a' } },
-    { types: ['property', 'tag'],                       style: { color: '#f0b27a' } },
-    { types: ['variable'],                              style: { color: '#d4e8d4' } },
+    { types: ['comment', 'prolog', 'doctype', 'cdata'], style: { color: '#5d6a85', fontStyle: 'italic' } },
+    { types: ['string', 'attr-value', 'char'],          style: { color: '#9ece6a' } },
+    { types: ['triple-quoted-string'],                  style: { color: '#9ece6a' } },
+    { types: ['keyword', 'control', 'directive'],       style: { color: '#bb9af7', fontWeight: 500 } },
+    { types: ['function', 'function-name'],             style: { color: '#7aa2f7' } },
+    { types: ['builtin'],                               style: { color: '#f7768e' } },
+    { types: ['class-name'],                            style: { color: '#e0af68' } },
+    { types: ['number', 'boolean'],                     style: { color: '#ff9e64' } },
+    { types: ['constant'],                              style: { color: '#ff9e64' } },
+    { types: ['operator'],                              style: { color: '#89ddff' } },
+    { types: ['punctuation'],                           style: { color: '#a9b1d6' } },
+    { types: ['property', 'tag'],                       style: { color: '#7dcfff' } },
+    { types: ['variable', 'parameter'],                 style: { color: '#c5cee4' } },
+    { types: ['decorator'],                             style: { color: '#f7768e', fontStyle: 'italic' } },
+    { types: ['regex', 'important'],                    style: { color: '#ff9e64' } },
   ],
 };
 
@@ -104,8 +110,9 @@ export default function CodeBlock({ code: initialCode }) {
 
   const sharedTypography = {
     fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-    fontSize: '12.5px',
+    fontSize: '13.5px',
     lineHeight: '1.7',
+    fontWeight: 500,
     padding: '12px 14px',
     margin: 0,
     whiteSpace: 'pre',

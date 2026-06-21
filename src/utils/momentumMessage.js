@@ -13,7 +13,7 @@ export function generateMessage({ streak, weeklyAvgRate, yesterdayRate }) {
   if (streak === 2) return "Two in a row. Make it three.";
   if (streak === 1) return "Good start. Do it again today.";
 
-  // No current streak — use yesterday or weekly rate
+  // No current streak - use yesterday or weekly rate
   if (yesterdayRate !== null) {
     if (yesterdayRate === 100) return "Perfect yesterday. Now repeat it.";
     if (yesterdayRate >= 75)   return "Strong effort yesterday. Push higher.";

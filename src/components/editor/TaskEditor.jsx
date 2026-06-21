@@ -115,7 +115,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       };
 
       if (targetDate !== today) {
-        // Future date — save only as a one-time snapshot to that day's log, no template created
+        // Future date - save only as a one-time snapshot to that day's log, no template created
         await addTaskToDateLog(targetDate, data);
         const label = targetDate === tomorrow ? 'tomorrow' : targetDate;
         showToast(`Task added for ${label}`);
@@ -163,7 +163,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
       </div>
 
       <div className="space-y-5">
-        {/* Date label — create mode only */}
+        {/* Date label - create mode only */}
         {!isEdit && (
           <div className="flex items-center gap-2">
             <span className="text-base">📅</span>
@@ -177,7 +177,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           </div>
         )}
 
-        {/* Template quick-pick — shown when scheduling for a future date */}
+        {/* Template quick-pick - shown when scheduling for a future date */}
         {!isEdit && targetDate !== today && templates.length > 0 && (
           <div>
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Quick assign from your tasks</label>
@@ -206,7 +206,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           </div>
         )}
 
-        {/* Hidden input for native emoji keyboard — sr-only keeps it focusable but invisible */}
+        {/* Hidden input for native emoji keyboard - sr-only keeps it focusable but invisible */}
         <input
           ref={emojiInputRef}
           type="text"
@@ -250,7 +250,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
           <TimerTypeSelect value={taskType} onChange={setTaskType} />
         </div>
 
-        {/* Duration — required for countdown, optional for checkbox */}
+        {/* Duration - required for countdown, optional for checkbox */}
         {(taskType === 'countdown' || taskType === 'checkbox') && (
           <div>
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">

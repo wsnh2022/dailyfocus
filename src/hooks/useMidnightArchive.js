@@ -29,12 +29,12 @@ export function useMidnightArchive() {
         const todayLog = await getTodayLog();
 
         if (todayLog) {
-          // Same day — restore existing state, merging with templates to pick up any field changes
+          // Same day - restore existing state, merging with templates to pick up any field changes
           const templates   = await getAllTasks();
           const templateMap = new Map(templates.map(t => [t.id, t]));
           const mergedTasks = (todayLog.tasks ?? []).map(t => {
             const tmpl = templateMap.get(t.id);
-            if (!tmpl) return t; // snapshot (pre-planned or deleted template) — keep as-is
+            if (!tmpl) return t; // snapshot (pre-planned or deleted template) - keep as-is
             return { ...tmpl, completed: t.completed ?? false };
           });
 
@@ -54,7 +54,7 @@ export function useMidnightArchive() {
           setTodayTasks(tasks);
           setTodayDayState(todayLog.dayState ?? 'active');
         } else {
-          // New day — start fresh from templates and persist immediately
+          // New day - start fresh from templates and persist immediately
           const today     = todayStr();
           const templates = await getAllTasks();
           const tasks     = templates.map(t => ({ ...t, completed: false }));
@@ -82,7 +82,7 @@ export function useMidnightArchive() {
         }
       } catch (err) {
         console.error('useMidnightArchive failed:', err);
-        // Fail silently — don't crash app, show stale state
+        // Fail silently - don't crash app, show stale state
       } finally {
         setLoading(false);
       }

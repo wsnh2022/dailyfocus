@@ -1,5 +1,5 @@
 // One-time script: generates public/icons/icon-192.png and icon-512.png
-// Solid slate-800 (#1e293b = rgb 30,41,59) squares — valid PWA icons
+// Solid slate-800 (#1e293b = rgb 30,41,59) squares - valid PWA icons
 import { writeFileSync, mkdirSync } from 'fs';
 import { deflateSync } from 'zlib';
 

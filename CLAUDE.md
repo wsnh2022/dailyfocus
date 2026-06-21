@@ -1,4 +1,4 @@
-# DailyFocus — Project Map
+# DailyFocus - Project Map
 
 A mobile-first PWA for daily habit tracking with live timers, streak monitoring, and offline IndexedDB storage. Deployed to GitHub Pages at `/dailyfocus/`.
 
@@ -41,12 +41,12 @@ Single Zustand store. Key slices:
 
 ## Database (`src/db/`)
 
-**`schema.js`** — Defines `DailyFocusDB` via Dexie with 3 tables:
-- `task_templates` — Reusable task definitions (checkbox / countdown / pomodoro)
-- `daily_logs` — One log per calendar date; primary key is ISO date string (`"2024-06-19"`)
-- `pomodoro_sessions` — Records of each completed Pomodoro set
+**`schema.js`** - Defines `DailyFocusDB` via Dexie with 3 tables:
+- `task_templates` - Reusable task definitions (checkbox / countdown / pomodoro)
+- `daily_logs` - One log per calendar date; primary key is ISO date string (`"2024-06-19"`)
+- `pomodoro_sessions` - Records of each completed Pomodoro set
 
-**`queries.js`** — All DB access helpers: task CRUD, `reorderTasks()`, `saveLog()`, `getAllLogs()`, `getLastNLogs(n)`, `addSession()`, `getSessionsByDate()`
+**`queries.js`** - All DB access helpers: task CRUD, `reorderTasks()`, `saveLog()`, `getAllLogs()`, `getLastNLogs(n)`, `addSession()`, `getSessionsByDate()`
 
 ---
 
@@ -65,7 +65,7 @@ Single Zustand store. Key slices:
 
 | File | Purpose |
 |---|---|
-| `dateHelpers.js` | `todayStr()`, `yesterdayStr()`, `getPastDate(n)`, `getISOWeek(dateStr)` — all return ISO date strings using UTC |
+| `dateHelpers.js` | `todayStr()`, `yesterdayStr()`, `getPastDate(n)`, `getISOWeek(dateStr)` - all return ISO date strings using UTC |
 | `streakCalc.js` | `calculateStreaks(logs)` → streak counts + yesterday/weekly completion rates. `getSevenDayDots(logs)` → 6-dot array for past 6 days |
 | `momentumMessage.js` | `generateMessage({ streak, weeklyAvgRate, yesterdayRate })` → motivational 1-liner shown when no tasks exist |
 | `dayStateValidator.js` | `canSetDayState(newState, allLogs)` → enforces max 2 rest days/week and max 2 consecutive pause days |
@@ -80,7 +80,7 @@ Single Zustand store. Key slices:
 | File | Contents |
 |---|---|
 | `dayStates.js` | `DAY_STATES` enum, `DAY_STATE_CONFIG` (label/emoji/colors), limits: `MAX_REST_DAYS_PER_WEEK=2`, `MAX_CONSECUTIVE_PAUSE_DAYS=2`, `MAX_TASKS=8` |
-| `colors.js` | `PRESET_COLORS[12]` — Tailwind color swatches with bg/text/border classes; `getColor(id)` lookup |
+| `colors.js` | `PRESET_COLORS[12]` - Tailwind color swatches with bg/text/border classes; `getColor(id)` lookup |
 | `emojiCategories.js` | Emoji arrays grouped by category (Fitness, Study, Health, Work, Personal, Food) |
 
 ---
@@ -135,7 +135,7 @@ Single Zustand store. Key slices:
 | File | Purpose |
 |---|---|
 | `BottomNav.jsx` | 4-tab fixed nav (Home / Apps / History / Settings); hides when `pomodoroRunning` |
-| `Modal.jsx` | Overlay modal — backdrop + centered card, click-outside to close |
+| `Modal.jsx` | Overlay modal - backdrop + centered card, click-outside to close |
 | `Toast.jsx` | Top-center notification; supports success / error / pomodoro-done / pomodoro-break / pomodoro-work |
 | `ErrorBoundary.jsx` | React error boundary with graceful fallback UI |
 
@@ -167,17 +167,17 @@ Countdown / Pomodoro
 ## Key Conventions
 
 - **Dates are UTC ISO strings** (`toISOString().split('T')[0]`). Be aware of timezone offset when debugging date mismatches.
-- **Optimistic UI** — store updates first, DB write follows; toast on failure.
-- **Single timer rule** — `activeTimerId` in store; hooks pause themselves if they're not the active one.
-- **LocalStorage keys** — `df_hero_subtitle`, `df_pomo_sound`, `df_pomo_voice`, `df_pomo_${taskId}` (Pomodoro recovery), `df_last_backup_prompt`.
-- **Max tasks** — `MAX_TASKS = 8` enforced in editor.
-- **Mobile-first** — max-width 448px, 44px+ tap targets, swipe actions on task cards.
+- **Optimistic UI** - store updates first, DB write follows; toast on failure.
+- **Single timer rule** - `activeTimerId` in store; hooks pause themselves if they're not the active one.
+- **LocalStorage keys** - `df_hero_subtitle`, `df_pomo_sound`, `df_pomo_voice`, `df_pomo_${taskId}` (Pomodoro recovery), `df_last_backup_prompt`.
+- **Max tasks** - `MAX_TASKS = 8` enforced in editor.
+- **Mobile-first** - max-width 448px, 44px+ tap targets, swipe actions on task cards.
 
 ---
 
 ## Build & Deploy
 
-- `npm run dev` — Vite dev server
-- `npm run build` — Output to `dist/`, base path `/dailyfocus/`
+- `npm run dev` - Vite dev server
+- `npm run build` - Output to `dist/`, base path `/dailyfocus/`
 - Push to `main` → GitHub Actions builds + deploys to GitHub Pages automatically
 - Live URL: `https://wsnh2022.github.io/dailyfocus/`

@@ -49,19 +49,19 @@ export default function HistoryScreen() {
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
           <div className="text-lg font-bold text-slate-800 leading-none">
-            {currentStreak > 0 ? `🔥 ${currentStreak}` : '—'}
+            {currentStreak > 0 ? `🔥 ${currentStreak}` : '-'}
           </div>
           <div className="text-[10px] text-slate-400 mt-1">streak</div>
         </div>
         <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
           <div className="text-lg font-bold text-slate-800 leading-none">
-            {bestStreak > 0 ? bestStreak : '—'}
+            {bestStreak > 0 ? bestStreak : '-'}
           </div>
           <div className="text-[10px] text-slate-400 mt-1">best</div>
         </div>
         <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
           <div className="text-lg font-bold text-slate-800 leading-none">
-            {totalActiveDays > 0 ? totalActiveDays : '—'}
+            {totalActiveDays > 0 ? totalActiveDays : '-'}
           </div>
           <div className="text-[10px] text-slate-400 mt-1">total days</div>
         </div>

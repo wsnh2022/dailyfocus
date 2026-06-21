@@ -3,7 +3,7 @@ import { todayStr, yesterdayStr, getPastDate } from './dateHelpers';
 /**
  * Returns { currentStreak, bestStreak, yesterdayRate, weeklyAvgRate }
  * An active day counts toward streak only if at least 1 task was completed.
- * Rest and pause days do NOT break the streak — they're neutral.
+ * Rest and pause days do NOT break the streak - they're neutral.
  */
 export function calculateStreaks(logs) {
   const logMap = {};
@@ -26,7 +26,7 @@ export function calculateStreaks(logs) {
       if (completed === 0) break; // active day with 0 completions breaks streak
       currentStreak++;
     }
-    // rest/pause days are neutral — just advance without incrementing or breaking
+    // rest/pause days are neutral - just advance without incrementing or breaking
     daysBack++;
     if (daysBack > 365) break; // safety cap
   }
@@ -42,7 +42,7 @@ export function calculateStreaks(logs) {
       const tasks = log.tasks ?? [];
       const completed = tasks.filter(t => t.completed).length;
       if (completed > 0) {
-        // Check for gap — only count consecutive calendar days (rest/pause allowed in between)
+        // Check for gap - only count consecutive calendar days (rest/pause allowed in between)
         // Rebuild actual sequence checking for gaps
         running++;
         bestStreak = Math.max(bestStreak, running);

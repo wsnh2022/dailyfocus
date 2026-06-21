@@ -24,7 +24,7 @@ export default function EditorScreen() {
     getTaskById(parseInt(id)).then(t => setEditingTask(t ?? null));
   }, [id]);
 
-  // Add mode — only reached via home "+ Add task" button
+  // Add mode - only reached via home "+ Add task" button
   if (!id) {
     if (editingTask === null || fromHome) {
       return (
@@ -42,7 +42,7 @@ export default function EditorScreen() {
     return null;
   }
 
-  // Edit mode — reached via long-press on task card
+  // Edit mode - reached via long-press on task card
   if (editingTask === undefined) {
     return <div className="p-4 text-sm text-slate-400">Loading…</div>;
   }

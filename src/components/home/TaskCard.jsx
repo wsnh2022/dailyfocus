@@ -133,7 +133,7 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Delete action — revealed by swiping right */}
+      {/* Delete action - revealed by swiping right */}
       <div className="absolute left-0 top-0 bottom-0 w-20 bg-red-500 flex items-center justify-center">
         <button onClick={handleDelete} className="flex flex-col items-center gap-1 text-white">
           <span className="text-xl">🗑️</span>
@@ -141,7 +141,7 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
         </button>
       </div>
 
-      {/* Edit action — revealed by swiping left */}
+      {/* Edit action - revealed by swiping left */}
       <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 flex items-center justify-center">
         <button
           onClick={() => { close(); navigate(`/editor/${taskId}`); }}
@@ -174,12 +174,12 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
         {children}
       </div>
 
-      {/* Overlay when edit is open — covers card area, not edit button */}
+      {/* Overlay when edit is open - covers card area, not edit button */}
       {isOpenLeft && (
         <div className="absolute inset-0" style={{ right: `${ACTION_WIDTH}px` }} onClick={close} />
       )}
 
-      {/* Overlay when delete is open — covers card area, not delete button */}
+      {/* Overlay when delete is open - covers card area, not delete button */}
       {isOpenRight && (
         <div className="absolute inset-0" style={{ left: `${ACTION_WIDTH}px` }} onClick={close} />
       )}
@@ -296,7 +296,7 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
 
   const handleBreakStart = useCallback(() => {
     soundBreakStart(name, breakMin);
-    showToast(`Break time 🧘 — ${breakMin ?? 5} min`, 'pomodoro-break', 6000);
+    showToast(`Break time 🧘 - ${breakMin ?? 5} min`, 'pomodoro-break', 6000);
   }, [name, breakMin, showToast]);
 
   const handleBreakEnd = useCallback(() => {

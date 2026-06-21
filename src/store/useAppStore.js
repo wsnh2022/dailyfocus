@@ -28,7 +28,7 @@ export const useAppStore = create((set) => ({
   showBackupPrompt: false,
   setShowBackupPrompt: (show) => set({ showBackupPrompt: show }),
 
-  // Standalone Pomodoro app — hides nav when running
+  // Standalone Pomodoro app - hides nav when running
   pomodoroRunning: false,
   setPomodoroRunning: (v) => set({ pomodoroRunning: v }),
 

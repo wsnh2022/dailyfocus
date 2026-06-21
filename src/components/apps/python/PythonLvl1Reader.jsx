@@ -126,7 +126,7 @@ export default function PythonLvl1Reader() {
             <div className={`text-[10px] font-mono uppercase tracking-wider ${isInterview ? 'text-amber-300/60' : 'text-white/30'}`}>
               {isInterview ? 'Pinned' : `${String(index + 1).padStart(2, '0')} of ${String(lvl1.length).padStart(2, '0')}`}
             </div>
-            <h1 className="text-base font-semibold truncate">{section.title}</h1>
+            <h1 className="text-lg font-semibold truncate tracking-tight">{section.title}</h1>
           </div>
           <div className="text-2xl">{section.emoji}</div>
         </div>
@@ -136,35 +136,35 @@ export default function PythonLvl1Reader() {
         className="px-4 pt-4 pb-32 transition-opacity duration-300"
         style={{ opacity: mounted ? 1 : 0 }}
       >
-        <p className="text-[13px] text-white/55 leading-relaxed mb-5">{section.intro}</p>
+        <p className="text-[14px] text-white/65 leading-relaxed mb-5 font-medium">{section.intro}</p>
 
-        <div className="space-y-3">
+        <div key={sectionId} className="space-y-3">
           {section.concepts.map((c, i) => {
             if (c.kind === 'subsection') {
               return (
                 <div key={i} className="pt-3 pb-1">
-                  <h3 className={`text-[11px] uppercase tracking-[0.18em] font-semibold ${subsectionColor}`}>{c.title}</h3>
+                  <h3 className={`text-[12.5px] uppercase tracking-[0.18em] font-bold ${subsectionColor}`}>{c.title}</h3>
                 </div>
               );
             }
             if (c.kind === 'paragraph') {
               return (
-                <p key={i} className="text-[13px] text-white/60 leading-relaxed">{c.text}</p>
+                <p key={i} className="text-[14px] text-white/70 leading-relaxed">{c.text}</p>
               );
             }
             if (c.kind === 'interviewer-asks') {
               return (
                 <div key={i} className="flex items-start gap-2 -mt-1">
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-amber-300/70 font-semibold mt-1 shrink-0">Asks</span>
-                  <p className="text-[12.5px] text-amber-50/85 italic leading-relaxed">{c.text}</p>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-amber-300/80 font-bold mt-1 shrink-0">Asks</span>
+                  <p className="text-[13.5px] text-amber-50/90 italic leading-relaxed font-medium">{c.text}</p>
                 </div>
               );
             }
             if (c.kind === 'remember') {
               return (
                 <div key={i} className="pt-2 pl-3 border-l-2 border-amber-400/20">
-                  <div className="text-[9px] uppercase tracking-[0.2em] text-amber-300/60 font-semibold mb-1">Remember</div>
-                  <p className="text-[12.5px] text-white/65 leading-relaxed">{c.text}</p>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-amber-300/70 font-bold mb-1">Remember</div>
+                  <p className="text-[13.5px] text-white/75 leading-relaxed">{c.text}</p>
                 </div>
               );
             }
@@ -176,7 +176,7 @@ export default function PythonLvl1Reader() {
                 <div key={i} className="rounded-xl bg-amber-400/[0.07] border border-amber-400/15 px-3.5 py-3">
                   <div className="flex gap-2">
                     <span className="text-amber-300 text-sm leading-tight">!</span>
-                    <p className="text-[12.5px] text-amber-100/85 leading-relaxed">{c.text}</p>
+                    <p className="text-[13.5px] text-amber-100/90 leading-relaxed font-medium">{c.text}</p>
                   </div>
                 </div>
               );
@@ -184,11 +184,11 @@ export default function PythonLvl1Reader() {
             if (c.kind === 'table') {
               return (
                 <div key={i} className="rounded-xl border border-white/5 overflow-hidden">
-                  <table className="w-full text-[11.5px]">
+                  <table className="w-full text-[12.5px]">
                     <thead className="bg-white/[0.04]">
                       <tr>
                         {c.headers.map((h, j) => (
-                          <th key={j} className="px-2.5 py-2 text-left font-medium text-white/55">{h}</th>
+                          <th key={j} className="px-2.5 py-2 text-left font-semibold text-white/65">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -196,7 +196,7 @@ export default function PythonLvl1Reader() {
                       {c.rows.map((row, ri) => (
                         <tr key={ri} className="border-t border-white/5">
                           {row.map((cell, ci) => (
-                            <td key={ci} className="px-2.5 py-2 align-top text-white/70" dangerouslySetInnerHTML={{ __html: cell.replace(/`([^`]+)`/g, '<code class="bg-white/5 px-1 py-0.5 rounded text-emerald-200/90 font-mono">$1</code>') }} />
+                            <td key={ci} className="px-2.5 py-2 align-top text-white/80" dangerouslySetInnerHTML={{ __html: cell.replace(/`([^`]+)`/g, '<code class="bg-white/5 px-1 py-0.5 rounded text-emerald-200/90 font-mono">$1</code>') }} />
                           ))}
                         </tr>
                       ))}

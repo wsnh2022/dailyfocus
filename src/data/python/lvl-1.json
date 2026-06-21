@@ -40,7 +40,7 @@
       },
       {
         "kind": "code",
-        "code": "print(int(\"25\"))        # 25\nprint(float(\"3.14\"))    # 3.14\nprint(str(100))         # \"100\"\nprint(int(3.9))         # 3  — truncates, does NOT round\nprint(bool(\"\"))         # False\nprint(bool(\"text\"))     # True\nprint(bool(0))          # False\nprint(bool(1))          # True\nprint(list(\"hello\"))    # ['h', 'e', 'l', 'l', 'o']\nprint(set([1,2,2,3]))   # {1, 2, 3}"
+        "code": "print(int(\"25\"))        # 25\nprint(float(\"3.14\"))    # 3.14\nprint(str(100))         # \"100\"\nprint(int(3.9))         # 3  - truncates, does NOT round\nprint(bool(\"\"))         # False\nprint(bool(\"text\"))     # True\nprint(bool(0))          # False\nprint(bool(1))          # True\nprint(list(\"hello\"))    # ['h', 'e', 'l', 'l', 'o']\nprint(set([1,2,2,3]))   # {1, 2, 3}"
       },
       {
         "kind": "warning",
@@ -97,7 +97,7 @@
       },
       {
         "kind": "code",
-        "code": "print(5 + 3)    # 8\nprint(5 - 3)    # 2\nprint(5 * 3)    # 15\nprint(7 / 2)    # 3.5  — always float\nprint(7 // 2)   # 3    — floor division, rounds down\nprint(7 % 2)    # 1    — remainder\nprint(2 ** 3)   # 8    — exponent"
+        "code": "print(5 + 3)    # 8\nprint(5 - 3)    # 2\nprint(5 * 3)    # 15\nprint(7 / 2)    # 3.5  - always float\nprint(7 // 2)   # 3    - floor division, rounds down\nprint(7 % 2)    # 1    - remainder\nprint(2 ** 3)   # 8    - exponent"
       },
       {
         "kind": "warning",
@@ -150,7 +150,7 @@
       },
       {
         "kind": "code",
-        "code": "print(5 == 5)    # True\nprint(5 != 3)    # True\nprint(5 > 3)     # True\nprint(3 < 5)     # True\nprint(5 >= 5)    # True\nprint(3 <= 5)    # True\n\nx = 5\nprint(0 < x < 10)   # True  — chained comparisons work in Python"
+        "code": "print(5 == 5)    # True\nprint(5 != 3)    # True\nprint(5 > 3)     # True\nprint(3 < 5)     # True\nprint(5 >= 5)    # True\nprint(3 <= 5)    # True\n\nx = 5\nprint(0 < x < 10)   # True  - chained comparisons work in Python"
       },
       {
         "kind": "subsection",
@@ -158,7 +158,7 @@
       },
       {
         "kind": "code",
-        "code": "print(True and False)   # False — both must be True\nprint(True or False)    # True  — at least one must be True\nprint(not True)         # False — flips the value"
+        "code": "print(True and False)   # False - both must be True\nprint(True or False)    # True  - at least one must be True\nprint(not True)         # False - flips the value"
       },
       {
         "kind": "subsection",
@@ -170,7 +170,7 @@
       },
       {
         "kind": "warning",
-        "text": "Use `==` for value comparison. Use `is` only for `None`, `True`, `False`. Never do `x is 5` or `x is \"hello\"` — it may work sometimes due to Python internals but it is not guaranteed."
+        "text": "Use `==` for value comparison. Use `is` only for `None`, `True`, `False`. Never do `x is 5` or `x is \"hello\"` - it may work sometimes due to Python internals but it is not guaranteed."
       }
     ]
   },
@@ -190,7 +190,7 @@
       },
       {
         "kind": "code",
-        "code": "price = 75000.5\nratio = 0.855\nnum = 42\nsalary = 75000\n\nprint(f\"{price:.2f}\")    # 75000.50   — 2 decimal places\nprint(f\"{salary:,}\")     # 75,000     — comma separator\nprint(f\"{num:05d}\")      # 00042      — zero-padded to 5 digits\nprint(f\"{ratio:.1%}\")    # 85.5%      — percentage"
+        "code": "price = 75000.5\nratio = 0.855\nnum = 42\nsalary = 75000\n\nprint(f\"{price:.2f}\")    # 75000.50   - 2 decimal places\nprint(f\"{salary:,}\")     # 75,000     - comma separator\nprint(f\"{num:05d}\")      # 00042      - zero-padded to 5 digits\nprint(f\"{ratio:.1%}\")    # 85.5%      - percentage"
       }
     ]
   },
@@ -202,7 +202,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "text = \"Hello World\"\nprint(text.lower())              # hello world\nprint(text.upper())              # HELLO WORLD\nprint(text.replace(\"World\", \"Python\"))  # Hello Python\nprint(text)                      # Hello World  — unchanged"
+        "code": "text = \"Hello World\"\nprint(text.lower())              # hello world\nprint(text.upper())              # HELLO WORLD\nprint(text.replace(\"World\", \"Python\"))  # Hello Python\nprint(text)                      # Hello World  - unchanged"
       },
       {
         "kind": "subsection",
@@ -210,7 +210,7 @@
       },
       {
         "kind": "code",
-        "code": "text = \"Hello\"\nprint(text[0])      # H      — first character\nprint(text[-1])     # o      — last character\nprint(text[1:4])    # ell    — slice from index 1 to 3\nprint(text[:3])     # Hel    — first 3 characters\nprint(text[2:])     # llo    — from index 2 to end\nprint(text[::-1])   # olleH  — reversed\nprint(len(text))    # 5"
+        "code": "text = \"Hello\"\nprint(text[0])      # H      - first character\nprint(text[-1])     # o      - last character\nprint(text[1:4])    # ell    - slice from index 1 to 3\nprint(text[:3])     # Hel    - first 3 characters\nprint(text[2:])     # llo    - from index 2 to end\nprint(text[::-1])   # olleH  - reversed\nprint(len(text))    # 5"
       },
       {
         "kind": "subsection",
@@ -227,7 +227,7 @@
           [
             "Find position",
             "`\"hello\".find(\"l\")`",
-            "`2` — returns -1 if not found"
+            "`2` - returns -1 if not found"
           ],
           [
             "Find from right",
@@ -237,7 +237,7 @@
           [
             "Index (strict)",
             "`\"hello\".index(\"l\")`",
-            "`2` — raises ValueError if not found"
+            "`2` - raises ValueError if not found"
           ],
           [
             "Count occurrences",
@@ -331,7 +331,7 @@
       },
       {
         "kind": "code",
-        "code": "text = \"one,two,three\"\nprint(text.split(\",\"))          # ['one', 'two', 'three']\nprint(text.split(\",\", 1))       # ['one', 'two,three']  — split at first only\n\nwords = [\"one\", \"two\", \"three\"]\nprint(\",\".join(words))          # one,two,three\nprint(\"\\n\".join(words))         # each word on its own line\n\nprint(\"a=b\".partition(\"=\"))     # ('a', '=', 'b')"
+        "code": "text = \"one,two,three\"\nprint(text.split(\",\"))          # ['one', 'two', 'three']\nprint(text.split(\",\", 1))       # ['one', 'two,three']  - split at first only\n\nwords = [\"one\", \"two\", \"three\"]\nprint(\",\".join(words))          # one,two,three\nprint(\"\\n\".join(words))         # each word on its own line\n\nprint(\"a=b\".partition(\"=\"))     # ('a', '=', 'b')"
       },
       {
         "kind": "subsection",
@@ -412,7 +412,7 @@
       },
       {
         "kind": "code",
-        "code": "path = r\"C:\\Users\\name\"   # raw string — backslashes treated literally\nprint(path)               # C:\\Users\\name"
+        "code": "path = r\"C:\\Users\\name\"   # raw string - backslashes treated literally\nprint(path)               # C:\\Users\\name"
       }
     ]
   },
@@ -424,7 +424,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "print(abs(-5))              # 5\nprint(round(3.14159, 2))    # 3.14\nprint(round(3.7))           # 4\nprint(pow(2, 3))            # 8\nprint(max(5, 10, 3))        # 10\nprint(min(5, 10, 3))        # 3\nprint(sum([1, 2, 3]))       # 6\nprint(divmod(7, 2))         # (3, 1)  — (quotient, remainder)\nprint(bin(10))              # 0b1010\nprint(hex(255))             # 0xff"
+        "code": "print(abs(-5))              # 5\nprint(round(3.14159, 2))    # 3.14\nprint(round(3.7))           # 4\nprint(pow(2, 3))            # 8\nprint(max(5, 10, 3))        # 10\nprint(min(5, 10, 3))        # 3\nprint(sum([1, 2, 3]))       # 6\nprint(divmod(7, 2))         # (3, 1)  - (quotient, remainder)\nprint(bin(10))              # 0b1010\nprint(hex(255))             # 0xff"
       },
       {
         "kind": "warning",
@@ -432,7 +432,7 @@
       },
       {
         "kind": "code",
-        "code": "print(round(2.5))   # 2  — rounds to nearest even\nprint(round(3.5))   # 4  — rounds to nearest even\nprint(round(4.5))   # 4  — rounds to nearest even"
+        "code": "print(round(2.5))   # 2  - rounds to nearest even\nprint(round(3.5))   # 4  - rounds to nearest even\nprint(round(4.5))   # 4  - rounds to nearest even"
       },
       {
         "kind": "warning",
@@ -440,7 +440,7 @@
       },
       {
         "kind": "code",
-        "code": "print(0.1 + 0.2)            # 0.30000000000000004\nprint(0.1 + 0.2 == 0.3)     # False\nprint(round(0.1 + 0.2, 1) == 0.3)  # True  — workaround"
+        "code": "print(0.1 + 0.2)            # 0.30000000000000004\nprint(0.1 + 0.2 == 0.3)     # False\nprint(round(0.1 + 0.2, 1) == 0.3)  # True  - workaround"
       }
     ]
   },
@@ -464,7 +464,7 @@
       },
       {
         "kind": "code",
-        "code": "scores = [85, 92, 78, 95, 88]\nprint(scores[0])        # 85\nprint(scores[-1])       # 88    — last item\nprint(scores[1:4])      # [92, 78, 95]\nprint(scores[:3])       # [85, 92, 78]\nprint(scores[2:])       # [78, 95, 88]\nprint(scores[-2:])      # [95, 88]\nprint(scores[::-1])     # [88, 95, 78, 92, 85]  — reversed\n\nmatrix = [[1,2], [3,4]]\nprint(matrix[0][1])     # 2"
+        "code": "scores = [85, 92, 78, 95, 88]\nprint(scores[0])        # 85\nprint(scores[-1])       # 88    - last item\nprint(scores[1:4])      # [92, 78, 95]\nprint(scores[:3])       # [85, 92, 78]\nprint(scores[2:])       # [78, 95, 88]\nprint(scores[-2:])      # [95, 88]\nprint(scores[::-1])     # [88, 95, 78, 92, 85]  - reversed\n\nmatrix = [[1,2], [3,4]]\nprint(matrix[0][1])     # 2"
       },
       {
         "kind": "subsection",
@@ -472,7 +472,7 @@
       },
       {
         "kind": "code",
-        "code": "scores = [85, 92, 78]\nscores.append(91)           # [85, 92, 78, 91]\nscores.insert(0, 100)       # [100, 85, 92, 78, 91]\nscores.extend([96, 97])     # [100, 85, 92, 78, 91, 96, 97]\n\ncombined = [1, 2] + [3, 4]  # [1, 2, 3, 4]  — creates new list"
+        "code": "scores = [85, 92, 78]\nscores.append(91)           # [85, 92, 78, 91]\nscores.insert(0, 100)       # [100, 85, 92, 78, 91]\nscores.extend([96, 97])     # [100, 85, 92, 78, 91, 96, 97]\n\ncombined = [1, 2] + [3, 4]  # [1, 2, 3, 4]  - creates new list"
       },
       {
         "kind": "subsection",
@@ -504,7 +504,7 @@
       },
       {
         "kind": "code",
-        "code": "a = [1, 2, 3]\n\n# WRONG — this does NOT copy, both names point to same list\nb = a\nb.append(4)\nprint(a)    # [1, 2, 3, 4]  — a changed too!\n\n# CORRECT ways to copy\nb = a.copy()\nb = a[:]\nb = list(a)"
+        "code": "a = [1, 2, 3]\n\n# WRONG - this does NOT copy, both names point to same list\nb = a\nb.append(4)\nprint(a)    # [1, 2, 3, 4]  - a changed too!\n\n# CORRECT ways to copy\nb = a.copy()\nb = a[:]\nb = list(a)"
       },
       {
         "kind": "warning",
@@ -532,7 +532,7 @@
       },
       {
         "kind": "code",
-        "code": "location = {(10.5, 20.3): \"office\"}    # valid — tuple as dict key\n# {[10.5, 20.3]: \"office\"}             # TypeError — list is not hashable"
+        "code": "location = {(10.5, 20.3): \"office\"}    # valid - tuple as dict key\n# {[10.5, 20.3]: \"office\"}             # TypeError - list is not hashable"
       }
     ]
   },
@@ -548,7 +548,7 @@
       },
       {
         "kind": "code",
-        "code": "unique = {1, 2, 3}\ndeduped = set([1, 2, 3, 2, 1])     # {1, 2, 3}\nempty = set()                        # NOT {} — that creates a dict\nchars = set(\"hello\")                 # {'h', 'e', 'l', 'o'}  — 'l' appears once"
+        "code": "unique = {1, 2, 3}\ndeduped = set([1, 2, 3, 2, 1])     # {1, 2, 3}\nempty = set()                        # NOT {} - that creates a dict\nchars = set(\"hello\")                 # {'h', 'e', 'l', 'o'}  - 'l' appears once"
       },
       {
         "kind": "warning",
@@ -560,7 +560,7 @@
       },
       {
         "kind": "code",
-        "code": "s = {1, 2, 3}\ns.add(4)            # {1, 2, 3, 4}\ns.update([4,5,6])   # {1, 2, 3, 4, 5, 6}\ns.remove(2)         # removes 2 — raises KeyError if not found\ns.discard(99)       # safe remove — no error if 99 not in set"
+        "code": "s = {1, 2, 3}\ns.add(4)            # {1, 2, 3, 4}\ns.update([4,5,6])   # {1, 2, 3, 4, 5, 6}\ns.remove(2)         # removes 2 - raises KeyError if not found\ns.discard(99)       # safe remove - no error if 99 not in set"
       },
       {
         "kind": "subsection",
@@ -568,7 +568,7 @@
       },
       {
         "kind": "code",
-        "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\n\nprint(a | b)    # {1, 2, 3, 4, 5, 6}  — union (all from both)\nprint(a & b)    # {3, 4}              — intersection (common only)\nprint(a - b)    # {1, 2}             — difference (in a but not b)\nprint(a ^ b)    # {1, 2, 5, 6}       — symmetric difference (not common)\n\nprint(a.issubset(b))     # False\nprint(a.issuperset(b))   # False\nprint(a.isdisjoint({7, 8}))  # True  — no overlap"
+        "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\n\nprint(a | b)    # {1, 2, 3, 4, 5, 6}  - union (all from both)\nprint(a & b)    # {3, 4}              - intersection (common only)\nprint(a - b)    # {1, 2}             - difference (in a but not b)\nprint(a ^ b)    # {1, 2, 5, 6}       - symmetric difference (not common)\n\nprint(a.issubset(b))     # False\nprint(a.issuperset(b))   # False\nprint(a.isdisjoint({7, 8}))  # True  - no overlap"
       },
       {
         "kind": "paragraph",
@@ -596,7 +596,7 @@
       },
       {
         "kind": "code",
-        "code": "employee = {\"name\": \"John\", \"age\": 30}\n\nprint(employee[\"name\"])             # John\n# print(employee[\"salary\"])         # KeyError — key doesn't exist\n\nprint(employee.get(\"salary\"))       # None    — safe, no error\nprint(employee.get(\"salary\", 0))    # 0       — default if missing\n\nprint(employee.keys())              # dict_keys(['name', 'age'])\nprint(employee.values())            # dict_values(['John', 30])\nprint(employee.items())             # dict_items([('name', 'John'), ('age', 30)])\n\nnested = {\"emp1\": {\"name\": \"John\", \"score\": 92}}\nprint(nested[\"emp1\"][\"name\"])       # John"
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\n\nprint(employee[\"name\"])             # John\n# print(employee[\"salary\"])         # KeyError - key doesn't exist\n\nprint(employee.get(\"salary\"))       # None    - safe, no error\nprint(employee.get(\"salary\", 0))    # 0       - default if missing\n\nprint(employee.keys())              # dict_keys(['name', 'age'])\nprint(employee.values())            # dict_values(['John', 30])\nprint(employee.items())             # dict_items([('name', 'John'), ('age', 30)])\n\nnested = {\"emp1\": {\"name\": \"John\", \"score\": 92}}\nprint(nested[\"emp1\"][\"name\"])       # John"
       },
       {
         "kind": "subsection",
@@ -612,7 +612,7 @@
       },
       {
         "kind": "code",
-        "code": "employee = {\"name\": \"John\", \"age\": 30}\nprint(\"name\" in employee)           # True   — checks keys\nprint(\"John\" in employee.values())  # True   — checks values\nprint(len(employee))                # 2"
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\nprint(\"name\" in employee)           # True   - checks keys\nprint(\"John\" in employee.values())  # True   - checks values\nprint(len(employee))                # 2"
       },
       {
         "kind": "subsection",
@@ -732,7 +732,7 @@
       },
       {
         "kind": "code",
-        "code": "items = [1, 2, 3, 4]\n\nfor item in items:\n    if item == 99:\n        break\nelse:\n    print(\"99 not found\")   # prints — loop finished without break"
+        "code": "items = [1, 2, 3, 4]\n\nfor item in items:\n    if item == 99:\n        break\nelse:\n    print(\"99 not found\")   # prints - loop finished without break"
       }
     ]
   },
@@ -776,7 +776,7 @@
       },
       {
         "kind": "code",
-        "code": "# List comprehension — builds entire list in memory\nsquares_list = [x ** 2 for x in range(1000000)]\n\n# Generator — produces one value at a time\nsquares_gen = (x ** 2 for x in range(1000000))\n\n# Use directly in functions — no extra memory\ntotal = sum(x * 2 for x in range(100))\nprint(total)        # 9900\n\nlongest = max(len(w) for w in [\"apple\", \"banana\", \"kiwi\"])\nprint(longest)      # 6\n\nany_large = any(x > 90 for x in [85, 92, 78])\nprint(any_large)    # True"
+        "code": "# List comprehension - builds entire list in memory\nsquares_list = [x ** 2 for x in range(1000000)]\n\n# Generator - produces one value at a time\nsquares_gen = (x ** 2 for x in range(1000000))\n\n# Use directly in functions - no extra memory\ntotal = sum(x * 2 for x in range(100))\nprint(total)        # 9900\n\nlongest = max(len(w) for w in [\"apple\", \"banana\", \"kiwi\"])\nprint(longest)      # 6\n\nany_large = any(x > 90 for x in [85, 92, 78])\nprint(any_large)    # True"
       }
     ]
   },
@@ -800,11 +800,11 @@
       },
       {
         "kind": "code",
-        "code": "# Default value\ndef greet(name=\"World\"):\n    print(f\"Hello {name}\")\n\ngreet()             # Hello World\ngreet(\"John\")       # Hello John\ngreet(name=\"John\")  # Hello John — keyword argument\n\n# *args — variable number of positional arguments\ndef total(*args):\n    return sum(args)\n\nprint(total(1, 2, 3, 4))    # 10\n\n# **kwargs — variable number of keyword arguments\ndef config(**kwargs):\n    for k, v in kwargs.items():\n        print(f\"{k}: {v}\")\n\nconfig(host=\"localhost\", port=3000)\n# host: localhost\n# port: 3000"
+        "code": "# Default value\ndef greet(name=\"World\"):\n    print(f\"Hello {name}\")\n\ngreet()             # Hello World\ngreet(\"John\")       # Hello John\ngreet(name=\"John\")  # Hello John - keyword argument\n\n# *args - variable number of positional arguments\ndef total(*args):\n    return sum(args)\n\nprint(total(1, 2, 3, 4))    # 10\n\n# **kwargs - variable number of keyword arguments\ndef config(**kwargs):\n    for k, v in kwargs.items():\n        print(f\"{k}: {v}\")\n\nconfig(host=\"localhost\", port=3000)\n# host: localhost\n# port: 3000"
       },
       {
         "kind": "code",
-        "code": "# Keyword-only — must be passed by name\ndef connect(*, host, port):\n    print(f\"{host}:{port}\")\n\nconnect(host=\"localhost\", port=3000)    # works\n# connect(\"localhost\", 3000)            # TypeError\n\n# Positional-only — must be passed by position\ndef add(a, b, /):\n    return a + b\n\nadd(1, 2)           # works\n# add(a=1, b=2)     # TypeError"
+        "code": "# Keyword-only - must be passed by name\ndef connect(*, host, port):\n    print(f\"{host}:{port}\")\n\nconnect(host=\"localhost\", port=3000)    # works\n# connect(\"localhost\", 3000)            # TypeError\n\n# Positional-only - must be passed by position\ndef add(a, b, /):\n    return a + b\n\nadd(1, 2)           # works\n# add(a=1, b=2)     # TypeError"
       },
       {
         "kind": "subsection",
@@ -812,7 +812,7 @@
       },
       {
         "kind": "code",
-        "code": "double = lambda x: x * 2\nprint(double(5))    # 10\n\nadd = lambda a, b: a + b\nprint(add(3, 4))    # 7\n\n# Common use: as a sort key\npeople = [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]\npeople.sort(key=lambda p: p[\"age\"])\nprint(people[0][\"name\"])    # Bob — sorted by age ascending\n\n# map and filter\nnumbers = [1, 2, 3, 4, 5]\nprint(list(map(lambda x: x ** 2, numbers)))     # [1, 4, 9, 16, 25]\nprint(list(filter(lambda x: x > 2, numbers)))   # [3, 4, 5]"
+        "code": "double = lambda x: x * 2\nprint(double(5))    # 10\n\nadd = lambda a, b: a + b\nprint(add(3, 4))    # 7\n\n# Common use: as a sort key\npeople = [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]\npeople.sort(key=lambda p: p[\"age\"])\nprint(people[0][\"name\"])    # Bob - sorted by age ascending\n\n# map and filter\nnumbers = [1, 2, 3, 4, 5]\nprint(list(map(lambda x: x ** 2, numbers)))     # [1, 4, 9, 16, 25]\nprint(list(filter(lambda x: x > 2, numbers)))   # [3, 4, 5]"
       },
       {
         "kind": "subsection",
@@ -840,11 +840,11 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "result = None\n\nprint(result is None)       # True   — use 'is', not '=='\nprint(result is not None)   # False\nprint(bool(None))           # False  — None is falsy\nprint(type(None))           # <class 'NoneType'>\n\ndef log(msg):\n    print(msg)\n    # no return statement\n\nval = log(\"hello\")\nprint(val)      # None  — functions without return give None"
+        "code": "result = None\n\nprint(result is None)       # True   - use 'is', not '=='\nprint(result is not None)   # False\nprint(bool(None))           # False  - None is falsy\nprint(type(None))           # <class 'NoneType'>\n\ndef log(msg):\n    print(msg)\n    # no return statement\n\nval = log(\"hello\")\nprint(val)      # None  - functions without return give None"
       },
       {
         "kind": "code",
-        "code": "# Safe default pattern — avoids mutable default argument bug\ndef append_to(item, lst=None):\n    if lst is None:\n        lst = []\n    lst.append(item)\n    return lst\n\n# Filter out None from a list\ndata = [1, None, 3, None, 5]\nclean = [x for x in data if x is not None]\nprint(clean)    # [1, 3, 5]"
+        "code": "# Safe default pattern - avoids mutable default argument bug\ndef append_to(item, lst=None):\n    if lst is None:\n        lst = []\n    lst.append(item)\n    return lst\n\n# Filter out None from a list\ndata = [1, None, 3, None, 5]\nclean = [x for x in data if x is not None]\nprint(clean)    # [1, 3, 5]"
       },
       {
         "kind": "warning",
@@ -893,7 +893,7 @@
       },
       {
         "kind": "code",
-        "code": "# Mutable aliasing problem\na = [1, 2, 3]\nb = a           # b is NOT a copy, both point to same list\nb.append(4)\nprint(a)        # [1, 2, 3, 4]  — a changed too\n\n# Strings look mutable but aren't\ns = \"hello\"\ns = s.upper()   # creates a new string, original is gone"
+        "code": "# Mutable aliasing problem\na = [1, 2, 3]\nb = a           # b is NOT a copy, both point to same list\nb.append(4)\nprint(a)        # [1, 2, 3, 4]  - a changed too\n\n# Strings look mutable but aren't\ns = \"hello\"\ns = s.upper()   # creates a new string, original is gone"
       }
     ]
   },
@@ -905,7 +905,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "import copy\n\na = [1, 2, 3]\nb = a.copy()        # or a[:] or list(a)\nb.append(99)\nprint(a)    # [1, 2, 3]  — unchanged\nprint(b)    # [1, 2, 3, 99]"
+        "code": "import copy\n\na = [1, 2, 3]\nb = a.copy()        # or a[:] or list(a)\nb.append(99)\nprint(a)    # [1, 2, 3]  - unchanged\nprint(b)    # [1, 2, 3, 99]"
       },
       {
         "kind": "subsection",
@@ -913,11 +913,11 @@
       },
       {
         "kind": "code",
-        "code": "a = [[1, 2], [3, 4]]\nb = a.copy()            # shallow copy\n\nb[0].append(99)\nprint(a)    # [[1, 2, 99], [3, 4]]  — inner list is shared!\nprint(b)    # [[1, 2, 99], [3, 4]]"
+        "code": "a = [[1, 2], [3, 4]]\nb = a.copy()            # shallow copy\n\nb[0].append(99)\nprint(a)    # [[1, 2, 99], [3, 4]]  - inner list is shared!\nprint(b)    # [[1, 2, 99], [3, 4]]"
       },
       {
         "kind": "code",
-        "code": "# Fix: use deepcopy\na = [[1, 2], [3, 4]]\nb = copy.deepcopy(a)\n\nb[0].append(99)\nprint(a)    # [[1, 2], [3, 4]]      — untouched\nprint(b)    # [[1, 2, 99], [3, 4]]"
+        "code": "# Fix: use deepcopy\na = [[1, 2], [3, 4]]\nb = copy.deepcopy(a)\n\nb[0].append(99)\nprint(a)    # [[1, 2], [3, 4]]      - untouched\nprint(b)    # [[1, 2, 99], [3, 4]]"
       },
       {
         "kind": "warning",
@@ -933,7 +933,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "import os\nimport os as operating_system        # alias\nfrom os import path                  # specific item\nfrom os import path, makedirs        # multiple items\n# from os import *                   # avoid — pollutes namespace\n\nif __name__ == \"__main__\":\n    print(\"running directly\")\n    # this block does NOT run when the file is imported"
+        "code": "import os\nimport os as operating_system        # alias\nfrom os import path                  # specific item\nfrom os import path, makedirs        # multiple items\n# from os import *                   # avoid - pollutes namespace\n\nif __name__ == \"__main__\":\n    print(\"running directly\")\n    # this block does NOT run when the file is imported"
       },
       {
         "kind": "table",
@@ -966,7 +966,7 @@
       },
       {
         "kind": "code",
-        "code": "class Dog:\n    count = 0   # class variable — shared across all instances\n\n    def __init__(self, name, breed):\n        self.name = name        # instance variable — unique per dog\n        self.breed = breed\n        Dog.count += 1\n\n    def bark(self):\n        return f\"{self.name} says Woof!\"\n\n    def __str__(self):\n        return f\"Dog({self.name}, {self.breed})\"\n\n    def __repr__(self):\n        return f\"Dog(name={self.name!r}, breed={self.breed!r})\"\n\nmy_dog = Dog(\"Max\", \"Golden\")\nprint(my_dog.bark())    # Max says Woof!\nprint(str(my_dog))      # Dog(Max, Golden)\nprint(Dog.count)        # 1"
+        "code": "class Dog:\n    count = 0   # class variable - shared across all instances\n\n    def __init__(self, name, breed):\n        self.name = name        # instance variable - unique per dog\n        self.breed = breed\n        Dog.count += 1\n\n    def bark(self):\n        return f\"{self.name} says Woof!\"\n\n    def __str__(self):\n        return f\"Dog({self.name}, {self.breed})\"\n\n    def __repr__(self):\n        return f\"Dog(name={self.name!r}, breed={self.breed!r})\"\n\nmy_dog = Dog(\"Max\", \"Golden\")\nprint(my_dog.bark())    # Max says Woof!\nprint(str(my_dog))      # Dog(Max, Golden)\nprint(Dog.count)        # 1"
       },
       {
         "kind": "subsection",
@@ -1036,7 +1036,7 @@
       },
       {
         "kind": "code",
-        "code": "class Employee:\n    def __init__(self, name, salary):\n        self._salary = salary\n        self.name = name\n\n    @property\n    def salary(self):\n        return self._salary\n\n    @salary.setter\n    def salary(self, value):\n        if value < 0:\n            raise ValueError(\"Salary cannot be negative\")\n        self._salary = value\n\nemp = Employee(\"Alice\", 75000)\nprint(emp.salary)       # 75000  — calls getter\nemp.salary = 80000      # calls setter\n# emp.salary = -100     # ValueError"
+        "code": "class Employee:\n    def __init__(self, name, salary):\n        self._salary = salary\n        self.name = name\n\n    @property\n    def salary(self):\n        return self._salary\n\n    @salary.setter\n    def salary(self, value):\n        if value < 0:\n            raise ValueError(\"Salary cannot be negative\")\n        self._salary = value\n\nemp = Employee(\"Alice\", 75000)\nprint(emp.salary)       # 75000  - calls getter\nemp.salary = 80000      # calls setter\n# emp.salary = -100     # ValueError"
       },
       {
         "kind": "subsection",
@@ -1044,7 +1044,7 @@
       },
       {
         "kind": "code",
-        "code": "class MathHelper:\n    base = 10\n\n    @staticmethod\n    def square(x):          # no self, no cls — just a utility\n        return x ** 2\n\n    @classmethod\n    def describe(cls):      # gets the class, not the instance\n        return f\"Base is {cls.base}\"\n\nprint(MathHelper.square(5))     # 25\nprint(MathHelper.describe())    # Base is 10"
+        "code": "class MathHelper:\n    base = 10\n\n    @staticmethod\n    def square(x):          # no self, no cls - just a utility\n        return x ** 2\n\n    @classmethod\n    def describe(cls):      # gets the class, not the instance\n        return f\"Base is {cls.base}\"\n\nprint(MathHelper.square(5))     # 25\nprint(MathHelper.describe())    # Base is 10"
       }
     ]
   },
@@ -1087,15 +1087,15 @@
           ],
           [
             "`\"w\"`",
-            "write — overwrites existing content"
+            "write - overwrites existing content"
           ],
           [
             "`\"a\"`",
-            "append — adds to end"
+            "append - adds to end"
           ],
           [
             "`\"x\"`",
-            "create — fails if file exists"
+            "create - fails if file exists"
           ],
           [
             "`\"rb\"`, `\"wb\"`",
@@ -1210,7 +1210,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "# File — auto-closes\nwith open(\"data.txt\") as f:\n    data = f.read()\n\n# Multiple resources\nwith open(\"input.txt\") as fin, open(\"output.txt\", \"w\") as fout:\n    fout.write(fin.read())\n\n# Custom context manager using decorator\nfrom contextlib import contextmanager\n\n@contextmanager\ndef timer():\n    import time\n    start = time.time()\n    yield                               # code inside `with` runs here\n    end = time.time()\n    print(f\"Elapsed: {end - start:.2f}s\")\n\nwith timer():\n    total = sum(range(1000000))\n# Elapsed: 0.03s  (time varies)"
+        "code": "# File - auto-closes\nwith open(\"data.txt\") as f:\n    data = f.read()\n\n# Multiple resources\nwith open(\"input.txt\") as fin, open(\"output.txt\", \"w\") as fout:\n    fout.write(fin.read())\n\n# Custom context manager using decorator\nfrom contextlib import contextmanager\n\n@contextmanager\ndef timer():\n    import time\n    start = time.time()\n    yield                               # code inside `with` runs here\n    end = time.time()\n    print(f\"Elapsed: {end - start:.2f}s\")\n\nwith timer():\n    total = sum(range(1000000))\n# Elapsed: 0.03s  (time varies)"
       }
     ]
   },
@@ -1226,7 +1226,7 @@
       },
       {
         "kind": "code",
-        "code": "# Infinite generator — only safe because values are pulled one at a time\ndef integers_from(start):\n    n = start\n    while True:\n        yield n\n        n += 1\n\ngen = integers_from(1)\nprint(next(gen))    # 1\nprint(next(gen))    # 2\nprint(next(gen))    # 3"
+        "code": "# Infinite generator - only safe because values are pulled one at a time\ndef integers_from(start):\n    n = start\n    while True:\n        yield n\n        n += 1\n\ngen = integers_from(1)\nprint(next(gen))    # 1\nprint(next(gen))    # 2\nprint(next(gen))    # 3"
       },
       {
         "kind": "table",
@@ -1263,7 +1263,7 @@
     "concepts": [
       {
         "kind": "code",
-        "code": "it = iter([1, 2, 3])\nprint(next(it))     # 1\nprint(next(it))     # 2\nprint(next(it))     # 3\n# print(next(it))   # StopIteration\n\nprint(next(it, \"done\"))     # \"done\"  — default instead of error"
+        "code": "it = iter([1, 2, 3])\nprint(next(it))     # 1\nprint(next(it))     # 2\nprint(next(it))     # 3\n# print(next(it))   # StopIteration\n\nprint(next(it, \"done\"))     # \"done\"  - default instead of error"
       },
       {
         "kind": "table",
@@ -1292,7 +1292,7 @@
       },
       {
         "kind": "code",
-        "code": "nums = [1, 2, 3]\n\n# A list is iterable but not an iterator\nfor n in nums: print(n)     # works\nfor n in nums: print(n)     # works again — resets\n\nit = iter(nums)\nfor n in it: print(n)       # works\nfor n in it: print(n)       # prints nothing — already exhausted"
+        "code": "nums = [1, 2, 3]\n\n# A list is iterable but not an iterator\nfor n in nums: print(n)     # works\nfor n in nums: print(n)     # works again - resets\n\nit = iter(nums)\nfor n in it: print(n)       # works\nfor n in it: print(n)       # prints nothing - already exhausted"
       }
     ]
   },
@@ -1316,7 +1316,7 @@
       },
       {
         "kind": "code",
-        "code": "import functools\n\n# Built-in cache decorator — remembers past results\n@functools.lru_cache(maxsize=None)\ndef fibonacci(n):\n    if n < 2:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(30))    # 832040  — fast because results are cached"
+        "code": "import functools\n\n# Built-in cache decorator - remembers past results\n@functools.lru_cache(maxsize=None)\ndef fibonacci(n):\n    if n < 2:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(30))    # 832040  - fast because results are cached"
       }
     ]
   },
