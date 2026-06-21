@@ -1,0 +1,128 @@
+{
+  "id": "interview-essentials",
+  "title": "Interview Essentials",
+  "emoji": "🎯",
+  "intro": "Gotchas interviewers love to ask about. Skim before you walk in.",
+  "concepts": [
+    { "kind": "subsection", "title": "1. Indentation" },
+    { "kind": "interviewer-asks", "text": "Why does Python care about whitespace?" },
+    {
+      "kind": "indent-visual",
+      "correctTitle": "Correct",
+      "correctCode": "def greet(name):\n    if name:\n        print(f\"Hi {name}\")\n    else:\n        print(\"Hi stranger\")",
+      "wrongTitle": "IndentationError",
+      "wrongCode": "def greet(name):\nif name:\n  print(f\"Hi {name}\")\n     else:\n print(\"Hi stranger\")"
+    },
+    {
+      "kind": "code",
+      "code": "def greet(name):\n    if name:\n        print(f\"Hi {name}\")\n    else:\n        print(\"Hi stranger\")\n\ngreet(\"Alice\")\ngreet(\"\")"
+    },
+    { "kind": "remember", "text": "Python uses indentation, not braces, to mark blocks. Stick to 4 spaces, be consistent inside a block, never mix tabs with spaces." },
+
+    { "kind": "subsection", "title": "2. is vs ==" },
+    { "kind": "interviewer-asks", "text": "What is the difference between is and ==?" },
+    {
+      "kind": "code",
+      "code": "a = 256\nb = 256\nprint(a is b, a == b)        # True True   small ints (-5 to 256) are cached\n\n# For bigger numbers, compile-time interning of literals can fool you.\n# Force a fresh object to see the real behaviour:\nx = 1000\ny = int(\"1000\")\nprint(x is y, x == y)        # False True\n\nprint(None is None)          # True   always use 'is' for None\nprint([] == [])              # True   value match\nprint([] is [])              # False  different list objects"
+    },
+    { "kind": "remember", "text": "== compares values. is compares identity (same object in memory). Use is only for None, True, False. The small-int cache for -5 to 256 is a CPython detail, not a contract." },
+
+    { "kind": "subsection", "title": "3. Mutable default arguments" },
+    { "kind": "interviewer-asks", "text": "What is wrong with def f(x=[])?" },
+    {
+      "kind": "code",
+      "code": "def append_to(item, lst=[]):\n    lst.append(item)\n    return lst\n\nprint(append_to(1))     # [1]\nprint(append_to(2))     # [1, 2]  the list persists across calls!\nprint(append_to(3))     # [1, 2, 3]\n\n# Fix: use None as a sentinel\ndef append_to_fixed(item, lst=None):\n    if lst is None:\n        lst = []\n    lst.append(item)\n    return lst\n\nprint(append_to_fixed(1))   # [1]\nprint(append_to_fixed(2))   # [2]   fresh list each call"
+    },
+    { "kind": "remember", "text": "Default arguments are evaluated once at function definition, not on each call. Never use mutable defaults. Use None and assign inside the function." },
+
+    { "kind": "subsection", "title": "4. Late binding in closures" },
+    { "kind": "interviewer-asks", "text": "What does [lambda: i for i in range(3)] return when called?" },
+    {
+      "kind": "code",
+      "code": "funcs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])   # [2, 2, 2]  all bound to final i\n\n# Fix: capture i with a default argument\nfuncs = [lambda i=i: i for i in range(3)]\nprint([f() for f in funcs])   # [0, 1, 2]  each lambda holds its own"
+    },
+    { "kind": "remember", "text": "Closures capture variables by reference, not by value. By the time you call the lambdas, the loop has finished and i is at its last value. Default args freeze the value at definition time." },
+
+    { "kind": "subsection", "title": "5. Pass by object reference" },
+    { "kind": "interviewer-asks", "text": "Does Python pass arguments by value or by reference?" },
+    {
+      "kind": "code",
+      "code": "def mutate(lst):\n    lst.append(99)   # changes the caller's list\n\nmy_list = [1, 2, 3]\nmutate(my_list)\nprint(my_list)       # [1, 2, 3, 99]\n\ndef rebind(lst):\n    lst = [99]       # local rebind, caller unchanged\n\nmy_list = [1, 2, 3]\nrebind(my_list)\nprint(my_list)       # [1, 2, 3]"
+    },
+    { "kind": "remember", "text": "Python passes object references by value. The reference inside the function points to the same object, so mutations leak out. Reassigning the local name does not affect the caller." },
+
+    { "kind": "subsection", "title": "6. Shallow vs deep copy" },
+    { "kind": "interviewer-asks", "text": "When does .copy() not actually copy?" },
+    {
+      "kind": "code",
+      "code": "import copy\n\noriginal = [[1, 2], [3, 4]]\nshallow  = original.copy()       # only outer list copied\ndeep     = copy.deepcopy(original)\n\nshallow[0].append(99)\nprint(original)   # [[1, 2, 99], [3, 4]]  inner list is shared!\nprint(shallow)    # [[1, 2, 99], [3, 4]]\nprint(deep)       # [[1, 2], [3, 4]]      truly independent"
+    },
+    { "kind": "remember", "text": "Shallow copy duplicates the outer container but the inner objects are still shared. For nested structures (lists of lists, dicts of dicts) use copy.deepcopy." },
+
+    { "kind": "subsection", "title": "7. Dict insertion order" },
+    { "kind": "interviewer-asks", "text": "Do Python dicts preserve insertion order?" },
+    {
+      "kind": "code",
+      "code": "d = {}\nd['banana'] = 1\nd['apple']  = 2\nd['cherry'] = 3\n\nprint(list(d.keys()))     # ['banana', 'apple', 'cherry']\nprint(list(d.values()))   # [1, 2, 3]\n\n# Order survives updates to existing keys\nd['apple'] = 99\nprint(list(d.keys()))     # ['banana', 'apple', 'cherry']  same order"
+    },
+    { "kind": "remember", "text": "Insertion order is guaranteed since Python 3.7. Before that it was a CPython 3.6 implementation detail. Use collections.OrderedDict only when you need its extra methods like move_to_end." },
+
+    { "kind": "subsection", "title": "8. range() is lazy" },
+    { "kind": "interviewer-asks", "text": "Is range(10**9) safe to use?" },
+    {
+      "kind": "code",
+      "code": "import sys\n\nr = range(10**6)\nprint(sys.getsizeof(r))            # 48 bytes  same size whatever the range\n\nfirst_few = []\nfor x in r:\n    first_few.append(x)\n    if len(first_few) == 5:\n        break\nprint(first_few)                   # [0, 1, 2, 3, 4]\n\n# Converting to a list materializes every value, expensive for big ranges\nl = list(range(1000))\nprint(sys.getsizeof(l), 'bytes for list(range(1000))')"
+    },
+    { "kind": "remember", "text": "range is a lazy sequence, not a list. It stores start, stop, step and computes values on demand. Wrap it in list() only when you actually need the materialized values." },
+
+    { "kind": "subsection", "title": "9. GIL: threading vs multiprocessing" },
+    { "kind": "interviewer-asks", "text": "Why doesn't threading speed up CPU-bound work in Python?" },
+    {
+      "kind": "code",
+      "code": "import threading, time\n\ndef cpu_work():\n    total = 0\n    for i in range(2_000_000):\n        total += i\n    return total\n\nstart = time.time()\ncpu_work(); cpu_work()\nprint(f\"Sequential : {time.time() - start:.3f}s\")\n\nstart = time.time()\nt1 = threading.Thread(target=cpu_work)\nt2 = threading.Thread(target=cpu_work)\nt1.start(); t2.start()\nt1.join();  t2.join()\nprint(f\"Two threads: {time.time() - start:.3f}s\")\n# Threads are about the same or slower for CPU work. The GIL only lets\n# one thread execute Python bytecode at a time."
+    },
+    { "kind": "remember", "text": "The GIL (Global Interpreter Lock) lets only one thread execute Python bytecode at a time. Threading helps I/O-bound work because the GIL releases during waits. For CPU work, use multiprocessing (separate processes, separate GILs)." },
+
+    { "kind": "subsection", "title": "10. Time complexity quick table" },
+    { "kind": "interviewer-asks", "text": "Pick the right data structure for the access pattern." },
+    {
+      "kind": "table",
+      "headers": ["Operation", "list", "dict", "set"],
+      "rows": [
+        ["append / add",          "O(1) amortized", "O(1) avg",       "O(1) avg"],
+        ["index / key lookup",    "O(1)",           "O(1) avg",       "n/a"],
+        ["`x in collection`",     "O(n)",           "O(1) avg",       "O(1) avg"],
+        ["remove value",          "O(n)",           "O(1) avg",       "O(1) avg"],
+        ["pop from start",        "O(n)",           "n/a",            "n/a"],
+        ["pop from end",          "O(1)",           "n/a",            "n/a"],
+        ["iterate",               "O(n)",           "O(n)",           "O(n)"],
+        ["size",                  "O(1)",           "O(1)",           "O(1)"]
+      ]
+    },
+    { "kind": "remember", "text": "If you do many `x in collection` checks on a large collection, switch list to set or dict. If you need ordered, insert/delete from both ends in O(1), use collections.deque." },
+
+    { "kind": "subsection", "title": "11. PEP 8 naming" },
+    { "kind": "interviewer-asks", "text": "What naming conventions does Python use?" },
+    {
+      "kind": "code",
+      "code": "# Variables and functions: snake_case\nuser_name = \"alice\"\ndef calculate_total(items):\n    return sum(items)\n\n# Classes: PascalCase\nclass UserAccount:\n    pass\n\n# Constants: UPPER_CASE\nMAX_RETRIES = 3\nDEFAULT_TIMEOUT = 30\n\n# Internal or protected: _leading_underscore\n_internal_cache = {}\n\n# Strongly private (name-mangled inside a class): __double_underscore\nclass A:\n    def __init__(self):\n        self.__secret = 42\n\na = A()\nprint(dir(a))    # __secret becomes _A__secret\n\n# Dunder methods: __name__   reserved by Python, do not invent\nclass Point:\n    def __init__(self, x): self.x = x\n    def __repr__(self):    return f\"Point({self.x})\""
+    },
+    { "kind": "remember", "text": "snake_case for funcs and vars, PascalCase for classes, UPPER_CASE for constants, _single underscore for protected, __double for name-mangled private. Never invent your own dunder names." },
+
+    { "kind": "subsection", "title": "12. __repr__ vs __str__" },
+    { "kind": "interviewer-asks", "text": "When should you implement each?" },
+    {
+      "kind": "code",
+      "code": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n    def __str__(self):\n        return f\"({self.x}, {self.y})\"          # for users\n\n    def __repr__(self):\n        return f\"Point(x={self.x}, y={self.y})\"  # for developers\n\np = Point(3, 4)\nprint(str(p))     # (3, 4)\nprint(repr(p))    # Point(x=3, y=4)\nprint(p)          # (3, 4)             print uses __str__\nprint([p])        # [Point(x=3, y=4)]  containers use __repr__\n\n# If you only define __repr__, str() falls back to it.\n# If you only define __str__, repr() shows the default <Point object at 0x...>"
+    },
+    { "kind": "remember", "text": "__repr__ is the developer view, shown in the REPL and inside containers. __str__ is the friendly view, used by print and str(). Always implement __repr__. __str__ is optional." },
+
+    { "kind": "subsection", "title": "13. f-string vs .format vs %" },
+    { "kind": "interviewer-asks", "text": "Which string formatting style should you use?" },
+    {
+      "kind": "code",
+      "code": "name = \"Alice\"\nage  = 30\n\n# Old C-style (avoid in new code)\nprint(\"Name: %s, Age: %d\" % (name, age))\n\n# .format() (older Python 3, still fine)\nprint(\"Name: {}, Age: {}\".format(name, age))\nprint(\"Name: {n}, Age: {a}\".format(n=name, a=age))\n\n# f-string (Python 3.6+, PREFER THIS)\nprint(f\"Name: {name}, Age: {age}\")\n\n# f-strings allow expressions and format specs inline\nprint(f\"Next year: {age + 1}\")\nprint(f\"Upper: {name.upper()}\")\nprint(f\"Price: {19.995:.2f}\")\nprint(f\"Padded: {age:>5d}\")\nprint(f\"{name=}, {age=}\")     # Python 3.8+ self-documenting"
+    },
+    { "kind": "remember", "text": "Prefer f-strings: faster, shorter, and they let you inline expressions and format specs. Fall back to .format only when the template lives somewhere user-editable (config, translation file). Avoid %-style in new code." }
+  ]
+}

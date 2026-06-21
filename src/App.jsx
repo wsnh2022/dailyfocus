@@ -11,6 +11,8 @@ import SettingsScreen from './components/settings/SettingsScreen';
 import AppsScreen from './components/apps/AppsScreen';
 import PomodoroApp from './components/apps/PomodoroApp';
 import EnglishApp from './components/apps/EnglishApp';
+import PythonLvl1Screen from './components/apps/python/PythonLvl1Screen';
+import PythonLvl1Reader from './components/apps/python/PythonLvl1Reader';
 
 prewarmSpeech();
 navigator.storage?.persist();
@@ -27,6 +29,8 @@ export default function App() {
             <Route path="/apps"           element={<AppsScreen />} />
             <Route path="/apps/pomodoro"  element={<PomodoroApp />} />
             <Route path="/apps/english"   element={<EnglishApp />} />
+            <Route path="/apps/python-lvl-1" element={<PythonLvl1Screen />} />
+            <Route path="/apps/python-lvl-1/:sectionId" element={<PythonLvl1Reader />} />
             <Route path="/history"        element={<HistoryScreen />} />
             <Route path="/settings"       element={<SettingsScreen />} />
             <Route path="*"               element={<Navigate to="/" replace />} />

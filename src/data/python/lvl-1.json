@@ -1,0 +1,1598 @@
+[
+  {
+    "id": "variables-and-types",
+    "title": "Variables & Data Types",
+    "emoji": "📦",
+    "intro": "Python figures out the type automatically. You never declare it.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "age = 25\nsalary = 75000.50\nname = \"John\"\nis_active = True\nresult = None\n\nprint(type(age))        # <class 'int'>\nprint(type(salary))     # <class 'float'>\nprint(type(name))       # <class 'str'>\nprint(type(is_active))  # <class 'bool'>\nprint(type(result))     # <class 'NoneType'>"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Concept",
+          "Code",
+          "Output"
+        ],
+        "rows": [
+          [
+            "Type name as string",
+            "`type(age).__name__`",
+            "`\"int\"`"
+          ],
+          [
+            "Check specific type",
+            "`isinstance(age, int)`",
+            "`True`"
+          ],
+          [
+            "Check multiple types",
+            "`isinstance(3.14, (int, float))`",
+            "`True`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Type Conversion"
+      },
+      {
+        "kind": "code",
+        "code": "print(int(\"25\"))        # 25\nprint(float(\"3.14\"))    # 3.14\nprint(str(100))         # \"100\"\nprint(int(3.9))         # 3  — truncates, does NOT round\nprint(bool(\"\"))         # False\nprint(bool(\"text\"))     # True\nprint(bool(0))          # False\nprint(bool(1))          # True\nprint(list(\"hello\"))    # ['h', 'e', 'l', 'l', 'o']\nprint(set([1,2,2,3]))   # {1, 2, 3}"
+      },
+      {
+        "kind": "warning",
+        "text": "`int(3.9)` gives `3`, not `4`. It truncates, it does not round. Use `round()` if you want rounding."
+      },
+      {
+        "kind": "subsection",
+        "title": "Truthy & Falsy"
+      },
+      {
+        "kind": "paragraph",
+        "text": "Python treats certain values as `False` in conditions. Everything else is `True`."
+      },
+      {
+        "kind": "code",
+        "code": "# All of these behave as False in an if statement\nif not False:   print(\"falsy\")\nif not 0:       print(\"falsy\")\nif not \"\":      print(\"falsy\")\nif not []:      print(\"falsy\")\nif not {}:      print(\"falsy\")\nif not None:    print(\"falsy\")"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Falsy",
+          "Truthy"
+        ],
+        "rows": [
+          [
+            "`False`, `0`, `0.0`",
+            "`True`, any non-zero number"
+          ],
+          [
+            "`\"\"`",
+            "any non-empty string"
+          ],
+          [
+            "`[]`, `()`, `{}`, `set()`",
+            "any non-empty collection"
+          ],
+          [
+            "`None`",
+            "everything else"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "operators",
+    "title": "Operators",
+    "emoji": "➕",
+    "intro": "Arithmetic, comparison, logical, membership. The grammar of expressions.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Arithmetic"
+      },
+      {
+        "kind": "code",
+        "code": "print(5 + 3)    # 8\nprint(5 - 3)    # 2\nprint(5 * 3)    # 15\nprint(7 / 2)    # 3.5  — always float\nprint(7 // 2)   # 3    — floor division, rounds down\nprint(7 % 2)    # 1    — remainder\nprint(2 ** 3)   # 8    — exponent"
+      },
+      {
+        "kind": "warning",
+        "text": "`/` always returns a float in Python 3. `7 / 2` is `3.5`, never `3`. Use `//` if you want integer division."
+      },
+      {
+        "kind": "subsection",
+        "title": "Assignment Shortcuts"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Operator",
+          "Same as"
+        ],
+        "rows": [
+          [
+            "`x += 5`",
+            "`x = x + 5`"
+          ],
+          [
+            "`x -= 3`",
+            "`x = x - 3`"
+          ],
+          [
+            "`x *= 2`",
+            "`x = x * 2`"
+          ],
+          [
+            "`x /= 4`",
+            "`x = x / 4`"
+          ],
+          [
+            "`x //= 2`",
+            "`x = x // 2`"
+          ],
+          [
+            "`x %= 3`",
+            "`x = x % 3`"
+          ],
+          [
+            "`x **= 2`",
+            "`x = x ** 2`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Comparison"
+      },
+      {
+        "kind": "code",
+        "code": "print(5 == 5)    # True\nprint(5 != 3)    # True\nprint(5 > 3)     # True\nprint(3 < 5)     # True\nprint(5 >= 5)    # True\nprint(3 <= 5)    # True\n\nx = 5\nprint(0 < x < 10)   # True  — chained comparisons work in Python"
+      },
+      {
+        "kind": "subsection",
+        "title": "Logical"
+      },
+      {
+        "kind": "code",
+        "code": "print(True and False)   # False — both must be True\nprint(True or False)    # True  — at least one must be True\nprint(not True)         # False — flips the value"
+      },
+      {
+        "kind": "subsection",
+        "title": "Membership & Identity"
+      },
+      {
+        "kind": "code",
+        "code": "print(5 in [1, 5, 9])       # True\nprint(4 not in [1, 5, 9])   # True\n\nx = None\nprint(x is None)            # True\nprint(x is not None)        # False"
+      },
+      {
+        "kind": "warning",
+        "text": "Use `==` for value comparison. Use `is` only for `None`, `True`, `False`. Never do `x is 5` or `x is \"hello\"` — it may work sometimes due to Python internals but it is not guaranteed."
+      }
+    ]
+  },
+  {
+    "id": "input-output",
+    "title": "Input / Output",
+    "emoji": "🔁",
+    "intro": "Read from the user with input(), write with print(), format with f-strings.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "name = input(\"Enter name: \")   # always returns a string\nage = int(input(\"Age: \"))      # convert immediately after input\nprice = float(input(\"Price: \"))\n\nprint(\"Hello\")\nprint(\"Name:\", name, \"Age:\", age)\nprint(f\"Name: {name}, Age: {age}\")     # f-string (preferred)\nprint(\"Hello {}\".format(name))         # .format() style\n\nprint(\"loading\", end=\"\")    # no newline at end\nprint(\"a\", \"b\", \"c\", sep=\"-\")  # a-b-c"
+      },
+      {
+        "kind": "subsection",
+        "title": "F-string Formatting"
+      },
+      {
+        "kind": "code",
+        "code": "price = 75000.5\nratio = 0.855\nnum = 42\nsalary = 75000\n\nprint(f\"{price:.2f}\")    # 75000.50   — 2 decimal places\nprint(f\"{salary:,}\")     # 75,000     — comma separator\nprint(f\"{num:05d}\")      # 00042      — zero-padded to 5 digits\nprint(f\"{ratio:.1%}\")    # 85.5%      — percentage"
+      }
+    ]
+  },
+  {
+    "id": "strings",
+    "title": "Strings",
+    "emoji": "🔤",
+    "intro": "Text values. Immutable, so every method returns a new string.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "text = \"Hello World\"\nprint(text.lower())              # hello world\nprint(text.upper())              # HELLO WORLD\nprint(text.replace(\"World\", \"Python\"))  # Hello Python\nprint(text)                      # Hello World  — unchanged"
+      },
+      {
+        "kind": "subsection",
+        "title": "Accessing Characters"
+      },
+      {
+        "kind": "code",
+        "code": "text = \"Hello\"\nprint(text[0])      # H      — first character\nprint(text[-1])     # o      — last character\nprint(text[1:4])    # ell    — slice from index 1 to 3\nprint(text[:3])     # Hel    — first 3 characters\nprint(text[2:])     # llo    — from index 2 to end\nprint(text[::-1])   # olleH  — reversed\nprint(len(text))    # 5"
+      },
+      {
+        "kind": "subsection",
+        "title": "Searching"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Concept",
+          "Code",
+          "Output / Notes"
+        ],
+        "rows": [
+          [
+            "Find position",
+            "`\"hello\".find(\"l\")`",
+            "`2` — returns -1 if not found"
+          ],
+          [
+            "Find from right",
+            "`\"hello\".rfind(\"l\")`",
+            "`3`"
+          ],
+          [
+            "Index (strict)",
+            "`\"hello\".index(\"l\")`",
+            "`2` — raises ValueError if not found"
+          ],
+          [
+            "Count occurrences",
+            "`\"hello\".count(\"l\")`",
+            "`2`"
+          ],
+          [
+            "Contains",
+            "`\"ell\" in \"hello\"`",
+            "`True`"
+          ],
+          [
+            "Starts with",
+            "`\"hello\".startswith(\"he\")`",
+            "`True`"
+          ],
+          [
+            "Ends with",
+            "`\"data.csv\".endswith(\".csv\")`",
+            "`True`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Modifying"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Concept",
+          "Code",
+          "Output"
+        ],
+        "rows": [
+          [
+            "Lowercase",
+            "`\"HELLO\".lower()`",
+            "`\"hello\"`"
+          ],
+          [
+            "Uppercase",
+            "`\"hello\".upper()`",
+            "`\"HELLO\"`"
+          ],
+          [
+            "Title case",
+            "`\"hello world\".title()`",
+            "`\"Hello World\"`"
+          ],
+          [
+            "Capitalize",
+            "`\"hello world\".capitalize()`",
+            "`\"Hello world\"`"
+          ],
+          [
+            "Strip whitespace",
+            "`\"  hi  \".strip()`",
+            "`\"hi\"`"
+          ],
+          [
+            "Strip left",
+            "`\"  hi  \".lstrip()`",
+            "`\"hi  \"`"
+          ],
+          [
+            "Strip right",
+            "`\"  hi  \".rstrip()`",
+            "`\"  hi\"`"
+          ],
+          [
+            "Replace",
+            "`\"aabbaa\".replace(\"a\",\"x\")`",
+            "`\"xxbbxx\"`"
+          ],
+          [
+            "Replace first only",
+            "`\"aabbaa\".replace(\"a\",\"x\",1)`",
+            "`\"xabbaa\"`"
+          ],
+          [
+            "Zero pad",
+            "`\"42\".zfill(5)`",
+            "`\"00042\"`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Splitting & Joining"
+      },
+      {
+        "kind": "code",
+        "code": "text = \"one,two,three\"\nprint(text.split(\",\"))          # ['one', 'two', 'three']\nprint(text.split(\",\", 1))       # ['one', 'two,three']  — split at first only\n\nwords = [\"one\", \"two\", \"three\"]\nprint(\",\".join(words))          # one,two,three\nprint(\"\\n\".join(words))         # each word on its own line\n\nprint(\"a=b\".partition(\"=\"))     # ('a', '=', 'b')"
+      },
+      {
+        "kind": "subsection",
+        "title": "Checking Content"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Concept",
+          "Code",
+          "Output"
+        ],
+        "rows": [
+          [
+            "All digits",
+            "`\"123\".isdigit()`",
+            "`True`"
+          ],
+          [
+            "All letters",
+            "`\"abc\".isalpha()`",
+            "`True`"
+          ],
+          [
+            "Letters and digits",
+            "`\"abc123\".isalnum()`",
+            "`True`"
+          ],
+          [
+            "All whitespace",
+            "`\"   \".isspace()`",
+            "`True`"
+          ],
+          [
+            "All lowercase",
+            "`\"hello\".islower()`",
+            "`True`"
+          ],
+          [
+            "All uppercase",
+            "`\"HELLO\".isupper()`",
+            "`True`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Escape Characters"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Character",
+          "Meaning"
+        ],
+        "rows": [
+          [
+            "`\\n`",
+            "newline"
+          ],
+          [
+            "`\\t`",
+            "tab"
+          ],
+          [
+            "`\\\\`",
+            "literal backslash"
+          ],
+          [
+            "`\\\"`",
+            "literal double quote"
+          ],
+          [
+            "`\\'`",
+            "literal single quote"
+          ]
+        ]
+      },
+      {
+        "kind": "code",
+        "code": "path = r\"C:\\Users\\name\"   # raw string — backslashes treated literally\nprint(path)               # C:\\Users\\name"
+      }
+    ]
+  },
+  {
+    "id": "numbers",
+    "title": "Numbers",
+    "emoji": "🔢",
+    "intro": "Built-in math helpers plus a few surprises around rounding and float precision.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "print(abs(-5))              # 5\nprint(round(3.14159, 2))    # 3.14\nprint(round(3.7))           # 4\nprint(pow(2, 3))            # 8\nprint(max(5, 10, 3))        # 10\nprint(min(5, 10, 3))        # 3\nprint(sum([1, 2, 3]))       # 6\nprint(divmod(7, 2))         # (3, 1)  — (quotient, remainder)\nprint(bin(10))              # 0b1010\nprint(hex(255))             # 0xff"
+      },
+      {
+        "kind": "warning",
+        "text": "`round(2.5)` returns `2`, not `3`. Python uses banker's rounding (round half to even). `round(3.5)` returns `4`. This surprises most people."
+      },
+      {
+        "kind": "code",
+        "code": "print(round(2.5))   # 2  — rounds to nearest even\nprint(round(3.5))   # 4  — rounds to nearest even\nprint(round(4.5))   # 4  — rounds to nearest even"
+      },
+      {
+        "kind": "warning",
+        "text": "Floating point is not exact. `0.1 + 0.2` does not equal `0.3` in Python (or any language using IEEE 754)."
+      },
+      {
+        "kind": "code",
+        "code": "print(0.1 + 0.2)            # 0.30000000000000004\nprint(0.1 + 0.2 == 0.3)     # False\nprint(round(0.1 + 0.2, 1) == 0.3)  # True  — workaround"
+      }
+    ]
+  },
+  {
+    "id": "lists",
+    "title": "Lists",
+    "emoji": "📋",
+    "intro": "Ordered, mutable collections. The most used data structure in Python.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Creating"
+      },
+      {
+        "kind": "code",
+        "code": "items = []                          # empty list\nscores = [85, 92, 78, 95, 88]\ndata = [1, \"hello\", True, 3.14]     # mixed types are fine\nnums = list(range(1, 6))            # [1, 2, 3, 4, 5]\nchars = list(\"hello\")               # ['h', 'e', 'l', 'l', 'o']\nzeros = [0] * 5                     # [0, 0, 0, 0, 0]\nmatrix = [[1,2], [3,4], [5,6]]      # nested list"
+      },
+      {
+        "kind": "subsection",
+        "title": "Accessing"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78, 95, 88]\nprint(scores[0])        # 85\nprint(scores[-1])       # 88    — last item\nprint(scores[1:4])      # [92, 78, 95]\nprint(scores[:3])       # [85, 92, 78]\nprint(scores[2:])       # [78, 95, 88]\nprint(scores[-2:])      # [95, 88]\nprint(scores[::-1])     # [88, 95, 78, 92, 85]  — reversed\n\nmatrix = [[1,2], [3,4]]\nprint(matrix[0][1])     # 2"
+      },
+      {
+        "kind": "subsection",
+        "title": "Adding Items"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78]\nscores.append(91)           # [85, 92, 78, 91]\nscores.insert(0, 100)       # [100, 85, 92, 78, 91]\nscores.extend([96, 97])     # [100, 85, 92, 78, 91, 96, 97]\n\ncombined = [1, 2] + [3, 4]  # [1, 2, 3, 4]  — creates new list"
+      },
+      {
+        "kind": "subsection",
+        "title": "Removing Items"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78, 92, 88]\nscores.remove(92)       # removes first match → [85, 78, 92, 88]\nval = scores.pop(1)     # removes index 1, returns it → val=78\nlast = scores.pop()     # removes last item, returns it\ndel scores[0]           # removes by index, returns nothing\nscores.clear()          # []"
+      },
+      {
+        "kind": "subsection",
+        "title": "Sorting"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78, 95, 88]\nscores.sort()                       # sorts in place → [78, 85, 88, 92, 95]\nscores.sort(reverse=True)           # [95, 92, 88, 85, 78]\n\nwords = [\"banana\", \"apple\", \"kiwi\"]\nwords.sort(key=len)                 # sort by string length → ['kiwi', 'apple', 'banana']\n\nnew_sorted = sorted(scores)         # returns new list, does not modify original"
+      },
+      {
+        "kind": "subsection",
+        "title": "Searching"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78, 95, 88]\nprint(85 in scores)         # True\nprint(scores.index(92))     # 1\nprint(scores.count(85))     # 1\nprint(len(scores))          # 5\nprint(min(scores))          # 78\nprint(max(scores))          # 95\nprint(sum(scores))          # 438"
+      },
+      {
+        "kind": "subsection",
+        "title": "Copying"
+      },
+      {
+        "kind": "code",
+        "code": "a = [1, 2, 3]\n\n# WRONG — this does NOT copy, both names point to same list\nb = a\nb.append(4)\nprint(a)    # [1, 2, 3, 4]  — a changed too!\n\n# CORRECT ways to copy\nb = a.copy()\nb = a[:]\nb = list(a)"
+      },
+      {
+        "kind": "warning",
+        "text": "Copying only works one level deep. For nested lists you need `copy.deepcopy()`. See the Shallow vs Deep Copy section."
+      }
+    ]
+  },
+  {
+    "id": "tuples",
+    "title": "Tuples",
+    "emoji": "📎",
+    "intro": "Ordered and immutable. Use when data should not change after creation.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "coords = (10.5, 20.3)\nsingle = (42,)              # comma required for single-item tuple\nalso_tuple = 1, 2, 3        # parentheses optional\n\nprint(coords[0])            # 10.5\nprint(coords[-1])           # 20.3\nprint(len(coords))          # 2\nprint(10.5 in coords)       # True\n\nx, y = coords               # unpacking\nprint(x)                    # 10.5"
+      },
+      {
+        "kind": "warning",
+        "text": "`(42)` is just parentheses around an integer. `(42,)` is the tuple. The comma is what makes it a tuple."
+      },
+      {
+        "kind": "paragraph",
+        "text": "Tuples are faster than lists and can be used as dictionary keys (lists cannot)."
+      },
+      {
+        "kind": "code",
+        "code": "location = {(10.5, 20.3): \"office\"}    # valid — tuple as dict key\n# {[10.5, 20.3]: \"office\"}             # TypeError — list is not hashable"
+      }
+    ]
+  },
+  {
+    "id": "sets",
+    "title": "Sets",
+    "emoji": "🎯",
+    "intro": "Unordered collections with no duplicates. Fast membership checks.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Creating"
+      },
+      {
+        "kind": "code",
+        "code": "unique = {1, 2, 3}\ndeduped = set([1, 2, 3, 2, 1])     # {1, 2, 3}\nempty = set()                        # NOT {} — that creates a dict\nchars = set(\"hello\")                 # {'h', 'e', 'l', 'o'}  — 'l' appears once"
+      },
+      {
+        "kind": "warning",
+        "text": "`{}` creates an empty dict, not a set. Use `set()` for empty sets."
+      },
+      {
+        "kind": "subsection",
+        "title": "Modifying"
+      },
+      {
+        "kind": "code",
+        "code": "s = {1, 2, 3}\ns.add(4)            # {1, 2, 3, 4}\ns.update([4,5,6])   # {1, 2, 3, 4, 5, 6}\ns.remove(2)         # removes 2 — raises KeyError if not found\ns.discard(99)       # safe remove — no error if 99 not in set"
+      },
+      {
+        "kind": "subsection",
+        "title": "Set Operations"
+      },
+      {
+        "kind": "code",
+        "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\n\nprint(a | b)    # {1, 2, 3, 4, 5, 6}  — union (all from both)\nprint(a & b)    # {3, 4}              — intersection (common only)\nprint(a - b)    # {1, 2}             — difference (in a but not b)\nprint(a ^ b)    # {1, 2, 5, 6}       — symmetric difference (not common)\n\nprint(a.issubset(b))     # False\nprint(a.issuperset(b))   # False\nprint(a.isdisjoint({7, 8}))  # True  — no overlap"
+      },
+      {
+        "kind": "paragraph",
+        "text": "`in` checks on sets are much faster than on lists for large collections."
+      }
+    ]
+  },
+  {
+    "id": "dictionaries",
+    "title": "Dictionaries",
+    "emoji": "🗂️",
+    "intro": "Key-value pairs. The go-to structure for labeled data.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Creating"
+      },
+      {
+        "kind": "code",
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\nempty = {}\nfrom_pairs = dict([(\"a\", 1), (\"b\", 2)])        # {\"a\": 1, \"b\": 2}\ndefaults = dict.fromkeys([\"a\",\"b\",\"c\"], 0)      # {\"a\": 0, \"b\": 0, \"c\": 0}\nnested = {\"emp1\": {\"name\": \"John\", \"score\": 92}}"
+      },
+      {
+        "kind": "subsection",
+        "title": "Accessing"
+      },
+      {
+        "kind": "code",
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\n\nprint(employee[\"name\"])             # John\n# print(employee[\"salary\"])         # KeyError — key doesn't exist\n\nprint(employee.get(\"salary\"))       # None    — safe, no error\nprint(employee.get(\"salary\", 0))    # 0       — default if missing\n\nprint(employee.keys())              # dict_keys(['name', 'age'])\nprint(employee.values())            # dict_values(['John', 30])\nprint(employee.items())             # dict_items([('name', 'John'), ('age', 30)])\n\nnested = {\"emp1\": {\"name\": \"John\", \"score\": 92}}\nprint(nested[\"emp1\"][\"name\"])       # John"
+      },
+      {
+        "kind": "subsection",
+        "title": "Modifying"
+      },
+      {
+        "kind": "code",
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\n\nemployee[\"salary\"] = 75000          # add new key\nemployee[\"age\"] = 31                # update existing key\nemployee.update({\"salary\": 80000, \"city\": \"Chennai\"})\nemployee.setdefault(\"dept\", \"General\")   # adds only if key missing\n\ndel employee[\"age\"]                 # removes key\nval = employee.pop(\"salary\", None)  # removes and returns, None if missing\nlast = employee.popitem()           # removes and returns last inserted pair\nemployee.clear()                    # {}"
+      },
+      {
+        "kind": "subsection",
+        "title": "Checking"
+      },
+      {
+        "kind": "code",
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\nprint(\"name\" in employee)           # True   — checks keys\nprint(\"John\" in employee.values())  # True   — checks values\nprint(len(employee))                # 2"
+      },
+      {
+        "kind": "subsection",
+        "title": "Looping"
+      },
+      {
+        "kind": "code",
+        "code": "employee = {\"name\": \"John\", \"age\": 30}\n\nfor key in employee:\n    print(key)              # name, age\n\nfor val in employee.values():\n    print(val)              # John, 30\n\nfor key, val in employee.items():\n    print(f\"{key}: {val}\")  # name: John  /  age: 30"
+      },
+      {
+        "kind": "subsection",
+        "title": "Merging"
+      },
+      {
+        "kind": "code",
+        "code": "d1 = {\"a\": 1, \"b\": 2}\nd2 = {\"b\": 99, \"c\": 3}\n\nmerged = d1 | d2            # Python 3.9+ → {\"a\": 1, \"b\": 99, \"c\": 3}\nmerged = {**d1, **d2}       # older Python → same result\n\n# Note: d2 values win on key conflict (\"b\" becomes 99)"
+      }
+    ]
+  },
+  {
+    "id": "conditionals",
+    "title": "Conditionals",
+    "emoji": "🔀",
+    "intro": "Branching logic with if, elif, else, ternaries, walrus, and match-case.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "if / elif / else"
+      },
+      {
+        "kind": "code",
+        "code": "score = 82\n\nif score > 90:\n    print(\"A\")\nelif score > 75:\n    print(\"B\")\nelse:\n    print(\"C\")\n# B"
+      },
+      {
+        "kind": "code",
+        "code": "age = 20\nstatus = \"active\"\n\nif age > 18 and status == \"active\":\n    print(\"eligible\")           # eligible\n\nrole = \"viewer\"\nif role == \"admin\" or role == \"owner\":\n    print(\"has access\")         # not printed\n\nmy_list = []\nif not my_list:\n    print(\"list is empty\")      # list is empty\n\nvalue = None\nif value is None:\n    print(\"no value set\")       # no value set"
+      },
+      {
+        "kind": "subsection",
+        "title": "Ternary"
+      },
+      {
+        "kind": "code",
+        "code": "score = 82\ngrade = \"Pass\" if score > 50 else \"Fail\"\nprint(grade)    # Pass\n\nlabel = \"A\" if score > 90 else \"B\" if score > 75 else \"C\"\nprint(label)    # B"
+      },
+      {
+        "kind": "subsection",
+        "title": "Walrus Operator (3.8+)"
+      },
+      {
+        "kind": "paragraph",
+        "text": "Assigns and tests a value in one expression."
+      },
+      {
+        "kind": "code",
+        "code": "items = [1, 2, 3, 4, 5, 6]\n\nif (n := len(items)) > 5:\n    print(f\"Too many items: {n}\")   # Too many items: 6"
+      },
+      {
+        "kind": "code",
+        "code": "# Useful in while loops\nwhile (line := input(\"Enter text (or 'quit'): \")) != \"quit\":\n    print(f\"You entered: {line}\")"
+      },
+      {
+        "kind": "subsection",
+        "title": "Match-Case (3.10+)"
+      },
+      {
+        "kind": "code",
+        "code": "command = \"quit\"\n\nmatch command:\n    case \"quit\":\n        print(\"Exiting\")\n    case \"help\":\n        print(\"Showing help\")\n    case _:\n        print(\"Unknown command\")\n# Exiting"
+      }
+    ]
+  },
+  {
+    "id": "loops",
+    "title": "Loops",
+    "emoji": "🔄",
+    "intro": "For loops, while loops, range, enumerate, zip, break, continue, for-else.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "For Loop"
+      },
+      {
+        "kind": "code",
+        "code": "scores = [85, 92, 78]\n\nfor score in scores:\n    print(score)        # 85, 92, 78\n\nfor char in \"hello\":\n    print(char)         # h, e, l, l, o\n\nfor i in range(5):\n    print(i)            # 0, 1, 2, 3, 4\n\nfor i in range(1, 6):\n    print(i)            # 1, 2, 3, 4, 5\n\nfor i in range(0, 10, 2):\n    print(i)            # 0, 2, 4, 6, 8\n\nfor i in range(5, 0, -1):\n    print(i)            # 5, 4, 3, 2, 1"
+      },
+      {
+        "kind": "subsection",
+        "title": "enumerate and zip"
+      },
+      {
+        "kind": "code",
+        "code": "items = [\"apple\", \"banana\", \"kiwi\"]\n\nfor i, val in enumerate(items):\n    print(i, val)       # 0 apple / 1 banana / 2 kiwi\n\nfor i, val in enumerate(items, start=1):\n    print(i, val)       # 1 apple / 2 banana / 3 kiwi\n\nnames = [\"Alice\", \"Bob\"]\nages = [25, 30]\n\nfor name, age in zip(names, ages):\n    print(name, age)    # Alice 25 / Bob 30"
+      },
+      {
+        "kind": "subsection",
+        "title": "While Loop"
+      },
+      {
+        "kind": "code",
+        "code": "count = 0\nwhile count < 3:\n    print(count)    # 0, 1, 2\n    count += 1\n\n# Infinite loop with break\nwhile True:\n    answer = input(\"Type 'yes': \")\n    if answer == \"yes\":\n        break"
+      },
+      {
+        "kind": "subsection",
+        "title": "Loop Control"
+      },
+      {
+        "kind": "code",
+        "code": "for i in range(5):\n    if i == 3:\n        break           # exits loop entirely\n    print(i)            # 0, 1, 2\n\nfor i in range(5):\n    if i == 3:\n        continue        # skips to next iteration\n    print(i)            # 0, 1, 2, 4"
+      },
+      {
+        "kind": "subsection",
+        "title": "For-Else"
+      },
+      {
+        "kind": "paragraph",
+        "text": "The `else` block runs only if the loop completed without hitting `break`."
+      },
+      {
+        "kind": "code",
+        "code": "items = [1, 2, 3, 4]\n\nfor item in items:\n    if item == 99:\n        break\nelse:\n    print(\"99 not found\")   # prints — loop finished without break"
+      }
+    ]
+  },
+  {
+    "id": "comprehensions",
+    "title": "Comprehensions",
+    "emoji": "✨",
+    "intro": "One-line shortcuts for building lists, dicts, sets, and lazy generators.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "List Comprehension"
+      },
+      {
+        "kind": "code",
+        "code": "# Basic\ndoubled = [x * 2 for x in range(5)]\nprint(doubled)          # [0, 2, 4, 6, 8]\n\n# With filter\nscores = [85, 92, 78, 95, 88]\nhigh = [x for x in scores if x > 85]\nprint(high)             # [92, 95, 88]\n\n# Transform + filter\nhigh_doubled = [x * 2 for x in scores if x > 85]\nprint(high_doubled)     # [184, 190, 176]\n\n# If-else in value\nlabels = [\"pass\" if x > 80 else \"fail\" for x in scores]\nprint(labels)           # ['pass', 'pass', 'fail', 'pass', 'pass']\n\n# Flatten nested list\nmatrix = [[1, 2], [3, 4], [5, 6]]\nflat = [x for row in matrix for x in row]\nprint(flat)             # [1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "kind": "subsection",
+        "title": "Dictionary Comprehension"
+      },
+      {
+        "kind": "code",
+        "code": "prices = {\"apple\": 1.0, \"banana\": 0.5, \"kiwi\": 2.0}\n\n# Double all prices\nnew = {k: v * 2 for k, v in prices.items()}\nprint(new)      # {'apple': 2.0, 'banana': 1.0, 'kiwi': 4.0}\n\n# Filter\ncheap = {k: v for k, v in prices.items() if v < 1.5}\nprint(cheap)    # {'apple': 1.0, 'banana': 0.5}\n\n# From two lists\nkeys = [\"a\", \"b\", \"c\"]\nvalues = [1, 2, 3]\nd = {k: v for k, v in zip(keys, values)}\nprint(d)        # {'a': 1, 'b': 2, 'c': 3}\n\n# Swap keys and values\nflipped = {v: k for k, v in prices.items()}\nprint(flipped)  # {1.0: 'apple', 0.5: 'banana', 2.0: 'kiwi'}"
+      },
+      {
+        "kind": "subsection",
+        "title": "Set Comprehension"
+      },
+      {
+        "kind": "code",
+        "code": "words = [\"Hello\", \"HELLO\", \"hello\", \"World\"]\nunique_lower = {w.lower() for w in words}\nprint(unique_lower)     # {'hello', 'world'}\n\nnumbers = [1, 2, 3, 4, 5, 6]\nevens = {x for x in numbers if x % 2 == 0}\nprint(evens)            # {2, 4, 6}"
+      },
+      {
+        "kind": "subsection",
+        "title": "Generator Expression"
+      },
+      {
+        "kind": "paragraph",
+        "text": "Same syntax as list comprehension but with `()`. Produces values one at a time instead of building the entire list in memory."
+      },
+      {
+        "kind": "code",
+        "code": "# List comprehension — builds entire list in memory\nsquares_list = [x ** 2 for x in range(1000000)]\n\n# Generator — produces one value at a time\nsquares_gen = (x ** 2 for x in range(1000000))\n\n# Use directly in functions — no extra memory\ntotal = sum(x * 2 for x in range(100))\nprint(total)        # 9900\n\nlongest = max(len(w) for w in [\"apple\", \"banana\", \"kiwi\"])\nprint(longest)      # 6\n\nany_large = any(x > 90 for x in [85, 92, 78])\nprint(any_large)    # True"
+      }
+    ]
+  },
+  {
+    "id": "functions",
+    "title": "Functions",
+    "emoji": "⚙️",
+    "intro": "Reusable blocks of logic. Parameters, defaults, args, kwargs, lambdas, scope.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Defining & Calling"
+      },
+      {
+        "kind": "code",
+        "code": "def greet():\n    print(\"Hello\")\n\ndef greet_name(name):\n    print(f\"Hello {name}\")\n\ndef add(a, b):\n    return a + b\n\ndef stats(data):\n    return min(data), max(data)     # returns a tuple\n\ngreet()                         # Hello\ngreet_name(\"John\")              # Hello John\nresult = add(3, 5)              # 8\nlo, hi = stats([5, 2, 9, 1])   # lo=1, hi=9"
+      },
+      {
+        "kind": "subsection",
+        "title": "Parameters & Arguments"
+      },
+      {
+        "kind": "code",
+        "code": "# Default value\ndef greet(name=\"World\"):\n    print(f\"Hello {name}\")\n\ngreet()             # Hello World\ngreet(\"John\")       # Hello John\ngreet(name=\"John\")  # Hello John — keyword argument\n\n# *args — variable number of positional arguments\ndef total(*args):\n    return sum(args)\n\nprint(total(1, 2, 3, 4))    # 10\n\n# **kwargs — variable number of keyword arguments\ndef config(**kwargs):\n    for k, v in kwargs.items():\n        print(f\"{k}: {v}\")\n\nconfig(host=\"localhost\", port=3000)\n# host: localhost\n# port: 3000"
+      },
+      {
+        "kind": "code",
+        "code": "# Keyword-only — must be passed by name\ndef connect(*, host, port):\n    print(f\"{host}:{port}\")\n\nconnect(host=\"localhost\", port=3000)    # works\n# connect(\"localhost\", 3000)            # TypeError\n\n# Positional-only — must be passed by position\ndef add(a, b, /):\n    return a + b\n\nadd(1, 2)           # works\n# add(a=1, b=2)     # TypeError"
+      },
+      {
+        "kind": "subsection",
+        "title": "Lambda"
+      },
+      {
+        "kind": "code",
+        "code": "double = lambda x: x * 2\nprint(double(5))    # 10\n\nadd = lambda a, b: a + b\nprint(add(3, 4))    # 7\n\n# Common use: as a sort key\npeople = [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]\npeople.sort(key=lambda p: p[\"age\"])\nprint(people[0][\"name\"])    # Bob — sorted by age ascending\n\n# map and filter\nnumbers = [1, 2, 3, 4, 5]\nprint(list(map(lambda x: x ** 2, numbers)))     # [1, 4, 9, 16, 25]\nprint(list(filter(lambda x: x > 2, numbers)))   # [3, 4, 5]"
+      },
+      {
+        "kind": "subsection",
+        "title": "Scope"
+      },
+      {
+        "kind": "code",
+        "code": "count = 0   # global\n\ndef increment():\n    global count        # must declare to modify global\n    count += 1\n\nincrement()\nprint(count)    # 1\n\ndef outer():\n    x = 10\n    def inner():\n        nonlocal x      # modify enclosing function's variable\n        x += 1\n    inner()\n    print(x)    # 11\n\nouter()"
+      },
+      {
+        "kind": "subsection",
+        "title": "Higher-Order Functions"
+      },
+      {
+        "kind": "code",
+        "code": "words = [\"banana\", \"apple\", \"kiwi\"]\n\nprint(sorted(words, key=len))               # ['kiwi', 'apple', 'banana']\nprint(sorted(words, key=len, reverse=True)) # ['banana', 'apple', 'kiwi']\n\nemployees = [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]\nyoungest = min(employees, key=lambda e: e[\"age\"])\nprint(youngest[\"name\"])     # Bob\n\nprint(list(map(str.upper, words)))          # ['BANANA', 'APPLE', 'KIWI']"
+      }
+    ]
+  },
+  {
+    "id": "none-nonetype",
+    "title": "None / NoneType",
+    "emoji": "🕳️",
+    "intro": "The absence-of-value marker. Use is for comparison, not ==.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "result = None\n\nprint(result is None)       # True   — use 'is', not '=='\nprint(result is not None)   # False\nprint(bool(None))           # False  — None is falsy\nprint(type(None))           # <class 'NoneType'>\n\ndef log(msg):\n    print(msg)\n    # no return statement\n\nval = log(\"hello\")\nprint(val)      # None  — functions without return give None"
+      },
+      {
+        "kind": "code",
+        "code": "# Safe default pattern — avoids mutable default argument bug\ndef append_to(item, lst=None):\n    if lst is None:\n        lst = []\n    lst.append(item)\n    return lst\n\n# Filter out None from a list\ndata = [1, None, 3, None, 5]\nclean = [x for x in data if x is not None]\nprint(clean)    # [1, 3, 5]"
+      },
+      {
+        "kind": "warning",
+        "text": "Never use `def foo(lst=[])`. Default mutable arguments are created once and shared across all calls. Use `None` as the default and create the object inside the function."
+      }
+    ]
+  },
+  {
+    "id": "unpacking",
+    "title": "Unpacking",
+    "emoji": "📤",
+    "intro": "Spread a sequence across variables in one move. Includes star unpacking.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "a, b = 1, 2\nprint(a, b)         # 1 2\n\nx, y = (10.5, 20.3)\nprint(x, y)         # 10.5 20.3\n\n# Swap without temp variable\na, b = b, a\nprint(a, b)         # 2 1\n\n# Star unpacking\nfirst, *rest = [1, 2, 3, 4, 5]\nprint(first)    # 1\nprint(rest)     # [2, 3, 4, 5]\n\nfirst, *mid, last = [1, 2, 3, 4, 5]\nprint(mid)      # [2, 3, 4]\n\n# Ignore values with _\n_, important, _ = (10, 42, 99)\nprint(important)    # 42\n\n# In loops\npairs = [(\"Alice\", 25), (\"Bob\", 30)]\nfor name, age in pairs:\n    print(f\"{name} is {age}\")"
+      }
+    ]
+  },
+  {
+    "id": "mutable-vs-immutable",
+    "title": "Mutable vs Immutable",
+    "emoji": "🔒",
+    "intro": "Some types can change, others cannot. Knowing which prevents subtle bugs.",
+    "concepts": [
+      {
+        "kind": "table",
+        "headers": [
+          "Mutable (can change)",
+          "Immutable (cannot change)"
+        ],
+        "rows": [
+          [
+            "`list`",
+            "`int`, `float`, `str`, `bool`"
+          ],
+          [
+            "`dict`",
+            "`tuple`, `frozenset`"
+          ],
+          [
+            "`set`",
+            "`None`"
+          ]
+        ]
+      },
+      {
+        "kind": "code",
+        "code": "# Mutable aliasing problem\na = [1, 2, 3]\nb = a           # b is NOT a copy, both point to same list\nb.append(4)\nprint(a)        # [1, 2, 3, 4]  — a changed too\n\n# Strings look mutable but aren't\ns = \"hello\"\ns = s.upper()   # creates a new string, original is gone"
+      }
+    ]
+  },
+  {
+    "id": "shallow-vs-deep-copy",
+    "title": "Shallow Copy vs Deep Copy",
+    "emoji": "🪞",
+    "intro": "Shallow copies share nested data. Deep copies clone everything.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "import copy\n\na = [1, 2, 3]\nb = a.copy()        # or a[:] or list(a)\nb.append(99)\nprint(a)    # [1, 2, 3]  — unchanged\nprint(b)    # [1, 2, 3, 99]"
+      },
+      {
+        "kind": "subsection",
+        "title": "Where Shallow Copy Fails"
+      },
+      {
+        "kind": "code",
+        "code": "a = [[1, 2], [3, 4]]\nb = a.copy()            # shallow copy\n\nb[0].append(99)\nprint(a)    # [[1, 2, 99], [3, 4]]  — inner list is shared!\nprint(b)    # [[1, 2, 99], [3, 4]]"
+      },
+      {
+        "kind": "code",
+        "code": "# Fix: use deepcopy\na = [[1, 2], [3, 4]]\nb = copy.deepcopy(a)\n\nb[0].append(99)\nprint(a)    # [[1, 2], [3, 4]]      — untouched\nprint(b)    # [[1, 2, 99], [3, 4]]"
+      },
+      {
+        "kind": "warning",
+        "text": "Shallow copy only copies the outer container. Nested lists, dicts, or objects inside are still shared. Always use `copy.deepcopy()` for nested structures."
+      }
+    ]
+  },
+  {
+    "id": "imports-and-modules",
+    "title": "Imports & Modules",
+    "emoji": "📦",
+    "intro": "Bring code from other files. The __name__ trick lets a file act as both script and module.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "import os\nimport os as operating_system        # alias\nfrom os import path                  # specific item\nfrom os import path, makedirs        # multiple items\n# from os import *                   # avoid — pollutes namespace\n\nif __name__ == \"__main__\":\n    print(\"running directly\")\n    # this block does NOT run when the file is imported"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Scenario",
+          "`__name__` value"
+        ],
+        "rows": [
+          [
+            "`python script.py`",
+            "`\"__main__\"`"
+          ],
+          [
+            "`import script` from another file",
+            "`\"script\"`"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "classes",
+    "title": "Classes",
+    "emoji": "🏛️",
+    "intro": "Custom types with state and behaviour. Inheritance, properties, dunder methods.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Defining"
+      },
+      {
+        "kind": "code",
+        "code": "class Dog:\n    count = 0   # class variable — shared across all instances\n\n    def __init__(self, name, breed):\n        self.name = name        # instance variable — unique per dog\n        self.breed = breed\n        Dog.count += 1\n\n    def bark(self):\n        return f\"{self.name} says Woof!\"\n\n    def __str__(self):\n        return f\"Dog({self.name}, {self.breed})\"\n\n    def __repr__(self):\n        return f\"Dog(name={self.name!r}, breed={self.breed!r})\"\n\nmy_dog = Dog(\"Max\", \"Golden\")\nprint(my_dog.bark())    # Max says Woof!\nprint(str(my_dog))      # Dog(Max, Golden)\nprint(Dog.count)        # 1"
+      },
+      {
+        "kind": "subsection",
+        "title": "Special (Dunder) Methods"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Method",
+          "Triggered by",
+          "Example"
+        ],
+        "rows": [
+          [
+            "`__init__`",
+            "`Dog(\"Max\", \"Golden\")`",
+            "constructor"
+          ],
+          [
+            "`__str__`",
+            "`print(obj)`, `str(obj)`",
+            "readable string"
+          ],
+          [
+            "`__repr__`",
+            "console, debugger",
+            "debug string"
+          ],
+          [
+            "`__len__`",
+            "`len(obj)`",
+            "length"
+          ],
+          [
+            "`__eq__`",
+            "`obj1 == obj2`",
+            "equality"
+          ],
+          [
+            "`__lt__`",
+            "`obj1 < obj2`",
+            "less than"
+          ],
+          [
+            "`__getitem__`",
+            "`obj[0]`",
+            "index access"
+          ],
+          [
+            "`__contains__`",
+            "`x in obj`",
+            "membership"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Inheritance"
+      },
+      {
+        "kind": "code",
+        "code": "class Puppy(Dog):\n    def __init__(self, name, breed, age_months):\n        super().__init__(name, breed)   # call parent constructor\n        self.age_months = age_months\n\n    def bark(self):     # override parent method\n        return f\"{self.name} says Yip!\"\n\npup = Puppy(\"Buddy\", \"Lab\", 3)\nprint(pup.bark())               # Buddy says Yip!\nprint(isinstance(pup, Dog))     # True\nprint(issubclass(Puppy, Dog))   # True"
+      },
+      {
+        "kind": "subsection",
+        "title": "Properties"
+      },
+      {
+        "kind": "code",
+        "code": "class Employee:\n    def __init__(self, name, salary):\n        self._salary = salary\n        self.name = name\n\n    @property\n    def salary(self):\n        return self._salary\n\n    @salary.setter\n    def salary(self, value):\n        if value < 0:\n            raise ValueError(\"Salary cannot be negative\")\n        self._salary = value\n\nemp = Employee(\"Alice\", 75000)\nprint(emp.salary)       # 75000  — calls getter\nemp.salary = 80000      # calls setter\n# emp.salary = -100     # ValueError"
+      },
+      {
+        "kind": "subsection",
+        "title": "Static & Class Methods"
+      },
+      {
+        "kind": "code",
+        "code": "class MathHelper:\n    base = 10\n\n    @staticmethod\n    def square(x):          # no self, no cls — just a utility\n        return x ** 2\n\n    @classmethod\n    def describe(cls):      # gets the class, not the instance\n        return f\"Base is {cls.base}\"\n\nprint(MathHelper.square(5))     # 25\nprint(MathHelper.describe())    # Base is 10"
+      }
+    ]
+  },
+  {
+    "id": "file-handling",
+    "title": "File Handling",
+    "emoji": "📁",
+    "intro": "Read and write files safely with the with statement.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Reading"
+      },
+      {
+        "kind": "code",
+        "code": "with open(\"data.txt\") as f:\n    content = f.read()          # entire file as one string\n\nwith open(\"data.txt\") as f:\n    lines = f.readlines()       # list of lines, each with \\n\n\nwith open(\"data.txt\") as f:\n    for line in f:              # memory-efficient for large files\n        print(line.strip())\n\nwith open(\"data.txt\", encoding=\"utf-8\") as f:\n    content = f.read()"
+      },
+      {
+        "kind": "subsection",
+        "title": "Writing"
+      },
+      {
+        "kind": "code",
+        "code": "with open(\"out.txt\", \"w\") as f:\n    f.write(\"Hello\\n\")          # overwrites if file exists\n\nwith open(\"log.txt\", \"a\") as f:\n    f.write(\"new entry\\n\")      # appends to end\n\nwith open(\"out.txt\", \"w\") as f:\n    f.writelines([\"line1\\n\", \"line2\\n\"])"
+      },
+      {
+        "kind": "subsection",
+        "title": "File Modes"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Mode",
+          "Meaning"
+        ],
+        "rows": [
+          [
+            "`\"r\"`",
+            "read (default)"
+          ],
+          [
+            "`\"w\"`",
+            "write — overwrites existing content"
+          ],
+          [
+            "`\"a\"`",
+            "append — adds to end"
+          ],
+          [
+            "`\"x\"`",
+            "create — fails if file exists"
+          ],
+          [
+            "`\"rb\"`, `\"wb\"`",
+            "binary read/write"
+          ],
+          [
+            "`\"r+\"`",
+            "read and write"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "File Position"
+      },
+      {
+        "kind": "code",
+        "code": "with open(\"data.txt\") as f:\n    f.read()\n    print(f.tell())     # current position in bytes\n    f.seek(0)           # go back to start\n    content = f.read()  # read again from beginning"
+      }
+    ]
+  },
+  {
+    "id": "error-handling",
+    "title": "Error Handling",
+    "emoji": "🛡️",
+    "intro": "Catch problems before they crash your program. try, except, else, finally.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Try / Except / Else / Finally"
+      },
+      {
+        "kind": "code",
+        "code": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"cannot divide by zero\")      # this runs\nexcept ValueError as e:\n    print(f\"value error: {e}\")\nelse:\n    print(\"no error occurred\")          # only runs if no exception\nfinally:\n    print(\"always runs\")                # runs regardless"
+      },
+      {
+        "kind": "code",
+        "code": "# Multiple exceptions in one line\ntry:\n    value = int(\"abc\")\nexcept (ValueError, TypeError) as e:\n    print(f\"conversion failed: {e}\")    # conversion failed: invalid literal..."
+      },
+      {
+        "kind": "warning",
+        "text": "Always catch specific exceptions first. A bare `except:` will catch everything including `KeyboardInterrupt` and `SystemExit`, which is almost never what you want."
+      },
+      {
+        "kind": "subsection",
+        "title": "Common Exception Types"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Exception",
+          "When it fires"
+        ],
+        "rows": [
+          [
+            "`ValueError`",
+            "right type, wrong value: `int(\"abc\")`"
+          ],
+          [
+            "`TypeError`",
+            "wrong type: `\"text\" + 5`"
+          ],
+          [
+            "`KeyError`",
+            "dict key missing: `d[\"missing\"]`"
+          ],
+          [
+            "`IndexError`",
+            "index out of range: `[1,2][5]`"
+          ],
+          [
+            "`AttributeError`",
+            "no such method: `\"text\".nonexistent()`"
+          ],
+          [
+            "`NameError`",
+            "variable not defined"
+          ],
+          [
+            "`ZeroDivisionError`",
+            "dividing by zero"
+          ],
+          [
+            "`FileNotFoundError`",
+            "file doesn't exist"
+          ],
+          [
+            "`ImportError`",
+            "module not found"
+          ],
+          [
+            "`StopIteration`",
+            "iterator exhausted"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Raising Exceptions"
+      },
+      {
+        "kind": "code",
+        "code": "def set_age(age):\n    if age < 0:\n        raise ValueError(f\"age cannot be negative, got {age}\")\n    return age\n\ntry:\n    set_age(-5)\nexcept ValueError as e:\n    print(e)    # age cannot be negative, got -5\n\n# Custom exception\nclass InsufficientFundsError(Exception):\n    pass\n\nraise InsufficientFundsError(\"balance too low\")"
+      }
+    ]
+  },
+  {
+    "id": "context-managers",
+    "title": "Context Managers",
+    "emoji": "🧰",
+    "intro": "The with statement. Automatic setup and cleanup around a block of code.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "# File — auto-closes\nwith open(\"data.txt\") as f:\n    data = f.read()\n\n# Multiple resources\nwith open(\"input.txt\") as fin, open(\"output.txt\", \"w\") as fout:\n    fout.write(fin.read())\n\n# Custom context manager using decorator\nfrom contextlib import contextmanager\n\n@contextmanager\ndef timer():\n    import time\n    start = time.time()\n    yield                               # code inside `with` runs here\n    end = time.time()\n    print(f\"Elapsed: {end - start:.2f}s\")\n\nwith timer():\n    total = sum(range(1000000))\n# Elapsed: 0.03s  (time varies)"
+      }
+    ]
+  },
+  {
+    "id": "generators",
+    "title": "Generators",
+    "emoji": "🌱",
+    "intro": "Functions that yield values lazily. Memory-efficient for big sequences.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "def count_up(n):\n    for i in range(n):\n        yield i\n\nfor val in count_up(5):\n    print(val)      # 0, 1, 2, 3, 4\n\ngen = count_up(5)\nprint(next(gen))    # 0\nprint(next(gen))    # 1\n\nprint(list(count_up(5)))    # [0, 1, 2, 3, 4]"
+      },
+      {
+        "kind": "code",
+        "code": "# Infinite generator — only safe because values are pulled one at a time\ndef integers_from(start):\n    n = start\n    while True:\n        yield n\n        n += 1\n\ngen = integers_from(1)\nprint(next(gen))    # 1\nprint(next(gen))    # 2\nprint(next(gen))    # 3"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "`return`",
+          "`yield`"
+        ],
+        "rows": [
+          [
+            "Exits function permanently",
+            "Pauses, resumes on next call"
+          ],
+          [
+            "One value",
+            "Many values, one at a time"
+          ],
+          [
+            "Entire result in memory",
+            "One value in memory at a time"
+          ],
+          [
+            "Regular function",
+            "Generator function"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "iterators",
+    "title": "Iterators",
+    "emoji": "➡️",
+    "intro": "The protocol behind every for loop. iter() and next() under the hood.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "it = iter([1, 2, 3])\nprint(next(it))     # 1\nprint(next(it))     # 2\nprint(next(it))     # 3\n# print(next(it))   # StopIteration\n\nprint(next(it, \"done\"))     # \"done\"  — default instead of error"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Iterable",
+          "Iterator"
+        ],
+        "rows": [
+          [
+            "Has `__iter__()`",
+            "Has `__iter__()` AND `__next__()`"
+          ],
+          [
+            "Can create an iterator",
+            "Is the iterator"
+          ],
+          [
+            "`list`, `str`, `dict`, `range`",
+            "result of `iter()`, generators, file objects"
+          ],
+          [
+            "Can loop multiple times",
+            "Exhausts after one pass"
+          ]
+        ]
+      },
+      {
+        "kind": "code",
+        "code": "nums = [1, 2, 3]\n\n# A list is iterable but not an iterator\nfor n in nums: print(n)     # works\nfor n in nums: print(n)     # works again — resets\n\nit = iter(nums)\nfor n in it: print(n)       # works\nfor n in it: print(n)       # prints nothing — already exhausted"
+      }
+    ]
+  },
+  {
+    "id": "decorators",
+    "title": "Decorators",
+    "emoji": "🎀",
+    "intro": "Wrap a function to add behaviour without changing its code.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "def my_decorator(func):\n    from functools import wraps\n\n    @wraps(func)                    # preserves original function's metadata\n    def wrapper(*args, **kwargs):\n        print(\"before\")\n        result = func(*args, **kwargs)\n        print(\"after\")\n        return result\n    return wrapper\n\n@my_decorator\ndef say_hello():\n    print(\"hello\")\n\nsay_hello()\n# before\n# hello\n# after"
+      },
+      {
+        "kind": "subsection",
+        "title": "Practical Examples"
+      },
+      {
+        "kind": "code",
+        "code": "import time\nfrom functools import wraps\n\n# Timer decorator\ndef timer(func):\n    @wraps(func)\n    def wrapper(*args, **kwargs):\n        start = time.time()\n        result = func(*args, **kwargs)\n        end = time.time()\n        print(f\"{func.__name__} took {end - start:.4f}s\")\n        return result\n    return wrapper\n\n@timer\ndef slow_sum(n):\n    return sum(range(n))\n\nslow_sum(1000000)   # slow_sum took 0.0312s  (time varies)"
+      },
+      {
+        "kind": "code",
+        "code": "import functools\n\n# Built-in cache decorator — remembers past results\n@functools.lru_cache(maxsize=None)\ndef fibonacci(n):\n    if n < 2:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(30))    # 832040  — fast because results are cached"
+      }
+    ]
+  },
+  {
+    "id": "type-hints",
+    "title": "Type Hints",
+    "emoji": "🏷️",
+    "intro": "Optional annotations. Python ignores them, editors and linters use them.",
+    "concepts": [
+      {
+        "kind": "code",
+        "code": "def greet(name: str) -> str:\n    return f\"Hello {name}\"\n\ndef add(a: int, b: int) -> int:\n    return a + b\n\ndef average(nums: list[int]) -> float:\n    return sum(nums) / len(nums)\n\ndef log(msg: str) -> None:\n    print(msg)\n\ndef find(name: str) -> str | None:     # can return str or None\n    if name == \"John\":\n        return \"found\"\n    return None\n\ndef config() -> dict[str, int]:\n    return {\"timeout\": 30, \"retries\": 3}"
+      },
+      {
+        "kind": "warning",
+        "text": "Type hints are documentation, not enforcement. `add(\"a\", \"b\")` will still run without error. Use a type checker like `mypy` if you want actual enforcement."
+      }
+    ]
+  },
+  {
+    "id": "built-in-functions",
+    "title": "Built-in Functions",
+    "emoji": "🧮",
+    "intro": "The standard toolkit. len, type, range, sorted, map, filter, and friends.",
+    "concepts": [
+      {
+        "kind": "subsection",
+        "title": "Most Used"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Function",
+          "What it does",
+          "Example",
+          "Output"
+        ],
+        "rows": [
+          [
+            "`len()`",
+            "length of collection",
+            "`len([1,2,3])`",
+            "`3`"
+          ],
+          [
+            "`type()`",
+            "check data type",
+            "`type(42)`",
+            "`<class 'int'>`"
+          ],
+          [
+            "`isinstance()`",
+            "check type match",
+            "`isinstance(42, int)`",
+            "`True`"
+          ],
+          [
+            "`range()`",
+            "sequence of numbers",
+            "`list(range(3))`",
+            "`[0, 1, 2]`"
+          ],
+          [
+            "`enumerate()`",
+            "index + value pairs",
+            "`list(enumerate([\"a\",\"b\"]))`",
+            "`[(0,'a'),(1,'b')]`"
+          ],
+          [
+            "`zip()`",
+            "pair items",
+            "`list(zip([1,2],[\"a\",\"b\"]))`",
+            "`[(1,'a'),(2,'b')]`"
+          ],
+          [
+            "`sorted()`",
+            "new sorted list",
+            "`sorted([3,1,2])`",
+            "`[1, 2, 3]`"
+          ],
+          [
+            "`reversed()`",
+            "reverse iterator",
+            "`list(reversed([1,2,3]))`",
+            "`[3, 2, 1]`"
+          ],
+          [
+            "`map()`",
+            "apply to all",
+            "`list(map(str,[1,2,3]))`",
+            "`['1','2','3']`"
+          ],
+          [
+            "`filter()`",
+            "keep matching",
+            "`list(filter(bool,[0,1,\"\",2]))`",
+            "`[1, 2]`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Math & Comparison"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Function",
+          "Example",
+          "Output"
+        ],
+        "rows": [
+          [
+            "`abs()`",
+            "`abs(-5)`",
+            "`5`"
+          ],
+          [
+            "`round()`",
+            "`round(3.14, 1)`",
+            "`3.1`"
+          ],
+          [
+            "`min()`",
+            "`min(3, 1, 5)`",
+            "`1`"
+          ],
+          [
+            "`max()`",
+            "`max(3, 1, 5)`",
+            "`5`"
+          ],
+          [
+            "`sum()`",
+            "`sum([1,2,3])`",
+            "`6`"
+          ],
+          [
+            "`pow()`",
+            "`pow(2, 3)`",
+            "`8`"
+          ],
+          [
+            "`divmod()`",
+            "`divmod(7, 2)`",
+            "`(3, 1)`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Type Conversion"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Function",
+          "Example",
+          "Output"
+        ],
+        "rows": [
+          [
+            "`int()`",
+            "`int(\"42\")`",
+            "`42`"
+          ],
+          [
+            "`float()`",
+            "`float(\"3.14\")`",
+            "`3.14`"
+          ],
+          [
+            "`str()`",
+            "`str(42)`",
+            "`\"42\"`"
+          ],
+          [
+            "`bool()`",
+            "`bool(0)`",
+            "`False`"
+          ],
+          [
+            "`list()`",
+            "`list(\"abc\")`",
+            "`['a','b','c']`"
+          ],
+          [
+            "`tuple()`",
+            "`tuple([1,2])`",
+            "`(1, 2)`"
+          ],
+          [
+            "`set()`",
+            "`set([1,1,2])`",
+            "`{1, 2}`"
+          ],
+          [
+            "`dict()`",
+            "`dict([(\"a\",1)])`",
+            "`{\"a\": 1}`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Checking & Testing"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Function",
+          "Example",
+          "Output"
+        ],
+        "rows": [
+          [
+            "`any()`",
+            "`any([False, True, False])`",
+            "`True`"
+          ],
+          [
+            "`all()`",
+            "`all([True, True, False])`",
+            "`False`"
+          ],
+          [
+            "`callable()`",
+            "`callable(print)`",
+            "`True`"
+          ],
+          [
+            "`hasattr()`",
+            "`hasattr(\"text\", \"upper\")`",
+            "`True`"
+          ]
+        ]
+      },
+      {
+        "kind": "subsection",
+        "title": "Characters & Encoding"
+      },
+      {
+        "kind": "table",
+        "headers": [
+          "Function",
+          "Example",
+          "Output"
+        ],
+        "rows": [
+          [
+            "`chr()`",
+            "`chr(65)`",
+            "`\"A\"`"
+          ],
+          [
+            "`ord()`",
+            "`ord(\"A\")`",
+            "`65`"
+          ],
+          [
+            "`bin()`",
+            "`bin(10)`",
+            "`\"0b1010\"`"
+          ],
+          [
+            "`hex()`",
+            "`hex(255)`",
+            "`\"0xff\"`"
+          ],
+          [
+            "`repr()`",
+            "`repr(\"hi\")`",
+            "`\"'hi'\"`"
+          ]
+        ]
+      }
+    ]
+  }
+]

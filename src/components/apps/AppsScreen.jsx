@@ -13,6 +13,12 @@ const APPS = [
     emoji: '📖',
     route: '/apps/english',
   },
+  {
+    id:    'python-lvl-1',
+    name:  'Python lvl-1',
+    emoji: '🐍',
+    route: '/apps/python-lvl-1',
+  },
 ];
 
 export default function AppsScreen() {
