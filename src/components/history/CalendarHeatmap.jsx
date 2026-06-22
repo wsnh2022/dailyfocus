@@ -4,8 +4,8 @@ const DOT_COLORS = {
   miss:    'bg-red-300',
   rest:    'bg-blue-300',
   pause:   'bg-amber-300',
-  none:    'bg-slate-200',
-  future:  'bg-slate-100',
+  none:    'bg-slate-200 dark:bg-white/10',
+  future:  'bg-slate-100 dark:bg-white/5',
   planned: 'bg-violet-200',
 };
 
@@ -75,7 +75,7 @@ export default function CalendarHeatmap({ logs, onSelectDay }) {
           {DAY_LABELS.map((lbl, i) => (
             <div
               key={i}
-              className="w-5 h-[18px] text-[10px] text-slate-400 flex items-center justify-end pr-0.5"
+              className="w-5 h-[18px] text-[10px] text-slate-400 dark:text-slate-500 flex items-center justify-end pr-0.5"
             >
               {lbl}
             </div>
@@ -88,7 +88,7 @@ export default function CalendarHeatmap({ logs, onSelectDay }) {
           return (
             <div key={wi} className="flex flex-col gap-[3px]">
               {/* Month label */}
-              <div className="h-5 text-[10px] text-slate-400 flex items-end leading-none">
+              <div className="h-5 text-[10px] text-slate-400 dark:text-slate-500 flex items-end leading-none">
                 {showMonth ? MONTH_NAMES[week[0].month] : ''}
               </div>
 

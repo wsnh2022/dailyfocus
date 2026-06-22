@@ -26,7 +26,7 @@ export default function MomentumBar() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm mb-3 h-[88px] animate-pulse" />
+      <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-4 shadow-sm dark:shadow-none mb-3 h-[88px] animate-pulse" />
     );
   }
 
@@ -38,36 +38,36 @@ export default function MomentumBar() {
   const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm mb-3">
+    <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-4 shadow-sm dark:shadow-none mb-3">
       {/* Stats row */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="text-center">
-            <div className="text-lg font-bold text-slate-800 leading-none">
+            <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">
               {currentStreak > 0 ? `🔥 ${currentStreak}` : '-'}
             </div>
-            <div className="text-[10px] text-slate-400 mt-0.5">streak</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">streak</div>
           </div>
-          <div className="w-px h-8 bg-slate-100" />
+          <div className="w-px h-8 bg-slate-100 dark:bg-white/10" />
           <div className="text-center">
-            <div className="text-lg font-bold text-slate-500 leading-none">{bestStreak}</div>
-            <div className="text-[10px] text-slate-400 mt-0.5">best</div>
+            <div className="text-lg font-bold text-slate-500 dark:text-slate-300 leading-none">{bestStreak}</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">best</div>
           </div>
           {yesterdayRate !== null && (
             <>
-              <div className="w-px h-8 bg-slate-100" />
+              <div className="w-px h-8 bg-slate-100 dark:bg-white/10" />
               <div className="text-center">
-                <div className="text-lg font-bold text-slate-500 leading-none">{yesterdayRate}%</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">yesterday</div>
+                <div className="text-lg font-bold text-slate-500 dark:text-slate-300 leading-none">{yesterdayRate}%</div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">yesterday</div>
               </div>
             </>
           )}
           {total > 0 && (
             <>
-              <div className="w-px h-8 bg-slate-100" />
+              <div className="w-px h-8 bg-slate-100 dark:bg-white/10" />
               <div className="text-center">
-                <div className="text-lg font-bold text-slate-800 leading-none">{pct}%</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">today</div>
+                <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">{pct}%</div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">today</div>
               </div>
             </>
           )}
@@ -88,18 +88,18 @@ export default function MomentumBar() {
       {/* Progress / message */}
       {total > 0 ? (
         <div className="flex items-center gap-2.5">
-          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-green-400 rounded-full transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <p className="text-xs text-slate-500 font-medium shrink-0 tabular-nums">
+          <p className="text-xs text-slate-500 dark:text-slate-300 font-medium shrink-0 tabular-nums">
             {done} / {total} done
           </p>
         </div>
       ) : (
-        <p className="text-xs text-slate-500 italic leading-snug">{message}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 italic leading-snug">{message}</p>
       )}
     </div>
   );

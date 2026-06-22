@@ -44,13 +44,13 @@ export default function EditorScreen() {
 
   // Edit mode - reached via long-press on task card
   if (editingTask === undefined) {
-    return <div className="p-4 text-sm text-slate-400">Loading…</div>;
+    return <div className="p-4 text-sm text-slate-400 dark:text-slate-500">Loading…</div>;
   }
   if (editingTask === null) {
     return (
       <div className="p-4">
-        <p className="text-slate-500">Task not found.</p>
-        <button onClick={() => navigate('/')} className="text-sm text-slate-600 mt-2">← Back</button>
+        <p className="text-slate-500 dark:text-slate-300">Task not found.</p>
+        <button onClick={() => navigate('/')} className="text-sm text-slate-600 dark:text-slate-400 mt-2">← Back</button>
       </div>
     );
   }

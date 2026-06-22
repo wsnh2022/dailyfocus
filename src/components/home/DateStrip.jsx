@@ -49,13 +49,13 @@ export default function DateStrip({ selected, onSelect, taskCountByDate = {} }) 
             className={[
               'flex flex-col items-center gap-0.5 rounded-2xl py-2 px-3 shrink-0 transition-colors',
               isSel
-                ? 'bg-slate-800 text-white'
+                ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900'
                 : isToday
-                  ? 'bg-white border border-slate-200 text-slate-800'
-                  : 'bg-transparent text-slate-600',
+                  ? 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100'
+                  : 'bg-transparent text-slate-600 dark:text-slate-300',
             ].join(' ')}
           >
-            <span className={`text-[10px] font-medium ${isSel ? 'text-slate-300' : 'text-slate-400'}`}>
+            <span className={`text-[10px] font-medium ${isSel ? 'text-slate-300 dark:text-slate-500' : 'text-slate-400 dark:text-slate-500'}`}>
               {isToday ? 'Today' : day}
             </span>
             <span className="text-sm font-bold leading-none">{num}</span>

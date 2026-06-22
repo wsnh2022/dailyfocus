@@ -8,4 +8,9 @@
 
 body {
   overscroll-behavior: none;
+  background-color: #f8fafc; /* slate-50, matches app shell in light */
+}
+
+html.dark body {
+  background-color: #020617; /* slate-950, matches app shell in dark */
 }

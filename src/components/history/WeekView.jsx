@@ -11,8 +11,8 @@ const STATE_BG = {
   rest:    'bg-blue-300',
   pause:   'bg-amber-300',
   planned: 'bg-violet-200',
-  none:    'bg-slate-100',
-  future:  'bg-slate-50',
+  none:    'bg-slate-100 dark:bg-white/5',
+  future:  'bg-slate-50 dark:bg-white/[0.02]',
 };
 
 const STATE_TEXT = {
@@ -22,8 +22,8 @@ const STATE_TEXT = {
   rest:    'text-white',
   pause:   'text-amber-900',
   planned: 'text-violet-700',
-  none:    'text-slate-400',
-  future:  'text-slate-300',
+  none:    'text-slate-400 dark:text-slate-500',
+  future:  'text-slate-300 dark:text-slate-600',
 };
 
 const STATE_EMOJI = { rest: '🌿', pause: '⏸️' };
@@ -62,7 +62,7 @@ function formatWeekLabel(mondayStr) {
 function WeekTaskList({ days, logMap }) {
   const pastDays = days.filter(d => !d.isFuture);
   if (pastDays.length === 0) return (
-    <p className="text-center text-sm text-slate-400 py-6">No data for this week yet.</p>
+    <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-6">No data for this week yet.</p>
   );
 
   return (
@@ -82,25 +82,25 @@ function WeekTaskList({ days, logMap }) {
                 {STATE_EMOJI[day.state] ?? label}
               </span>
               {!STATE_EMOJI[day.state] && (
-                <span className="text-[10px] text-slate-400">{label}</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500">{label}</span>
               )}
               {!day.isFuture && tasks.length > 0 && (
-                <span className="ml-auto text-[10px] font-semibold text-slate-400">{done}/{tasks.length}</span>
+                <span className="ml-auto text-[10px] font-semibold text-slate-400 dark:text-slate-500">{done}/{tasks.length}</span>
               )}
             </div>
             {tasks.length === 0 ? (
-              <p className="text-xs text-slate-300 pl-1 pb-1">
+              <p className="text-xs text-slate-300 dark:text-slate-600 pl-1 pb-1">
                 {day.isFuture ? 'Planned: no tasks yet' : 'No tasks logged'}
               </p>
             ) : (
               <ul className="space-y-1">
                 {tasks.map((task, i) => (
-                  <li key={task.id ?? i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50">
+                  <li key={task.id ?? i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5">
                     <span className="text-sm leading-none">{task.emoji}</span>
-                    <span className={`flex-1 text-xs ${task.completed ? 'text-slate-700' : 'text-slate-400 line-through'}`}>
+                    <span className={`flex-1 text-xs ${task.completed ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500 line-through'}`}>
                       {task.name}
                     </span>
-                    <span className={`text-xs font-medium ${task.completed ? 'text-green-500' : 'text-slate-300'}`}>
+                    <span className={`text-xs font-medium ${task.completed ? 'text-green-500 dark:text-emerald-300' : 'text-slate-300 dark:text-slate-600'}`}>
                       {task.completed ? '✓' : '○'}
                     </span>
                   </li>
@@ -144,12 +144,12 @@ export default function WeekView({ logs }) {
       <div className="flex items-center justify-between mb-5">
         <button
           onClick={() => setWeekStart(addDays(weekStart, -7))}
-          className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 text-xl font-bold active:bg-slate-200"
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-xl font-bold active:bg-slate-200 dark:active:bg-white/10"
         >‹</button>
-        <span className="text-xs font-semibold text-slate-600">{formatWeekLabel(weekStart)}</span>
+        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{formatWeekLabel(weekStart)}</span>
         <button
           onClick={() => setWeekStart(addDays(weekStart, 7))}
-          className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 text-xl font-bold active:bg-slate-200"
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-xl font-bold active:bg-slate-200 dark:active:bg-white/10"
         >›</button>
       </div>
 
@@ -179,7 +179,7 @@ export default function WeekView({ logs }) {
 
       <CalendarLegend />
 
-      <div className="pt-4 border-t border-slate-100">
+      <div className="pt-4 border-t border-slate-100 dark:border-white/5">
         <WeekTaskList days={days} logMap={logMap} />
       </div>
     </div>

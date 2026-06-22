@@ -19,7 +19,7 @@ export function CalendarLegend() {
       {LEGEND.map(({ color, label }) => (
         <div key={label} className="flex items-center gap-1">
           <div className={`w-2.5 h-2.5 rounded-sm ${color}`} />
-          <span className="text-[10px] text-slate-400">{label}</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">{label}</span>
         </div>
       ))}
     </div>
@@ -43,32 +43,32 @@ export default function HistoryScreen() {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold text-slate-800 mb-4">History</h1>
+      <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">History</h1>
 
       {/* Summary stats */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
-          <div className="text-lg font-bold text-slate-800 leading-none">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-3 shadow-sm dark:shadow-none text-center">
+          <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">
             {currentStreak > 0 ? `🔥 ${currentStreak}` : '-'}
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">streak</div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">streak</div>
         </div>
-        <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
-          <div className="text-lg font-bold text-slate-800 leading-none">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-3 shadow-sm dark:shadow-none text-center">
+          <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">
             {bestStreak > 0 ? bestStreak : '-'}
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">best</div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">best</div>
         </div>
-        <div className="bg-white rounded-2xl p-3 shadow-sm text-center">
-          <div className="text-lg font-bold text-slate-800 leading-none">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-3 shadow-sm dark:shadow-none text-center">
+          <div className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-none">
             {totalActiveDays > 0 ? totalActiveDays : '-'}
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">total days</div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">total days</div>
         </div>
       </div>
 
       {/* View toggle */}
-      <div className="flex bg-slate-100 rounded-xl p-1 mb-4">
+      <div className="flex bg-slate-100 dark:bg-white/5 rounded-xl p-1 mb-4">
         {[
           { id: 'month', label: '📅 Month' },
           { id: 'week',  label: '📆 Week'  },
@@ -78,7 +78,7 @@ export default function HistoryScreen() {
             onClick={() => setView(v.id)}
             className={[
               'flex-1 py-2 rounded-lg text-sm font-semibold transition-all',
-              view === v.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400',
+              view === v.id ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm dark:shadow-none' : 'text-slate-400 dark:text-slate-500',
             ].join(' ')}
           >
             {v.label}
@@ -87,9 +87,9 @@ export default function HistoryScreen() {
       </div>
 
       {/* Calendar card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl p-4 shadow-sm dark:shadow-none">
         {loading ? (
-          <div className="h-64 rounded-xl bg-slate-100 animate-pulse" />
+          <div className="h-64 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse" />
         ) : view === 'month' ? (
           <MonthCalendar logs={logs} />
         ) : (

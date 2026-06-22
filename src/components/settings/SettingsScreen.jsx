@@ -73,15 +73,15 @@ export default function SettingsScreen() {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold text-slate-800 mb-5">Settings</h1>
+      <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-5">Settings</h1>
 
       {/* Dashboard */}
       <section className="mb-4">
-        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+        <h2 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2 px-1">
           Dashboard
         </h2>
-        <div className="bg-white rounded-2xl shadow-sm p-4">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none p-4">
+          <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
             Subtitle
           </label>
           <div className="flex gap-2 mt-1.5">
@@ -91,25 +91,25 @@ export default function SettingsScreen() {
               onChange={e => setSubtitleDraft(e.target.value)}
               maxLength={40}
               placeholder="datacraft by yogi"
-              className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-slate-400 dark:focus:border-white/30 bg-white dark:bg-slate-950 placeholder:text-slate-300 dark:placeholder:text-slate-600"
             />
             <button
               onClick={() => { setHeroSubtitle(subtitleDraft.trim() || 'datacraft by yogi'); showToast('Dashboard updated'); }}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold"
+              className="px-4 py-2.5 rounded-xl bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold"
             >
               Save
             </button>
           </div>
-          <p className="text-xs text-slate-300 mt-1.5">Shown below "DailyFocus" on the home screen</p>
+          <p className="text-xs text-slate-300 dark:text-slate-500 mt-1.5">Shown below "DailyFocus" on the home screen</p>
         </div>
       </section>
 
       {/* Pomodoro sound */}
       <section className="mb-4">
-        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+        <h2 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2 px-1">
           Pomodoro Sound
         </h2>
-        <div className="bg-white rounded-2xl shadow-sm p-3">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none p-3">
           <div className="grid grid-cols-4 gap-2">
             {SOUND_PROFILES.map(p => (
               <button
@@ -117,8 +117,8 @@ export default function SettingsScreen() {
                 onClick={() => handleSoundChange(p.id)}
                 className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-xs font-medium transition-colors ${
                   soundProfile === p.id
-                    ? 'bg-slate-800 text-white'
-                    : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+                    ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 active:bg-slate-200 dark:active:bg-white/10'
                 }`}
               >
                 <span className="text-lg leading-none">{p.emoji}</span>
@@ -126,15 +126,15 @@ export default function SettingsScreen() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-slate-400 mt-2 text-center">Tap to preview</p>
-          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 text-center">Tap to preview</p>
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-700">Voice announcements</p>
-              <p className="text-xs text-slate-400">Speaks task name &amp; break duration</p>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Voice announcements</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Speaks task name &amp; break duration</p>
             </div>
             <button
               onClick={() => { const next = !voiceOn; setVoiceEnabled(next); setVoiceOn(next); }}
-              className={`w-12 h-6 rounded-full transition-colors relative ${voiceOn ? 'bg-slate-800' : 'bg-slate-200'}`}
+              className={`w-12 h-6 rounded-full transition-colors relative ${voiceOn ? 'bg-slate-800 dark:bg-emerald-500' : 'bg-slate-200 dark:bg-white/10'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${voiceOn ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
@@ -144,32 +144,32 @@ export default function SettingsScreen() {
 
       {/* Backup */}
       <section className="mb-4">
-        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+        <h2 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2 px-1">
           Data Backup
         </h2>
-        <div className="bg-white rounded-2xl shadow-sm divide-y divide-slate-100">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none divide-y divide-slate-100 dark:divide-white/5">
           <button
             onClick={handleExport}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50"
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50 dark:active:bg-white/5"
           >
             <span className="text-xl">💾</span>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-800">Export Backup</div>
-              <div className="text-xs text-slate-400">Download all data as JSON</div>
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Export Backup</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Download all data as JSON</div>
             </div>
-            <span className="text-slate-300">›</span>
+            <span className="text-slate-300 dark:text-slate-600">›</span>
           </button>
 
           <button
             onClick={handleExportCsv}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50"
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50 dark:active:bg-white/5"
           >
             <span className="text-xl">📊</span>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-800">Export CSV</div>
-              <div className="text-xs text-slate-400">Download history as spreadsheet</div>
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Export CSV</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Download history as spreadsheet</div>
             </div>
-            <span className="text-slate-300">›</span>
+            <span className="text-slate-300 dark:text-slate-600">›</span>
           </button>
 
           <button
@@ -179,12 +179,12 @@ export default function SettingsScreen() {
           >
             <span className="text-xl">📂</span>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-800">
+              <div className="text-sm font-medium text-slate-800 dark:text-slate-100">
                 {importing ? 'Importing…' : 'Import Backup'}
               </div>
-              <div className="text-xs text-slate-400">Restore from a .json backup file</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Restore from a .json backup file</div>
             </div>
-            <span className="text-slate-300">›</span>
+            <span className="text-slate-300 dark:text-slate-600">›</span>
           </button>
           <input
             ref={fileRef}
@@ -198,33 +198,33 @@ export default function SettingsScreen() {
 
       {/* Danger zone */}
       <section className="mb-4">
-        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">
+        <h2 className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2 px-1">
           Data
         </h2>
-        <div className="bg-white rounded-2xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none">
           <button
             onClick={() => setShowClearConfirm(true)}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50"
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-slate-50 dark:active:bg-white/5"
           >
             <span className="text-xl">🗑️</span>
             <div className="flex-1">
-              <div className="text-sm font-medium text-red-500">Clear All Data</div>
-              <div className="text-xs text-slate-400">Permanently delete all tasks and history</div>
+              <div className="text-sm font-medium text-red-500 dark:text-red-300">Clear All Data</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Permanently delete all tasks and history</div>
             </div>
-            <span className="text-slate-300">›</span>
+            <span className="text-slate-300 dark:text-slate-600">›</span>
           </button>
         </div>
       </section>
 
       {/* App info */}
       <section>
-        <div className="bg-white rounded-2xl shadow-sm px-4 py-3.5">
+        <div className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none px-4 py-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">Version</span>
-            <span className="text-sm text-slate-400">1.0.0</span>
+            <span className="text-sm text-slate-600 dark:text-slate-300">Version</span>
+            <span className="text-sm text-slate-400 dark:text-slate-500">1.0.0</span>
           </div>
         </div>
-        <p className="text-center text-xs text-slate-400 mt-4">
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
           DailyFocus · Built for consistency.
         </p>
       </section>
@@ -233,8 +233,8 @@ export default function SettingsScreen() {
         <Modal onClose={() => !clearing && setShowClearConfirm(false)}>
           <div className="text-center py-2">
             <div className="text-4xl mb-3">⚠️</div>
-            <h2 className="text-lg font-bold text-slate-800 mb-2">Clear all data?</h2>
-            <p className="text-sm text-slate-500 mb-6">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Clear all data?</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-300 mb-6">
               This deletes every task, log, and session. Export a backup first if you want to keep your history.
             </p>
             <div className="space-y-2">
@@ -248,7 +248,7 @@ export default function SettingsScreen() {
               <button
                 onClick={() => setShowClearConfirm(false)}
                 disabled={clearing}
-                className="w-full py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm"
+                className="w-full py-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-200 font-semibold text-sm"
               >
                 Cancel
               </button>

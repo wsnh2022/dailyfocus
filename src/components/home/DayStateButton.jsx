@@ -70,25 +70,25 @@ export default function DayStateButton() {
       <div className="flex items-center justify-between mb-3">
         {/* Date + planned time */}
         <div className="flex flex-col gap-0.5">
-          <p className="text-xs font-semibold text-slate-600">{todayLabel()}</p>
+          <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">{todayLabel()}</p>
           {totalMin > 0 && (
-            <p className="text-xs text-slate-400">{formatDuration(totalMin)} planned</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{formatDuration(totalMin)} planned</p>
           )}
         </div>
 
         <button
           onClick={() => setShowPicker(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-sm border border-slate-200 text-sm font-medium text-slate-700"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 shadow-sm dark:shadow-none border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200"
         >
           <span>{cfg.emoji}</span>
           <span>{cfg.label}</span>
-          <span className="text-slate-400 text-xs ml-0.5">▾</span>
+          <span className="text-slate-400 dark:text-slate-500 text-xs ml-0.5">▾</span>
         </button>
       </div>
 
       {showPicker && (
         <Modal onClose={() => setShowPicker(false)}>
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Set Day Type</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Set Day Type</h2>
           <div className="space-y-2">
             {STATES.map(key => {
               const { label, emoji } = DAY_STATE_CONFIG[key];
@@ -97,15 +97,15 @@ export default function DayStateButton() {
                   key={key}
                   onClick={() => handleSelect(key)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
-                    todayDayState === key ? 'bg-slate-100' : 'hover:bg-slate-50'
+                    todayDayState === key ? 'bg-slate-100 dark:bg-white/10' : 'hover:bg-slate-50 dark:hover:bg-white/5'
                   }`}
                 >
                   <span className="text-xl">{emoji}</span>
-                  <span className={`text-sm ${todayDayState === key ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>
+                  <span className={`text-sm ${todayDayState === key ? 'font-semibold text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-200'}`}>
                     {label}
                   </span>
                   {todayDayState === key && (
-                    <span className="ml-auto text-xs text-slate-400">current</span>
+                    <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">current</span>
                   )}
                 </button>
               );
@@ -118,11 +118,11 @@ export default function DayStateButton() {
         <Modal onClose={() => setBlockReason(null)}>
           <div className="text-center py-2">
             <div className="text-4xl mb-3">🚫</div>
-            <h2 className="text-lg font-bold text-slate-800 mb-2">Can't set that</h2>
-            <p className="text-sm text-slate-500 mb-6">{blockReason}</p>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Can't set that</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-300 mb-6">{blockReason}</p>
             <button
               onClick={() => setBlockReason(null)}
-              className="w-full py-3 rounded-xl bg-slate-800 text-white font-semibold text-sm"
+              className="w-full py-3 rounded-xl bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold text-sm"
             >
               Got it
             </button>

@@ -89,7 +89,7 @@ function Checkbox({ c, completed, onToggle }) {
     <button
       onClick={onToggle}
       className={`w-8 h-8 rounded-lg border-2 ${c.border} flex items-center justify-center flex-shrink-0 transition-colors ${
-        completed ? c.bg : 'bg-white'
+        completed ? c.bg : 'bg-white dark:bg-slate-800'
       }`}
     >
       {completed && <span className={`text-sm font-bold ${c.text}`}>✓</span>}
@@ -142,7 +142,7 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
       </div>
 
       {/* Edit action - revealed by swiping left */}
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 flex items-center justify-center">
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-slate-700 dark:bg-slate-600 flex items-center justify-center">
         <button
           onClick={() => { close(); navigate(`/editor/${taskId}`); }}
           className="flex flex-col items-center gap-1 text-white"
@@ -154,14 +154,14 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
 
       {/* Sliding card content */}
       <div
-        className="bg-white p-4 flex items-center gap-3"
+        className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 p-4 flex items-center gap-3"
         style={{ transform: `translateX(${offset}px)`, transition: transitioning ? 'transform 0.2s ease-out' : 'none' }}
       >
         {/* Drag handle */}
         <button
           {...dragListeners}
           {...dragAttributes}
-          className="touch-none shrink-0 text-slate-300 cursor-grab active:cursor-grabbing px-0.5 -ml-1"
+          className="touch-none shrink-0 text-slate-300 dark:text-slate-600 cursor-grab active:cursor-grabbing px-0.5 -ml-1"
           style={{ touchAction: 'none' }}
           tabIndex={-1}
         >
@@ -198,7 +198,7 @@ function CheckboxCard({ task, onToggleComplete, dragListeners, dragAttributes })
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
+        <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
       </div>
       <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
     </SwipeCard>
@@ -244,9 +244,9 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
+        <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
         {!isRunning && secondsLeft === totalSeconds
-          ? <p className="text-sm text-slate-400 mt-0.5">{duration ?? 30} {durationUnit ?? 'min'}</p>
+          ? <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">{duration ?? 30} {durationUnit ?? 'min'}</p>
           : <TimerDisplay formatted={formatted} />
         }
       </div>
@@ -255,7 +255,7 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
           <button
             onClick={handleStartPause}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-              isRunning ? 'bg-slate-200 text-slate-700' : `${c.bg} ${c.text}`
+              isRunning ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' : `${c.bg} ${c.text}`
             }`}
           >
             {isRunning ? 'Pause' : 'Start'}
@@ -326,9 +326,9 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
         {emoji}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-base font-bold text-slate-800 truncate leading-tight">{name}</p>
+        <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
         {phase === 'idle'
-          ? <p className="text-sm text-slate-400 mt-0.5">{workMin ?? 25} min · {breakMin ?? 5} min break</p>
+          ? <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">{workMin ?? 25} min · {breakMin ?? 5} min break</p>
           : <TimerDisplay
               formatted={
                 isDone               ? 'Done!'       :
@@ -353,7 +353,7 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500 text-white">Work →</button>;
           if (isRunning)
             return <button onClick={skipCurrent}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700">Skip</button>;
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">Skip</button>;
           return null;
         })()}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />

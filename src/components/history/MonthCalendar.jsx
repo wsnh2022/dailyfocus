@@ -12,8 +12,8 @@ const STATE_BG = {
   rest:    'bg-blue-300',
   pause:   'bg-amber-300',
   planned: 'bg-violet-200',
-  none:    'bg-slate-100',
-  future:  'bg-slate-50',
+  none:    'bg-slate-100 dark:bg-white/5',
+  future:  'bg-slate-50 dark:bg-white/[0.02]',
 };
 
 const STATE_TEXT = {
@@ -23,8 +23,8 @@ const STATE_TEXT = {
   rest:    'text-white',
   pause:   'text-amber-900',
   planned: 'text-violet-700',
-  none:    'text-slate-400',
-  future:  'text-slate-300',
+  none:    'text-slate-400 dark:text-slate-500',
+  future:  'text-slate-300 dark:text-slate-600',
 };
 
 const STATE_EMOJI = { rest: '🌿', pause: '⏸️' };
@@ -53,20 +53,20 @@ function MonthSummary({ logs, ym }) {
   const pauseDays  = monthLogs.filter(l => l.dayState === 'pause').length;
 
   if (monthLogs.length === 0) return (
-    <div className="text-center py-6 text-sm text-slate-400">No data for this month yet.</div>
+    <div className="text-center py-6 text-sm text-slate-400 dark:text-slate-500">No data for this month yet.</div>
   );
 
   return (
-    <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100">
+    <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
       {[
         { label: 'Active days',   value: activeDays },
         { label: 'Avg completion', value: `${avgRate}%` },
         { label: 'Tasks done',    value: totalDone },
         { label: 'Rest · Pause',  value: `${restDays} · ${pauseDays}` },
       ].map(({ label, value }) => (
-        <div key={label} className="bg-slate-50 rounded-xl px-3 py-2.5">
-          <div className="text-base font-bold text-slate-700 leading-none">{value}</div>
-          <div className="text-[10px] text-slate-400 mt-1">{label}</div>
+        <div key={label} className="bg-slate-50 dark:bg-white/5 rounded-xl px-3 py-2.5">
+          <div className="text-base font-bold text-slate-700 dark:text-slate-100 leading-none">{value}</div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">{label}</div>
         </div>
       ))}
     </div>
@@ -80,27 +80,27 @@ function InlineDayDetail({ log, dateStr, onClose }) {
   const stateEmoji = log ? (STATE_EMOJI[log.dayState] ?? '✅') : '';
 
   return (
-    <div className="mt-4 pt-4 border-t border-slate-100">
+    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs text-slate-400">{label}</p>
-          <p className="text-sm font-semibold text-slate-700">
+          <p className="text-xs text-slate-400 dark:text-slate-500">{label}</p>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             {stateEmoji} {log ? `${done}/${tasks.length} done` : 'No data'}
           </p>
         </div>
-        <button onClick={onClose} className="text-slate-300 text-lg leading-none active:text-slate-500">✕</button>
+        <button onClick={onClose} className="text-slate-300 dark:text-slate-600 text-lg leading-none active:text-slate-500">✕</button>
       </div>
       {tasks.length === 0 ? (
-        <p className="text-xs text-slate-400 text-center py-3">No tasks logged.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-3">No tasks logged.</p>
       ) : (
         <ul className="space-y-1.5">
           {tasks.map((task, i) => (
-            <li key={task.id ?? i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-50">
+            <li key={task.id ?? i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5">
               <span className="text-base leading-none">{task.emoji}</span>
-              <span className={`flex-1 text-sm ${task.completed ? 'text-slate-700' : 'text-slate-400 line-through'}`}>
+              <span className={`flex-1 text-sm ${task.completed ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500 line-through'}`}>
                 {task.name}
               </span>
-              <span className={`text-sm font-medium ${task.completed ? 'text-green-500' : 'text-slate-300'}`}>
+              <span className={`text-sm font-medium ${task.completed ? 'text-green-500 dark:text-emerald-300' : 'text-slate-300 dark:text-slate-600'}`}>
                 {task.completed ? '✓' : '○'}
               </span>
             </li>
@@ -150,14 +150,14 @@ export default function MonthCalendar({ logs, onSelectDay }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 text-xl font-bold active:bg-slate-200">‹</button>
-        <span className="text-sm font-semibold text-slate-700">{MONTH_NAMES[month - 1]} {year}</span>
-        <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 text-xl font-bold active:bg-slate-200">›</button>
+        <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-xl font-bold active:bg-slate-200 dark:active:bg-white/10">‹</button>
+        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{MONTH_NAMES[month - 1]} {year}</span>
+        <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-xl font-bold active:bg-slate-200 dark:active:bg-white/10">›</button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {DAY_HEADERS.map(d => (
-          <div key={d} className="text-center text-[10px] font-semibold text-slate-400 py-1">{d}</div>
+          <div key={d} className="text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 py-1">{d}</div>
         ))}
       </div>
 

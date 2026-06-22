@@ -14,18 +14,18 @@ import DateStrip from './DateStrip';
 
 function BackupBanner({ onDismiss, onGoBackup }) {
   return (
-    <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 mb-3">
+    <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-400/10 border border-amber-200 dark:border-amber-400/20 rounded-xl px-3 py-2.5 mb-3">
       <span className="text-base shrink-0">💾</span>
-      <p className="text-xs text-amber-800 flex-1 font-medium">
+      <p className="text-xs text-amber-800 dark:text-amber-100 flex-1 font-medium">
         Weekly reminder: back up your data.
       </p>
       <button
         onClick={onGoBackup}
-        className="text-xs font-semibold text-amber-700 underline shrink-0"
+        className="text-xs font-semibold text-amber-700 dark:text-amber-200 underline shrink-0"
       >
         Back up
       </button>
-      <button onClick={onDismiss} className="text-amber-400 text-sm ml-1 shrink-0">✕</button>
+      <button onClick={onDismiss} className="text-amber-400 dark:text-amber-300/70 text-sm ml-1 shrink-0">✕</button>
     </div>
   );
 }
@@ -120,7 +120,7 @@ export default function HomeScreen() {
   }, [updateTaskCompletion, setTodayTasks, showToast]);
 
   if (loading) {
-    return <div className="p-4 text-sm text-slate-400">Loading…</div>;
+    return <div className="p-4 text-sm text-slate-400 dark:text-slate-500">Loading…</div>;
   }
 
   const isToday = selectedDate === today;
@@ -149,10 +149,10 @@ export default function HomeScreen() {
       {isToday && (todayDayState === 'rest' || todayDayState === 'pause') && (
         <div className="text-center py-16">
           <div className="text-5xl mb-4">{todayDayState === 'rest' ? '🌿' : '⏸️'}</div>
-          <p className="text-slate-700 font-semibold mb-1">
+          <p className="text-slate-700 dark:text-slate-200 font-semibold mb-1">
             {todayDayState === 'rest' ? 'Rest Day' : 'Pause Day'}
           </p>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-400 dark:text-slate-500">
             {todayDayState === 'rest'
               ? 'Recharge today. Tasks resume tomorrow.'
               : 'Taking a break. See you soon.'}
@@ -164,11 +164,11 @@ export default function HomeScreen() {
       {isToday && todayDayState === 'active' && (todayTasks.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-5xl mb-4">🎯</div>
-          <p className="text-slate-500 font-medium mb-1">No tasks yet.</p>
-          <p className="text-sm text-slate-400 mb-6">Add your first task to get started.</p>
+          <p className="text-slate-500 dark:text-slate-300 font-medium mb-1">No tasks yet.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500 mb-6">Add your first task to get started.</p>
           <button
             onClick={() => navigate('/editor', { state: { fromHome: true } })}
-            className="px-8 py-3 bg-slate-800 text-white rounded-2xl font-semibold text-sm"
+            className="px-8 py-3 bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl font-semibold text-sm"
           >
             + Add Task
           </button>
@@ -198,7 +198,7 @@ export default function HomeScreen() {
               <div className="mt-2">
                 <button
                   onClick={() => setShowCompleted(v => !v)}
-                  className="flex items-center gap-1.5 w-full py-2 text-sm text-slate-400 font-medium"
+                  className="flex items-center gap-1.5 w-full py-2 text-sm text-slate-400 dark:text-slate-500 font-medium"
                 >
                   <span className={`text-base leading-none transition-transform duration-200 inline-block ${showCompleted ? 'rotate-90' : ''}`}>›</span>
                   Completed ({completedTasks.length})
@@ -206,12 +206,12 @@ export default function HomeScreen() {
                 {showCompleted && (
                   <ul className="space-y-2">
                     {completedTasks.map(task => (
-                      <li key={task.id} className="flex items-center gap-3 bg-white rounded-2xl px-3 py-2.5 shadow-sm opacity-70">
+                      <li key={task.id} className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-2xl px-3 py-2.5 shadow-sm dark:shadow-none dark:border dark:border-white/5 opacity-70">
                         <span className="text-xl leading-none">{task.emoji}</span>
-                        <span className="flex-1 text-sm text-slate-400 line-through">{task.name}</span>
+                        <span className="flex-1 text-sm text-slate-400 dark:text-slate-500 line-through">{task.name}</span>
                         <button
                           onClick={() => handleToggleComplete(task.id, false)}
-                          className="w-6 h-6 rounded-full bg-green-100 text-green-500 text-xs flex items-center justify-center shrink-0"
+                          className="w-6 h-6 rounded-full bg-green-100 dark:bg-emerald-400/15 text-green-500 dark:text-emerald-300 text-xs flex items-center justify-center shrink-0"
                           aria-label="Mark incomplete"
                         >✓</button>
                       </li>
@@ -222,7 +222,7 @@ export default function HomeScreen() {
             )}
             <button
               onClick={() => navigate('/editor', { state: { fromHome: true } })}
-              className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
+              className="w-full mt-3 py-3 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-500 text-sm font-medium active:bg-slate-50 dark:active:bg-white/5"
             >
               + Add task
             </button>
@@ -236,18 +236,18 @@ export default function HomeScreen() {
           {futureTasks.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-4xl mb-3">📅</div>
-              <p className="text-slate-500 font-medium mb-1">Nothing planned yet.</p>
-              <p className="text-sm text-slate-400 mb-5">Add tasks for this day below.</p>
+              <p className="text-slate-500 dark:text-slate-300 font-medium mb-1">Nothing planned yet.</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500 mb-5">Add tasks for this day below.</p>
             </div>
           ) : (
             <ul className="space-y-3 mb-3">
               {futureTasks.map(task => (
-                <li key={task.id} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm">
+                <li key={task.id} className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-2xl px-4 py-3 shadow-sm dark:shadow-none dark:border dark:border-white/5">
                   <span className="text-xl leading-none">{task.emoji}</span>
-                  <span className="flex-1 text-sm font-medium text-slate-700">{task.name}</span>
+                  <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">{task.name}</span>
                   <button
                     onClick={() => handleDeleteFutureTask(task.id)}
-                    className="w-7 h-7 rounded-full text-slate-300 text-base flex items-center justify-center active:scale-95 active:text-red-400 transition-all shrink-0"
+                    className="w-7 h-7 rounded-full text-slate-300 dark:text-slate-600 text-base flex items-center justify-center active:scale-95 active:text-red-400 transition-all shrink-0"
                     aria-label="Remove planned task"
                   >✕</button>
                 </li>
@@ -256,7 +256,7 @@ export default function HomeScreen() {
           )}
           <button
             onClick={() => navigate('/editor', { state: { fromHome: true, targetDate: selectedDate } })}
-            className="w-full py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 text-sm font-medium active:bg-slate-50"
+            className="w-full py-3 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-500 text-sm font-medium active:bg-slate-50 dark:active:bg-white/5"
           >
             + Add task for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
           </button>

@@ -9,8 +9,8 @@ export default function EmojiPicker({ selected, onSelect, onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <h2 className="text-lg font-bold text-slate-800">Pick an Emoji</h2>
-        <button onClick={onClose} className="text-slate-400 text-xl leading-none">✕</button>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Pick an Emoji</h2>
+        <button onClick={onClose} className="text-slate-400 dark:text-slate-500 text-xl leading-none">✕</button>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 mb-3 flex-shrink-0">
@@ -20,8 +20,8 @@ export default function EmojiPicker({ selected, onSelect, onClose }) {
             onClick={() => setActiveCategory(cat)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               activeCategory === cat
-                ? 'bg-slate-800 text-white'
-                : 'bg-slate-100 text-slate-600'
+                ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900'
+                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300'
             }`}
           >
             {cat}
@@ -36,7 +36,7 @@ export default function EmojiPicker({ selected, onSelect, onClose }) {
               key={e}
               onClick={() => onSelect(e)}
               className={`text-2xl p-2 rounded-xl transition-colors ${
-                selected === e ? 'bg-slate-200' : 'active:bg-slate-100'
+                selected === e ? 'bg-slate-200 dark:bg-white/15' : 'active:bg-slate-100 dark:active:bg-white/10'
               }`}
             >
               {e}

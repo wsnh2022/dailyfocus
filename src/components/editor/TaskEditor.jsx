@@ -157,8 +157,8 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   return (
     <div className="p-4">
       <div className="flex items-center justify-between mb-6">
-        <button onClick={onCancel} className="text-slate-500 text-sm font-medium">← Back</button>
-        <h1 className="text-lg font-bold text-slate-800">{isEdit ? 'Edit Task' : 'New Task'}</h1>
+        <button onClick={onCancel} className="text-slate-500 dark:text-slate-300 text-sm font-medium">← Back</button>
+        <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">{isEdit ? 'Edit Task' : 'New Task'}</h1>
         <div className="w-12" />
       </div>
 
@@ -167,7 +167,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         {!isEdit && (
           <div className="flex items-center gap-2">
             <span className="text-base">📅</span>
-            <span className="text-sm font-medium text-slate-600">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
               {targetDate === today
                 ? 'Today'
                 : targetDate === tomorrow
@@ -180,7 +180,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         {/* Template quick-pick - shown when scheduling for a future date */}
         {!isEdit && targetDate !== today && templates.length > 0 && (
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Quick assign from your tasks</label>
+            <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Quick assign from your tasks</label>
             <div className="flex gap-2 mt-1 overflow-x-auto pb-1 -mx-1 px-1">
               {templates.map(tmpl => (
                 <button
@@ -196,7 +196,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
                     if (tmpl.breakMin)     setBreakMin(tmpl.breakMin);
                     if (tmpl.sets)         setSets(tmpl.sets);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 whitespace-nowrap shrink-0 active:bg-slate-100"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0 active:bg-slate-100 dark:active:bg-white/10"
                 >
                   <span>{tmpl.emoji}</span>
                   <span className="font-medium">{tmpl.name}</span>
@@ -225,36 +225,36 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
             {emoji}
           </button>
           <div className="flex-1">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Task Name</label>
+            <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Task Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={30}
               placeholder="e.g. Morning Run"
-              className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+              className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-slate-400 dark:focus:border-white/30 bg-white dark:bg-slate-900 placeholder:text-slate-300 dark:placeholder:text-slate-600"
             />
-            <p className="text-xs text-slate-300 mt-1 text-right">{name.length}/30</p>
+            <p className="text-xs text-slate-300 dark:text-slate-600 mt-1 text-right">{name.length}/30</p>
           </div>
         </div>
 
         {/* Color */}
         <div>
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Color</label>
+          <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Color</label>
           <ColorPicker selected={color} onChange={setColor} />
         </div>
 
         {/* Type */}
         <div>
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Type</label>
+          <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Type</label>
           <TimerTypeSelect value={taskType} onChange={setTaskType} />
         </div>
 
         {/* Duration - required for countdown, optional for checkbox */}
         {(taskType === 'countdown' || taskType === 'checkbox') && (
           <div>
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-              Duration{taskType === 'checkbox' && <span className="normal-case font-normal text-slate-300 ml-1">(optional)</span>}
+            <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+              Duration{taskType === 'checkbox' && <span className="normal-case font-normal text-slate-300 dark:text-slate-600 ml-1">(optional)</span>}
             </label>
             <div className="flex gap-2 mt-1">
               <input
@@ -263,15 +263,15 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
                 onChange={e => setDuration(e.target.value)}
                 min={1}
                 max={999}
-                className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+                className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-slate-400 dark:focus:border-white/30 bg-white dark:bg-slate-900"
               />
-              <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+              <div className="flex rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
                 {['min', 'hrs'].map(u => (
                   <button
                     key={u}
                     onClick={() => setDurationUnit(u)}
                     className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-                      durationUnit === u ? 'bg-slate-800 text-white' : 'bg-white text-slate-500'
+                      durationUnit === u ? 'bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {u}
@@ -291,14 +291,14 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
               { label: 'Number of Sets',  value: sets,     onChange: setSets,     min: 1, max: 10  },
             ].map(({ label, value, onChange, min, max }) => (
               <div key={label}>
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</label>
+                <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">{label}</label>
                 <input
                   type="number"
                   value={value}
                   onChange={e => onChange(e.target.value)}
                   min={min}
                   max={max}
-                  className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-slate-400 bg-white"
+                  className="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-slate-400 dark:focus:border-white/30 bg-white dark:bg-slate-900"
                 />
               </div>
             ))}
@@ -307,7 +307,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
 
         <button
           onClick={handleSave}
-          className="w-full py-3.5 rounded-2xl bg-slate-800 text-white font-semibold text-sm active:scale-[0.98] transition-transform"
+          className="w-full py-3.5 rounded-2xl bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold text-sm active:scale-[0.98] transition-transform"
         >
           {isEdit
             ? 'Save Changes'
@@ -319,7 +319,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         {isEdit && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full py-3 rounded-2xl border border-red-200 text-red-500 font-medium text-sm"
+            className="w-full py-3 rounded-2xl border border-red-200 dark:border-red-400/30 text-red-500 dark:text-red-300 font-medium text-sm"
           >
             Delete Task
           </button>
@@ -328,12 +328,12 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
 
       {showDeleteConfirm && (
         <Modal onClose={() => setShowDeleteConfirm(false)}>
-          <h2 className="text-lg font-bold text-slate-800 mb-2">Delete this task?</h2>
-          <p className="text-sm text-slate-500 mb-6">This removes it from your task list. History data is preserved.</p>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Delete this task?</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-300 mb-6">This removes it from your task list. History data is preserved.</p>
           <div className="flex gap-3">
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm"
+              className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 font-medium text-sm"
             >
               Cancel
             </button>

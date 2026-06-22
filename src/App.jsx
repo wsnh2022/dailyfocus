@@ -21,7 +21,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <div className="min-h-screen bg-slate-50 max-w-md mx-auto relative pb-20 overflow-x-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 max-w-md mx-auto relative pb-20 overflow-x-hidden transition-colors">
           <Routes>
             <Route path="/"           element={<HomeScreen />} />
             <Route path="/editor"     element={<EditorScreen />} />

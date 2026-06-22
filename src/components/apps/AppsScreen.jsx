@@ -26,19 +26,19 @@ export default function AppsScreen() {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold text-slate-800 mb-4">Apps</h1>
+      <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Apps</h1>
       <div className="grid grid-cols-2 gap-3">
         {APPS.map(app => (
           <button
             key={app.id}
             onClick={() => navigate(app.route)}
-            className="bg-white rounded-2xl shadow-sm p-5 flex flex-col items-center gap-3 active:scale-95 transition-transform"
+            className="bg-white dark:bg-slate-900 dark:border dark:border-white/5 rounded-2xl shadow-sm dark:shadow-none p-5 flex flex-col items-center gap-3 active:scale-95 transition-transform"
           >
             {app.icon
               ? <img src={app.icon} alt={app.name} className="w-16 h-16 rounded-2xl object-cover" />
-              : <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-4xl">{app.emoji}</div>
+              : <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-4xl">{app.emoji}</div>
             }
-            <span className="text-sm font-semibold text-slate-700">{app.name}</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{app.name}</span>
           </button>
         ))}
       </div>

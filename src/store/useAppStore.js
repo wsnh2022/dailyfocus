@@ -39,6 +39,18 @@ export const useAppStore = create((set) => ({
     set({ heroSubtitle: v });
   },
 
+  // Theme: 'light' | 'dark'
+  theme: localStorage.getItem('df_theme') ?? 'light',
+  setTheme: (next) => {
+    localStorage.setItem('df_theme', next);
+    const root = document.documentElement;
+    if (next === 'dark') root.classList.add('dark');
+    else root.classList.remove('dark');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#020617' : '#1e293b');
+    set({ theme: next });
+  },
+
   // Toast notifications
   toast: null,
   showToast: (message, type = 'success', duration = 3000) => {
