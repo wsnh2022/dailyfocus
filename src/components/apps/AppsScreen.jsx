@@ -19,6 +19,12 @@ const APPS = [
     emoji: '🐍',
     route: '/apps/python-lvl-1',
   },
+  {
+    id:    'bookmarks',
+    name:  'Repo Bookmarks',
+    emoji: '🔖',
+    route: '/apps/bookmarks',
+  },
 ];
 
 export default function AppsScreen() {

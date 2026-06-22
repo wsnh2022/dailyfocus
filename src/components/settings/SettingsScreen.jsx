@@ -48,7 +48,9 @@ export default function SettingsScreen() {
     setImporting(true);
     try {
       const result = await importBackup(file);
-      showToast(`Imported ${result.tasks} tasks, ${result.logs} days`);
+      const parts = [`${result.tasks} tasks`, `${result.logs} days`];
+      if (result.settings) parts.push(`${result.settings} settings`);
+      showToast(`Imported ${parts.join(', ')}`);
       setTimeout(() => window.location.reload(), 1200);
     } catch (err) {
       showToast(err.message || 'Import failed', 'error');
@@ -155,7 +157,7 @@ export default function SettingsScreen() {
             <span className="text-xl">💾</span>
             <div className="flex-1">
               <div className="text-sm font-medium text-slate-800 dark:text-slate-100">Export Backup</div>
-              <div className="text-xs text-slate-400 dark:text-slate-500">Download all data as JSON</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Download all data &amp; app settings as JSON</div>
             </div>
             <span className="text-slate-300 dark:text-slate-600">›</span>
           </button>

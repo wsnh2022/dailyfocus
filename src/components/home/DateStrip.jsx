@@ -4,14 +4,17 @@ import { todayStr } from '../../utils/dateHelpers';
 const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function buildDays(count = 14) {
-  const base = todayStr(); // UTC ISO date e.g. "2026-06-19"
+  const base = todayStr(); // local ISO date e.g. "2026-06-23"
   const [y, m, d] = base.split('-').map(Number);
   return Array.from({ length: count }, (_, i) => {
-    const utc = new Date(Date.UTC(y, m - 1, d + i));
+    const local = new Date(y, m - 1, d + i);
+    const yy = local.getFullYear();
+    const mm = String(local.getMonth() + 1).padStart(2, '0');
+    const dd = String(local.getDate()).padStart(2, '0');
     return {
-      date:    utc.toISOString().split('T')[0],
-      day:     DAY_ABBR[utc.getUTCDay()],
-      num:     utc.getUTCDate(),
+      date:    `${yy}-${mm}-${dd}`,
+      day:     DAY_ABBR[local.getDay()],
+      num:     local.getDate(),
       isToday: i === 0,
     };
   });

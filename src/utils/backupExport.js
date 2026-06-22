@@ -1,5 +1,31 @@
 import { db } from '../db/schema';
 
+const LS_PREFIX = 'df_';
+
+function collectLocalStorage() {
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(LS_PREFIX)) out[key] = localStorage.getItem(key);
+  }
+  return out;
+}
+
+function restoreLocalStorage(map) {
+  if (!map || typeof map !== 'object') return 0;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(LS_PREFIX)) localStorage.removeItem(key);
+  }
+  let count = 0;
+  for (const [k, v] of Object.entries(map)) {
+    if (!k.startsWith(LS_PREFIX)) continue;
+    localStorage.setItem(k, v);
+    count++;
+  }
+  return count;
+}
+
 export async function exportBackup() {
   const [templates, logs, sessions] = await Promise.all([
     db.task_templates.toArray(),
@@ -8,11 +34,12 @@ export async function exportBackup() {
   ]);
 
   const backup = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     task_templates: templates,
     daily_logs: logs,
     pomodoro_sessions: sessions,
+    localStorage: collectLocalStorage(),
   };
 
   const json = JSON.stringify(backup, null, 2);
@@ -36,7 +63,7 @@ export function importBackup(file) {
       try {
         const data = JSON.parse(e.target.result);
 
-        if (!data.version || data.version !== 1) {
+        if (!data.version || (data.version !== 1 && data.version !== 2)) {
           reject(new Error('Unsupported backup format.'));
           return;
         }
@@ -51,10 +78,13 @@ export function importBackup(file) {
           if (data.pomodoro_sessions?.length) await db.pomodoro_sessions.bulkPut(data.pomodoro_sessions);
         });
 
+        const lsRestored = data.version === 2 ? restoreLocalStorage(data.localStorage) : 0;
+
         resolve({
           tasks:    data.task_templates?.length   ?? 0,
           logs:     data.daily_logs?.length        ?? 0,
           sessions: data.pomodoro_sessions?.length ?? 0,
+          settings: lsRestored,
         });
       } catch (err) {
         reject(err instanceof SyntaxError ? new Error('Invalid JSON file.') : err);
@@ -115,4 +145,8 @@ export async function clearAllData() {
     await db.daily_logs.clear();
     await db.pomodoro_sessions.clear();
   });
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(LS_PREFIX)) localStorage.removeItem(key);
+  }
 }
