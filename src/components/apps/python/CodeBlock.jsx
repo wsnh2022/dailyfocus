@@ -114,7 +114,7 @@ export default function CodeBlock({ code: initialCode }) {
     fontSize: '13.5px',
     lineHeight: '1.7',
     fontWeight: 500,
-    padding: '12px 14px',
+    padding: '12px 28px 12px 14px',
     margin: 0,
     whiteSpace: 'pre',
     tabSize: 4,
@@ -123,6 +123,13 @@ export default function CodeBlock({ code: initialCode }) {
 
   return (
     <div className="rounded-xl bg-black/40 border border-white/5 overflow-hidden">
+      <style>{`
+        .df-code-ta::-webkit-scrollbar { height: 4px; width: 4px; }
+        .df-code-ta::-webkit-scrollbar-track { background: transparent; }
+        .df-code-ta::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+        .df-code-ta:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+        .df-code-ta { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent; }
+      `}</style>
       <div className="relative">
         <Highlight theme={SOOTHING_THEME} code={code} language="python">
           {({ tokens, getLineProps, getTokenProps }) => (
@@ -163,6 +170,7 @@ export default function CodeBlock({ code: initialCode }) {
           spellCheck={false}
           rows={Math.max(2, lineCount)}
           wrap="off"
+          className="df-code-ta"
           style={{
             ...sharedTypography,
             position: 'absolute',
