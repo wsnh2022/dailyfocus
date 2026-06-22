@@ -308,14 +308,33 @@ export default function EnglishApp() {
   useEffect(() => {
     if (!isPlaying || view !== 'reading') return;
     let rafId, frame = 0;
+    let completionFired = false;
+
+    const finishReading = () => {
+      if (completionFired) return;
+      completionFired = true;
+      setIsPlaying(false);
+      setScrollProgress(1);
+      addWords(countWords(content));
+      if (readingPassageIdRef.current) setRatingSheetOpen(true);
+    };
+
     const step = (timestamp) => {
       const el = scrollRef.current;
       if (!el) return;
       if (touchActiveRef.current) { rafId = requestAnimationFrame(step); return; }
       if (timestamp < pauseUntilRef.current) { rafId = requestAnimationFrame(step); return; }
+
+      const points = pausePointsRef.current;
+      // Finish right after the last paragraph's pause settles, no need to scroll
+      // through the trailing 85vh padding.
+      if (points.length > 0 && nextPauseIdxRef.current >= points.length) {
+        finishReading();
+        return;
+      }
+
       posRef.current += speedRef.current * 0.7;
       el.scrollTop = posRef.current;
-      const points = pausePointsRef.current;
       if (nextPauseIdxRef.current < points.length && posRef.current >= points[nextPauseIdxRef.current]) {
         pauseUntilRef.current = timestamp + 1500;
         nextPauseIdxRef.current++;
@@ -324,10 +343,7 @@ export default function EnglishApp() {
       const progress  = maxScroll > 0 ? Math.min(posRef.current / maxScroll, 1) : 0;
       if (++frame % 10 === 0) setScrollProgress(progress);
       if (posRef.current >= maxScroll) {
-        setIsPlaying(false);
-        setScrollProgress(1);
-        addWords(countWords(content));
-        if (readingPassageIdRef.current) setRatingSheetOpen(true);
+        finishReading();
         return;
       }
       rafId = requestAnimationFrame(step);
