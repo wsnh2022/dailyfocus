@@ -259,15 +259,19 @@ export default function EnglishApp() {
 
   const autoSavePassage = (text, rawTitle, folderId) => {
     const title = rawTitle.trim() || generateTitle();
+    const targetFolder = folderId ?? null;
     setPassages(prev => {
-      const idx = prev.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+      const idx = prev.findIndex(p =>
+        p.title.toLowerCase() === title.toLowerCase() &&
+        (p.folderId ?? null) === targetFolder
+      );
       if (idx >= 0) {
         const updated = [...prev];
-        updated[idx] = { ...updated[idx], content: text.trim(), folderId: folderId ?? null };
+        updated[idx] = { ...updated[idx], content: text.trim(), folderId: targetFolder };
         localStorage.setItem(PASSAGES_KEY, JSON.stringify(updated));
         return updated;
       }
-      const updated = [{ id: Date.now(), title, content: text.trim(), folderId: folderId ?? null, createdAt: new Date().toISOString() }, ...prev];
+      const updated = [{ id: Date.now(), title, content: text.trim(), folderId: targetFolder, createdAt: new Date().toISOString() }, ...prev];
       localStorage.setItem(PASSAGES_KEY, JSON.stringify(updated));
       return updated;
     });
