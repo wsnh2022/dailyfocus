@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pencil, FileEdit, FolderInput, Copy, Download, Upload, Trash2 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import CompletionRatingSheet from './CompletionRatingSheet';
 
 const PASSAGES_KEY = 'df_english_passages';
 const FOLDERS_KEY  = 'df_english_folders';
@@ -102,6 +103,10 @@ export default function EnglishApp() {
   const [editingId,           setEditingId]           = useState(null);
   const [editingTitle,        setEditingTitle]        = useState('');
   const [editingPassageId,    setEditingPassageId]    = useState(null);
+  const [readingPassageId,    setReadingPassageId]    = useState(null);
+  const readingPassageIdRef                            = useRef(null);
+  const [ratingSheetOpen,     setRatingSheetOpen]     = useState(false);
+  const [reviewFilter,        setReviewFilter]        = useState('all');
   const [addViewNewFolder,    setAddViewNewFolder]    = useState(false);
   const [addViewFolderName,   setAddViewFolderName]   = useState('');
 
@@ -124,6 +129,7 @@ export default function EnglishApp() {
   const lastTouchYRef   = useRef(0);
 
   useEffect(() => { speedRef.current = speed; }, [speed]);
+  useEffect(() => { readingPassageIdRef.current = readingPassageId; }, [readingPassageId]);
   useEffect(() => { if (folderInputRef.current) folderInputRef.current.setAttribute('webkitdirectory', ''); }, [view]);
 
   // Hardware back button interception in reading view
@@ -260,21 +266,42 @@ export default function EnglishApp() {
   const autoSavePassage = (text, rawTitle, folderId) => {
     const title = rawTitle.trim() || generateTitle();
     const targetFolder = folderId ?? null;
+    const idx = passages.findIndex(p =>
+      p.title.toLowerCase() === title.toLowerCase() &&
+      (p.folderId ?? null) === targetFolder
+    );
+    if (idx >= 0) {
+      const existing = passages[idx];
+      const updated = [...passages];
+      updated[idx] = { ...existing, content: text.trim(), folderId: targetFolder };
+      persistPassages(updated);
+      return existing.id;
+    }
+    const newId = Date.now();
+    const newPassage = { id: newId, title, content: text.trim(), folderId: targetFolder, createdAt: new Date().toISOString() };
+    persistPassages([newPassage, ...passages]);
+    return newId;
+  };
+
+  const ratePassage = (passageId, rating) => {
+    if (!passageId) return;
     setPassages(prev => {
-      const idx = prev.findIndex(p =>
-        p.title.toLowerCase() === title.toLowerCase() &&
-        (p.folderId ?? null) === targetFolder
+      const updated = prev.map(p =>
+        p.id === passageId ? { ...p, review: { rating, ratedAt: Date.now() } } : p
       );
-      if (idx >= 0) {
-        const updated = [...prev];
-        updated[idx] = { ...updated[idx], content: text.trim(), folderId: targetFolder };
-        localStorage.setItem(PASSAGES_KEY, JSON.stringify(updated));
-        return updated;
-      }
-      const updated = [{ id: Date.now(), title, content: text.trim(), folderId: targetFolder, createdAt: new Date().toISOString() }, ...prev];
       localStorage.setItem(PASSAGES_KEY, JSON.stringify(updated));
       return updated;
     });
+  };
+
+  const handleRatePassage = (rating) => {
+    ratePassage(readingPassageId, rating);
+    setRatingSheetOpen(false);
+    showToast(rating === 'got-it' ? 'Marked as got it' : 'Marked to read again', 'success');
+  };
+
+  const handleSkipRating = () => {
+    setRatingSheetOpen(false);
   };
 
   // RAF scroll loop with paragraph auto-pause and swipe override
@@ -296,7 +323,13 @@ export default function EnglishApp() {
       const maxScroll = el.scrollHeight - el.clientHeight;
       const progress  = maxScroll > 0 ? Math.min(posRef.current / maxScroll, 1) : 0;
       if (++frame % 10 === 0) setScrollProgress(progress);
-      if (posRef.current >= maxScroll) { setIsPlaying(false); setScrollProgress(1); addWords(countWords(content)); return; }
+      if (posRef.current >= maxScroll) {
+        setIsPlaying(false);
+        setScrollProgress(1);
+        addWords(countWords(content));
+        if (readingPassageIdRef.current) setRatingSheetOpen(true);
+        return;
+      }
       rafId = requestAnimationFrame(step);
     };
     rafId = requestAnimationFrame(step);
@@ -305,7 +338,10 @@ export default function EnglishApp() {
 
   // Actions
   const startReading = (text, title, folderId) => {
-    autoSavePassage(text, title ?? inputTitle, folderId ?? saveFolderId);
+    const passageId = autoSavePassage(text, title ?? inputTitle, folderId ?? saveFolderId);
+    setReadingPassageId(passageId);
+    readingPassageIdRef.current = passageId;
+    setRatingSheetOpen(false);
     setContent(text);
     setReadingTitle(title ?? inputTitle ?? '');
     posRef.current = 0; setScrollProgress(0); setIsPlaying(false);
@@ -322,6 +358,8 @@ export default function EnglishApp() {
     setIsPlaying(false);
     if (scrollProgress > 0.05) addWords(Math.round(countWords(content) * scrollProgress));
     posRef.current = 0; setScrollProgress(0);
+    setRatingSheetOpen(false);
+    setReadingPassageId(null);
     setView('home');
     window.history.back();
   };
@@ -517,10 +555,24 @@ export default function EnglishApp() {
     sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
   );
 
-  const sections = [
-    { id: 'uncategorized', name: 'Uncategorized', items: sortItems(passages.filter(p => !p.folderId)) },
-    ...sortedFolders.map(f => ({ id: f.id, name: f.name, items: sortItems(passages.filter(p => p.folderId === f.id)) })),
-  ].filter(s => s.id === 'uncategorized' ? s.items.length > 0 || folders.length === 0 : true);
+  const matchesReviewFilter = (p) => {
+    if (reviewFilter === 'all')        return true;
+    if (reviewFilter === 'got-it')     return p.review?.rating === 'got-it';
+    if (reviewFilter === 'read-again') return p.review?.rating === 'read-again';
+    return true;
+  };
+
+  const rawSections = [
+    { id: 'uncategorized', name: 'Uncategorized', items: sortItems(passages.filter(p => !p.folderId && matchesReviewFilter(p))) },
+    ...sortedFolders.map(f => ({ id: f.id, name: f.name, items: sortItems(passages.filter(p => p.folderId === f.id && matchesReviewFilter(p))) })),
+  ];
+
+  const sections = reviewFilter === 'all'
+    ? rawSections.filter(s => s.id === 'uncategorized' ? s.items.length > 0 || folders.length === 0 : true)
+    : rawSections.filter(s => s.items.length > 0);
+
+  const gotItTotal     = passages.filter(p => p.review?.rating === 'got-it').length;
+  const readAgainTotal = passages.filter(p => p.review?.rating === 'read-again').length;
 
   // ── Reading view ───────────────────────────────────────────
   if (view === 'reading') {
@@ -588,6 +640,11 @@ export default function EnglishApp() {
           </div>
           <p className="text-white/25 text-xs">{wordsToday} / {goal} words today · {fontSize}px</p>
         </div>
+        <CompletionRatingSheet
+          open={ratingSheetOpen}
+          onRate={handleRatePassage}
+          onSkip={handleSkipRating}
+        />
       </div>
     );
   }
@@ -714,6 +771,38 @@ export default function EnglishApp() {
           </div>
         )}
 
+        {/* Review filter chips */}
+        {passages.length > 0 && (gotItTotal > 0 || readAgainTotal > 0) && (
+          <div className="flex items-center gap-1.5 mb-2.5">
+            {[
+              { id: 'all',        label: 'All',        count: passages.length, dot: null },
+              { id: 'read-again', label: 'Read again', count: readAgainTotal,  dot: 'bg-amber-400' },
+              { id: 'got-it',     label: 'Got it',     count: gotItTotal,      dot: 'bg-emerald-400' },
+            ].map(chip => {
+              const active = reviewFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => setReviewFilter(chip.id)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-medium transition-colors ${
+                    active
+                      ? chip.id === 'got-it'
+                        ? 'bg-emerald-400/15 text-emerald-200'
+                        : chip.id === 'read-again'
+                          ? 'bg-amber-400/15 text-amber-200'
+                          : 'bg-white/12 text-white/85'
+                      : 'bg-white/5 text-white/45 hover:bg-white/8'
+                  }`}
+                >
+                  {chip.dot && <span className={`w-1.5 h-1.5 rounded-full ${chip.dot}`} />}
+                  <span>{chip.label}</span>
+                  <span className="text-[10px] opacity-60">{chip.count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* Folder tree */}
         {passages.length > 0 && (
           <div className="bg-white/5 rounded-2xl overflow-hidden">
@@ -726,7 +815,33 @@ export default function EnglishApp() {
                     <span className="text-white/30 text-[10px] w-3 shrink-0">{isOpen ? '▼' : '▶'}</span>
                     <span className="text-base">📁</span>
                     <span className="flex-1 text-left text-sm text-white/70 font-medium line-clamp-2 break-words">{section.name}</span>
-                    <span className="text-xs text-white/25 ml-1">{section.items.length}</span>
+                    {(() => {
+                      const got      = section.items.filter(p => p.review?.rating === 'got-it').length;
+                      const again    = section.items.filter(p => p.review?.rating === 'read-again').length;
+                      const unrated  = section.items.length - got - again;
+                      if (got === 0 && again === 0) {
+                        return <span className="text-xs text-white/25 ml-1 shrink-0">{section.items.length}</span>;
+                      }
+                      return (
+                        <div className="flex items-center gap-2 ml-1 text-[11px] shrink-0">
+                          {got > 0 && (
+                            <span className="flex items-center gap-1 text-emerald-300/80">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                              {got}
+                            </span>
+                          )}
+                          {again > 0 && (
+                            <span className="flex items-center gap-1 text-amber-300/80">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                              {again}
+                            </span>
+                          )}
+                          {unrated > 0 && (
+                            <span className="text-white/30">{unrated}</span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </button>
 
                   {isOpen && section.items.length === 0 && (
@@ -736,7 +851,7 @@ export default function EnglishApp() {
                     const isSelected = selectedIds.has(p.id);
                     return (
                       <div key={p.id}
-                        className={`flex items-center gap-2 pr-3 py-2.5 border-t border-white/5 transition-colors ${selectMode ? 'pl-4 cursor-pointer' : 'pl-10'} ${isSelected ? 'bg-red-400/8' : ''}`}
+                        className={`flex items-center gap-2 pr-3 py-2.5 border-t border-white/5 transition-colors ${selectMode ? 'pl-4 cursor-pointer' : 'pl-10'} ${isSelected ? 'bg-red-400/8' : ''} ${p.review?.rating === 'read-again' ? 'border-l-2 border-l-amber-400/35 bg-amber-400/[0.025]' : ''}`}
                         onTouchStart={() => !selectMode && startLongPress(p.id)}
                         onTouchEnd={cancelLongPress}
                         onTouchMove={cancelLongPress}
@@ -755,7 +870,17 @@ export default function EnglishApp() {
                               onKeyDown={e => { if (e.key === 'Enter') saveRename(p.id); if (e.key === 'Escape') setEditingId(null); }}
                               className="w-full bg-white/10 rounded px-2 py-0.5 text-sm text-white border border-white/20 focus:outline-none" />
                           ) : (
-                            <p className="text-sm text-white/80 truncate">{p.title}</p>
+                            <div className="flex items-center gap-2 min-w-0">
+                              {p.review && (
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                    p.review.rating === 'got-it' ? 'bg-emerald-400' : 'bg-amber-400'
+                                  }`}
+                                  aria-label={p.review.rating === 'got-it' ? 'Got it' : 'Read again'}
+                                />
+                              )}
+                              <p className={`text-sm truncate ${p.review?.rating === 'got-it' ? 'text-white/55' : 'text-white/80'}`}>{p.title}</p>
+                            </div>
                           )}
                           <p className="text-xs text-white/25 mt-0.5">{countWords(p.content)} words</p>
                         </div>
@@ -997,6 +1122,12 @@ export default function EnglishApp() {
           </div>
         </>
       )}
+
+      <CompletionRatingSheet
+        open={ratingSheetOpen}
+        onRate={handleRatePassage}
+        onSkip={handleSkipRating}
+      />
     </div>
   );
 }
