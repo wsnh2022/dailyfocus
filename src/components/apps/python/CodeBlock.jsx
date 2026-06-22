@@ -31,6 +31,7 @@ export default function CodeBlock({ code: initialCode }) {
   const [copied, setCopied]   = useState(false);
   const [pendingInputs, setPendingInputs] = useState(null);
   const taRef = useRef(null);
+  const preRef = useRef(null);
   const { status, runCode } = usePyodide({ autoLoad: true });
 
   const lineCount = code.split('\n').length;
@@ -126,11 +127,12 @@ export default function CodeBlock({ code: initialCode }) {
         <Highlight theme={SOOTHING_THEME} code={code} language="python">
           {({ tokens, getLineProps, getTokenProps }) => (
             <pre
+              ref={preRef}
               aria-hidden="true"
               style={{
                 ...sharedTypography,
                 pointerEvents: 'none',
-                overflow: 'auto',
+                overflow: 'hidden',
               }}
             >
               {tokens.map((line, i) => {
@@ -152,8 +154,15 @@ export default function CodeBlock({ code: initialCode }) {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleTab}
+          onScroll={(e) => {
+            if (preRef.current) {
+              preRef.current.scrollLeft = e.currentTarget.scrollLeft;
+              preRef.current.scrollTop  = e.currentTarget.scrollTop;
+            }
+          }}
           spellCheck={false}
           rows={Math.max(2, lineCount)}
+          wrap="off"
           style={{
             ...sharedTypography,
             position: 'absolute',
@@ -166,7 +175,9 @@ export default function CodeBlock({ code: initialCode }) {
             resize: 'none',
             width: '100%',
             height: '100%',
-            overflow: 'auto',
+            overflowX: 'auto',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
           }}
         />
       </div>
