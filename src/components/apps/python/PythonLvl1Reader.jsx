@@ -4,6 +4,7 @@ import lvl1 from '../../../data/python/lvl-1.json';
 import interviewEssentials from '../../../data/python/interview-essentials.json';
 import { usePythonProgress } from '../../../hooks/usePythonProgress';
 import CodeBlock from './CodeBlock';
+import ConceptTable from './ConceptTable';
 
 function IndentLine({ text, tone = 'correct' }) {
   const dotColor = tone === 'correct' ? 'text-emerald-300/30' : 'text-rose-300/35';
@@ -182,28 +183,7 @@ export default function PythonLvl1Reader() {
               );
             }
             if (c.kind === 'table') {
-              return (
-                <div key={i} className="rounded-xl border border-white/5 overflow-hidden">
-                  <table className="w-full text-[12.5px]">
-                    <thead className="bg-white/[0.04]">
-                      <tr>
-                        {c.headers.map((h, j) => (
-                          <th key={j} className="px-2.5 py-2 text-left font-semibold text-white/65">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {c.rows.map((row, ri) => (
-                        <tr key={ri} className="border-t border-white/5">
-                          {row.map((cell, ci) => (
-                            <td key={ci} className="px-2.5 py-2 align-top text-white/80" dangerouslySetInnerHTML={{ __html: cell.replace(/`([^`]+)`/g, '<code class="bg-white/5 px-1 py-0.5 rounded text-emerald-200/90 font-mono">$1</code>') }} />
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              );
+              return <ConceptTable key={i} headers={c.headers} rows={c.rows} />;
             }
             if (c.kind === 'code') {
               return <CodeBlock key={i} code={c.code} />;
