@@ -298,10 +298,12 @@ export default function EnglishApp() {
     ratePassage(readingPassageId, rating);
     setRatingSheetOpen(false);
     showToast(rating === 'got-it' ? 'Marked as got it' : 'Marked to read again', 'success');
+    setTimeout(exitReader, 280);
   };
 
   const handleSkipRating = () => {
     setRatingSheetOpen(false);
+    setTimeout(exitReader, 280);
   };
 
   // RAF scroll loop with paragraph auto-pause and swipe override
