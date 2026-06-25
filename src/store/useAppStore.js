@@ -6,8 +6,17 @@ export const useAppStore = create((set) => ({
   setTodayTasks: (tasks) => set({ todayTasks: tasks }),
   updateTaskCompletion: (taskId, completed) =>
     set(state => ({
+      todayTasks: state.todayTasks.map(t => {
+        if (t.id !== taskId) return t;
+        if (!completed && t.subtasks?.length) return { ...t, completed, subtasksDone: [] };
+        return { ...t, completed };
+      })
+    })),
+
+  updateSubtaskState: (taskId, subtasksDone, completed) =>
+    set(state => ({
       todayTasks: state.todayTasks.map(t =>
-        t.id === taskId ? { ...t, completed } : t
+        t.id === taskId ? { ...t, subtasksDone, completed } : t
       )
     })),
 

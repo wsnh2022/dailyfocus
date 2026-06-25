@@ -46,6 +46,8 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [workMin, setWorkMin]               = useState(task?.workMin ?? 25);
   const [breakMin, setBreakMin]             = useState(task?.breakMin ?? 5);
   const [sets, setSets]                     = useState(task?.sets ?? 4);
+  const [subtasks, setSubtasks]             = useState(task?.subtasks ?? []);
+  const [subtaskInput, setSubtaskInput]     = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [targetDate, setTargetDate]         = useState(initialTargetDate ?? today);
   const [templates, setTemplates]           = useState([]);
@@ -111,6 +113,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
         workMin:      taskType === 'pomodoro'  ? Number(workMin) : null,
         breakMin:     taskType === 'pomodoro'  ? Number(breakMin) : null,
         sets:         taskType === 'pomodoro'  ? Number(sets) : null,
+        subtasks:     taskType === 'checkbox'  ? subtasks : [],
         sortOrder:    task?.sortOrder ?? nextSortOrder,
       };
 
@@ -195,6 +198,7 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
                     if (tmpl.workMin)      setWorkMin(tmpl.workMin);
                     if (tmpl.breakMin)     setBreakMin(tmpl.breakMin);
                     if (tmpl.sets)         setSets(tmpl.sets);
+                    if (tmpl.subtasks)    setSubtasks(tmpl.subtasks);
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0 active:bg-slate-100 dark:active:bg-white/10"
                 >
@@ -302,6 +306,59 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Subtasks - checkbox type only */}
+        {taskType === 'checkbox' && (
+          <div>
+            <label className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+              Subtasks
+              <span className="normal-case font-normal text-slate-300 dark:text-slate-600 ml-1">(optional, max 6)</span>
+            </label>
+            <div className="mt-2 space-y-2">
+              {subtasks.map(s => (
+                <div key={s.id} className="flex items-center gap-2">
+                  <span className="flex-1 text-sm text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 truncate">
+                    {s.label}
+                  </span>
+                  <button
+                    onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))}
+                    className="w-8 h-8 rounded-xl flex items-center justify-center text-red-400 dark:text-red-300/70 bg-red-50 dark:bg-red-400/10 active:scale-95 shrink-0"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {subtasks.length < 6 && (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={subtaskInput}
+                    onChange={e => setSubtaskInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && subtaskInput.trim()) {
+                        setSubtasks(prev => [...prev, { id: `st_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, label: subtaskInput.trim().slice(0, 40) }]);
+                        setSubtaskInput('');
+                      }
+                    }}
+                    maxLength={40}
+                    placeholder="Add a subtask..."
+                    className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-slate-400 dark:focus:border-white/30 bg-white dark:bg-slate-900 placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                  />
+                  <button
+                    onClick={() => {
+                      if (!subtaskInput.trim()) return;
+                      setSubtasks(prev => [...prev, { id: `st_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, label: subtaskInput.trim().slice(0, 40) }]);
+                      setSubtaskInput('');
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-semibold active:scale-[0.98]"
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

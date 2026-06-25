@@ -35,7 +35,7 @@ export function useMidnightArchive() {
           const mergedTasks = (todayLog.tasks ?? []).map(t => {
             const tmpl = templateMap.get(t.id);
             if (!tmpl) return t; // snapshot (pre-planned or deleted template) - keep as-is
-            return { ...tmpl, completed: t.completed ?? false };
+            return { ...tmpl, completed: t.completed ?? false, subtasksDone: t.subtasksDone ?? [] };
           });
 
           let tasks = mergedTasks;

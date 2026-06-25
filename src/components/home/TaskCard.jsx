@@ -189,18 +189,110 @@ function SwipeCard({ taskId, completed, children, dragListeners, dragAttributes 
 
 // ── Checkbox card ─────────────────────────────────────────────────────────────
 function CheckboxCard({ task, onToggleComplete, dragListeners, dragAttributes }) {
-  const { emoji, name, color, duration, durationUnit, completed } = task;
+  const { emoji, name, color, completed } = task;
+  const subtasks     = task.subtasks     ?? [];
+  const subtasksDone = task.subtasksDone ?? [];
   const c = getColor(color);
+
+  const [expanded, setExpanded] = useState(false);
+
+  const updateSubtaskState = useAppStore(s => s.updateSubtaskState);
+  const showToast          = useAppStore(s => s.showToast);
+
+  const hasSubtasks = subtasks.length > 0;
+  const doneCount   = hasSubtasks ? subtasks.filter(s => subtasksDone.includes(s.id)).length : 0;
+  const progress    = hasSubtasks ? Math.round((doneCount / subtasks.length) * 100) : 0;
+
+  const handleSubtaskToggle = useCallback(async (subtaskId, done) => {
+    const newDone = done
+      ? [...subtasksDone.filter(id => id !== subtaskId), subtaskId]
+      : subtasksDone.filter(id => id !== subtaskId);
+    const allDone     = subtasks.every(s => newDone.includes(s.id));
+    const wasComplete = task.completed;
+
+    updateSubtaskState(task.id, newDone, allDone);
+
+    if (allDone !== wasComplete) {
+      onToggleComplete(allDone);
+    } else {
+      const latest = useAppStore.getState().todayTasks;
+      const today  = todayStr();
+      try {
+        await saveLog({
+          date:       today,
+          dayState:   useAppStore.getState().todayDayState,
+          tasks:      latest,
+          weekNumber: getISOWeek(today),
+          createdAt:  new Date().toISOString(),
+        });
+      } catch {
+        showToast('Failed to save', 'error');
+      }
+    }
+  }, [subtasks, subtasksDone, task.id, task.completed, updateSubtaskState, onToggleComplete, showToast]);
+
+  const handleMainToggle = useCallback(() => {
+    if (hasSubtasks) {
+      const newCompleted = !completed;
+      updateSubtaskState(task.id, newCompleted ? subtasks.map(s => s.id) : [], newCompleted);
+      onToggleComplete(newCompleted);
+    } else {
+      onToggleComplete(!completed);
+    }
+  }, [hasSubtasks, completed, task.id, subtasks, updateSubtaskState, onToggleComplete]);
 
   return (
     <SwipeCard taskId={task.id} completed={completed} dragListeners={dragListeners} dragAttributes={dragAttributes}>
-      <div className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}>
-        {emoji}
-      </div>
       <div className="flex-1 min-w-0">
-        <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-14 h-14 rounded-2xl ${c.bg} flex items-center justify-center text-2xl flex-shrink-0`}
+            onClick={hasSubtasks ? () => setExpanded(v => !v) : undefined}
+          >
+            {emoji}
+          </div>
+          <div
+            className="flex-1 min-w-0"
+            onClick={hasSubtasks ? () => setExpanded(v => !v) : undefined}
+          >
+            <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
+            {hasSubtasks && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <div className="flex-1 h-1 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${c.bg} rounded-full transition-all duration-300`}
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums shrink-0">{doneCount}/{subtasks.length}</span>
+                <span className={`text-xs text-slate-400 dark:text-slate-500 inline-block transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}>›</span>
+              </div>
+            )}
+          </div>
+          <Checkbox c={c} completed={completed} onToggle={handleMainToggle} />
+        </div>
+
+        {hasSubtasks && expanded && (
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5 space-y-2.5 pl-[68px]">
+            {subtasks.map(s => {
+              const done = subtasksDone.includes(s.id);
+              return (
+                <div key={s.id} className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => handleSubtaskToggle(s.id, !done)}
+                    className={`w-5 h-5 rounded-md border-2 ${c.border} flex items-center justify-center flex-shrink-0 transition-colors ${done ? c.bg : 'bg-white dark:bg-slate-800'}`}
+                  >
+                    {done && <span className={`text-[9px] font-bold leading-none ${c.text}`}>✓</span>}
+                  </button>
+                  <span className={`text-sm leading-tight ${done ? 'line-through text-slate-400 dark:text-slate-600' : 'text-slate-700 dark:text-slate-200'}`}>
+                    {s.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-      <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
     </SwipeCard>
   );
 }
