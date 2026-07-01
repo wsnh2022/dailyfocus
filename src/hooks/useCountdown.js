@@ -1,12 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { vibrateLong } from '../utils/vibrate';
 
-export function useCountdown(totalSeconds, onComplete) {
-  const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+function loadSavedSeconds(storageKey) {
+  if (!storageKey) return null;
+  try {
+    const v = localStorage.getItem(storageKey);
+    return v !== null ? parseInt(v, 10) : null;
+  } catch { return null; }
+}
+
+export function useCountdown(totalSeconds, onComplete, storageKey = null) {
+  const savedSeconds = useRef(loadSavedSeconds(storageKey)).current;
+  const initSeconds  = savedSeconds ?? totalSeconds;
+
+  const [secondsLeft, setSecondsLeft] = useState(initSeconds);
   const [isRunning, setIsRunning]     = useState(false);
   const intervalRef  = useRef(null);
   const startTimeRef = useRef(null);
-  const remainingRef = useRef(totalSeconds);
+  const remainingRef = useRef(initSeconds);
 
   const start = useCallback(() => {
     startTimeRef.current = Date.now();
@@ -16,39 +27,43 @@ export function useCountdown(totalSeconds, onComplete) {
   const pause = useCallback(() => {
     remainingRef.current = secondsLeft;
     setIsRunning(false);
-  }, [secondsLeft]);
+    if (storageKey) try { localStorage.setItem(storageKey, String(secondsLeft)); } catch {}
+  }, [secondsLeft, storageKey]);
 
   const reset = useCallback(() => {
     setIsRunning(false);
     setSecondsLeft(totalSeconds);
     remainingRef.current = totalSeconds;
-  }, [totalSeconds]);
+    if (storageKey) try { localStorage.removeItem(storageKey); } catch {}
+  }, [totalSeconds, storageKey]);
 
-  // Sync secondsLeft when totalSeconds changes (e.g. task data refreshed from archive)
+  // Sync when task duration changes (e.g. task was edited)
   useEffect(() => {
     if (!isRunning) {
       setSecondsLeft(totalSeconds);
       remainingRef.current = totalSeconds;
+      if (storageKey) try { localStorage.removeItem(storageKey); } catch {}
     }
   }, [totalSeconds]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Recalculate elapsed time when screen wakes from lock
+  // Screen-lock recovery
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'visible' && isRunning && startTimeRef.current) {
-        const elapsed     = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        const elapsed      = Math.floor((Date.now() - startTimeRef.current) / 1000);
         const newRemaining = Math.max(0, remainingRef.current - elapsed);
         setSecondsLeft(newRemaining);
         if (newRemaining <= 0) {
           setIsRunning(false);
           vibrateLong();
+          if (storageKey) try { localStorage.removeItem(storageKey); } catch {}
           onComplete?.();
         }
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [isRunning, onComplete]);
+  }, [isRunning, onComplete, storageKey]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -59,6 +74,7 @@ export function useCountdown(totalSeconds, onComplete) {
           clearInterval(intervalRef.current);
           setIsRunning(false);
           vibrateLong();
+          if (storageKey) try { localStorage.removeItem(storageKey); } catch {}
           onComplete?.();
           return 0;
         }
@@ -66,7 +82,7 @@ export function useCountdown(totalSeconds, onComplete) {
       });
     }, 1000);
     return () => clearInterval(intervalRef.current);
-  }, [isRunning, onComplete]);
+  }, [isRunning, onComplete, storageKey]);
 
   const mins      = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
   const secs      = String(secondsLeft % 60).padStart(2, '0');

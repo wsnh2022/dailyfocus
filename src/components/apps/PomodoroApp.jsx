@@ -39,7 +39,7 @@ export default function PomodoroApp() {
     showToast('All sets done! Great work 🎉', 'pomodoro-done', 5000);
   }, [speak, setPomodoroRunning, showToast]);
 
-  const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } =
+  const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, pauseCurrent, resumeCurrent, skipCurrent, reset, isDone, isPaused, isActivelyRunning } =
     usePomodoro({
       taskId:       null,
       workMin:      preset.workMin,
@@ -53,7 +53,7 @@ export default function PomodoroApp() {
 
   const isRunning = phase === 'work' || phase === 'break';
 
-  // Sync nav visibility with running state
+  // Sync nav visibility - hide nav whenever mid-session (including paused)
   useEffect(() => {
     setPomodoroRunning(isRunning);
     return () => setPomodoroRunning(false);
@@ -70,7 +70,7 @@ export default function PomodoroApp() {
     setPresetIdx(idx);
   };
 
-  const dark = isRunning;
+  const dark = isActivelyRunning;
 
   return (
     <div className={`fixed inset-0 flex flex-col transition-colors duration-500 ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
@@ -186,6 +186,22 @@ export default function PomodoroApp() {
             className="w-full py-4 rounded-2xl bg-amber-500 text-white text-base font-semibold"
           >
             Start Work →
+          </button>
+        )}
+        {isRunning && isPaused && (
+          <button
+            onClick={resumeCurrent}
+            className="w-full py-4 rounded-2xl bg-slate-800 text-white text-base font-semibold active:scale-[0.98] transition-transform"
+          >
+            Resume
+          </button>
+        )}
+        {isRunning && !isPaused && (
+          <button
+            onClick={pauseCurrent}
+            className="w-full py-4 rounded-2xl bg-slate-600 text-white text-base font-semibold active:scale-[0.98] transition-transform"
+          >
+            Pause
           </button>
         )}
         {isRunning && (

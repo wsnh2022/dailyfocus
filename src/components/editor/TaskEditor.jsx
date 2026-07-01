@@ -48,6 +48,8 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
   const [sets, setSets]                     = useState(task?.sets ?? 4);
   const [subtasks, setSubtasks]             = useState(task?.subtasks ?? []);
   const [subtaskInput, setSubtaskInput]     = useState('');
+  const [editingSubtaskId, setEditingSubtaskId] = useState(null);
+  const [editingSubtaskVal, setEditingSubtaskVal] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [targetDate, setTargetDate]         = useState(initialTargetDate ?? today);
   const [templates, setTemplates]           = useState([]);
@@ -317,19 +319,47 @@ export default function TaskEditor({ task, onSave, onDelete, onCancel, nextSortO
               <span className="normal-case font-normal text-slate-300 dark:text-slate-600 ml-1">(optional, max 6)</span>
             </label>
             <div className="mt-2 space-y-2">
-              {subtasks.map(s => (
-                <div key={s.id} className="flex items-center gap-2">
-                  <span className="flex-1 text-sm text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 truncate">
-                    {s.label}
-                  </span>
-                  <button
-                    onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))}
-                    className="w-8 h-8 rounded-xl flex items-center justify-center text-red-400 dark:text-red-300/70 bg-red-50 dark:bg-red-400/10 active:scale-95 shrink-0"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              {subtasks.map(s => {
+                const isEditing = editingSubtaskId === s.id;
+                const commitEdit = () => {
+                  const trimmed = editingSubtaskVal.trim().slice(0, 40);
+                  if (trimmed) setSubtasks(prev => prev.map(x => x.id === s.id ? { ...x, label: trimmed } : x));
+                  setEditingSubtaskId(null);
+                  setEditingSubtaskVal('');
+                };
+                return (
+                  <div key={s.id} className="flex items-center gap-2">
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        type="text"
+                        value={editingSubtaskVal}
+                        onChange={e => setEditingSubtaskVal(e.target.value)}
+                        onBlur={commitEdit}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') { e.preventDefault(); commitEdit(); }
+                          if (e.key === 'Escape') { setEditingSubtaskId(null); setEditingSubtaskVal(''); }
+                        }}
+                        maxLength={40}
+                        className="flex-1 text-sm text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-400 dark:border-white/30 focus:outline-none"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => { setEditingSubtaskId(s.id); setEditingSubtaskVal(s.label); }}
+                        className="flex-1 text-sm text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 truncate text-left active:bg-slate-100 dark:active:bg-white/10"
+                      >
+                        {s.label}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setSubtasks(prev => prev.filter(x => x.id !== s.id))}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-red-400 dark:text-red-300/70 bg-red-50 dark:bg-red-400/10 active:scale-95 shrink-0"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
               {subtasks.length < 6 && (
                 <div className="flex gap-2">
                   <input

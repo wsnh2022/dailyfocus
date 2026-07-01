@@ -12,30 +12,47 @@ export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplet
   const saved = useRef(loadSaved(taskId)).current;
   const storageKey = taskId ? `df_pomo_${taskId}` : null;
 
-  // Normalize: if page was refreshed mid-timer, treat as if that phase just ended
   const savedPhase = saved?.phase;
+  const wasPaused  = !!(saved?.isPaused && (savedPhase === 'work' || savedPhase === 'break'));
+
   const initPhase =
     !savedPhase || savedPhase === 'idle' ? 'idle'       :
+    wasPaused                            ? savedPhase   :
     savedPhase === 'work'                ? 'work_done'  :
     savedPhase === 'break'               ? 'break_done' :
-    savedPhase; // work_done | break_done | done
+    savedPhase;
+
+  const initSeconds =
+    wasPaused && saved?.secondsLeft ? saved.secondsLeft :
+    initPhase === 'idle'            ? workMin * 60      : 0;
 
   const [phase, setPhase]             = useState(initPhase);
   const [currentSet, setCurrentSet]   = useState(saved?.currentSet ?? 1);
-  const [secondsLeft, setSecondsLeft] = useState(initPhase === 'idle' ? workMin * 60 : 0);
-  const intervalRef = useRef(null);
+  const [secondsLeft, setSecondsLeft] = useState(initSeconds);
+  const [isPaused, setIsPaused]       = useState(wasPaused);
+  const intervalRef    = useRef(null);
+  const secondsLeftRef = useRef(initSeconds);
 
-  // Persist phase + currentSet on every change
+  // Keep ref in sync so persistence effect can read it without adding it to deps
+  useEffect(() => { secondsLeftRef.current = secondsLeft; }, [secondsLeft]);
+
+  // Persist - include secondsLeft only when paused mid-phase
   useEffect(() => {
     if (!storageKey) return;
-    if (phase === 'idle') localStorage.removeItem(storageKey);
-    else localStorage.setItem(storageKey, JSON.stringify({ phase, currentSet }));
-  }, [phase, currentSet, storageKey]);
+    if (phase === 'idle') { localStorage.removeItem(storageKey); return; }
+    const data = { phase, currentSet };
+    if (isPaused && (phase === 'work' || phase === 'break')) {
+      data.isPaused    = true;
+      data.secondsLeft = secondsLeftRef.current;
+    }
+    localStorage.setItem(storageKey, JSON.stringify(data));
+  }, [phase, currentSet, isPaused, storageKey]);
 
   const clearTimer = () => clearInterval(intervalRef.current);
 
   const startPhase = useCallback((type, durationMin) => {
     clearTimer();
+    setIsPaused(false);
     setPhase(type);
     setSecondsLeft(durationMin * 60);
   }, []);
@@ -77,8 +94,18 @@ export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplet
     if (phase === 'idle') startPhase('work', workMin);
   }, [phase, workMin, startPhase]);
 
+  const pauseCurrent = useCallback(() => {
+    clearTimer();
+    setIsPaused(true);
+  }, []);
+
+  const resumeCurrent = useCallback(() => {
+    setIsPaused(false);
+  }, []);
+
   const skipCurrent = useCallback(() => {
     clearTimer();
+    setIsPaused(false);
     if      (phase === 'work')       finishWork(currentSet);
     else if (phase === 'work_done')  { setCurrentSet(s => s + 1); startPhase('break', breakMin); }
     else if (phase === 'break')      finishBreak();
@@ -90,11 +117,14 @@ export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplet
     setPhase('idle');
     setCurrentSet(1);
     setSecondsLeft(workMin * 60);
+    setIsPaused(false);
     if (storageKey) localStorage.removeItem(storageKey);
   }, [workMin, storageKey]);
 
+  // Timer - skips if paused
   useEffect(() => {
     if (phase !== 'work' && phase !== 'break') return;
+    if (isPaused) return;
     intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => {
         if (prev <= 1) {
@@ -106,10 +136,12 @@ export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplet
       });
     }, 1000);
     return clearTimer;
-  }, [phase, currentSet, finishWork, finishBreak]);
+  }, [phase, currentSet, isPaused, finishWork, finishBreak]);
 
   const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
   const secs = String(secondsLeft % 60).padStart(2, '0');
+
+  const isActivelyRunning = (phase === 'work' || phase === 'break') && !isPaused;
 
   return {
     phase,
@@ -119,8 +151,12 @@ export function usePomodoro({ taskId, workMin, breakMin, totalSets, onSetComplet
     start,
     beginBreak,
     beginWork,
+    pauseCurrent,
+    resumeCurrent,
     skipCurrent,
     reset,
     isDone: phase === 'done',
+    isPaused,
+    isActivelyRunning,
   };
 }

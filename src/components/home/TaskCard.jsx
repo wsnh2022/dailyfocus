@@ -315,7 +315,7 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
     clearActiveTimer();
   }, [onToggleComplete, clearActiveTimer]);
 
-  const { secondsLeft, formatted, isRunning, start, pause } = useCountdown(totalSeconds, handleComplete);
+  const { secondsLeft, formatted, isRunning, start, pause } = useCountdown(totalSeconds, handleComplete, `df_countdown_${id}`);
 
   useEffect(() => {
     if (activeTimerId !== id && isRunning) pause();
@@ -324,6 +324,8 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
   useEffect(() => {
     return () => { if (useAppStore.getState().activeTimerId === id) clearActiveTimer(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isStarted = secondsLeft < totalSeconds;
 
   const handleStartPause = () => {
     if (isRunning) { pause(); clearActiveTimer(); }
@@ -337,7 +339,7 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-base font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">{name}</p>
-        {!isRunning && secondsLeft === totalSeconds
+        {!isRunning && !isStarted
           ? <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">{duration ?? 30} {durationUnit ?? 'min'}</p>
           : <TimerDisplay formatted={formatted} />
         }
@@ -350,7 +352,7 @@ function CountdownCard({ task, onToggleComplete, dragListeners, dragAttributes }
               isRunning ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200' : `${c.bg} ${c.text}`
             }`}
           >
-            {isRunning ? 'Pause' : 'Start'}
+            {isRunning ? 'Pause' : isStarted ? 'Resume' : 'Start'}
           </button>
         )}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
@@ -396,7 +398,7 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
     showToast('Back to work 💪', 'pomodoro-work', 4000);
   }, [name, showToast]);
 
-  const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, skipCurrent, reset, isDone } = usePomodoro({
+  const { phase, currentSet, totalSets, formatted, start, beginBreak, beginWork, pauseCurrent, resumeCurrent, skipCurrent, reset, isDone, isPaused, isActivelyRunning } = usePomodoro({
     taskId: id, workMin: workMin ?? 25, breakMin: breakMin ?? 5, totalSets: sets ?? 4,
     onSetComplete: handleSetComplete, onAllComplete: handleAllComplete,
     onBreakStart: handleBreakStart, onBreakEnd: handleBreakEnd,
@@ -405,12 +407,15 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
   const isRunning = phase === 'work' || phase === 'break';
 
   useEffect(() => {
-    if (activeTimerId !== id && isRunning) reset();
+    if (activeTimerId !== id && isActivelyRunning) reset();
   }, [activeTimerId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     return () => { if (useAppStore.getState().activeTimerId === id) clearActiveTimer(); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePause = () => { pauseCurrent(); clearActiveTimer(); };
+  const handleResume = () => { setActiveTimer(id); resumeCurrent(); };
 
   return (
     <SwipeCard taskId={id} completed={completed} dragListeners={dragListeners} dragAttributes={dragAttributes}>
@@ -423,7 +428,7 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
           ? <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">{workMin ?? 25} min · {breakMin ?? 5} min break</p>
           : <TimerDisplay
               formatted={
-                isDone               ? 'Done!'       :
+                isDone                ? 'Done!'        :
                 phase === 'work_done'  ? 'Work done!'  :
                 phase === 'break_done' ? 'Break done!' :
                 formatted
@@ -443,9 +448,12 @@ function PomodoroCard({ task, onToggleComplete, dragListeners, dragAttributes })
           if (phase === 'break_done')
             return <button onClick={beginWork}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500 text-white">Work →</button>;
+          if (isRunning && isPaused)
+            return <button onClick={handleResume}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${c.bg} ${c.text}`}>Resume</button>;
           if (isRunning)
-            return <button onClick={skipCurrent}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">Skip</button>;
+            return <button onClick={handlePause}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">Pause</button>;
           return null;
         })()}
         <Checkbox c={c} completed={completed} onToggle={() => onToggleComplete(!completed)} />
