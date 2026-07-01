@@ -1,205 +1,91 @@
-# DailyFocus - Project Map
+# CLAUDE.md
 
-A mobile-first PWA for daily habit tracking with live timers, streak monitoring, and offline IndexedDB storage. Deployed to GitHub Pages at `/dailyfocus/`.
-
-**Stack:** React 18 · React Router 6 · Zustand · Dexie (IndexedDB) · Tailwind 3 · Vite 5 · PWA (Workbox)
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ---
 
-## Routing (`src/App.jsx`)
+## Commands
 
-| Path | Component | Purpose |
-|---|---|---|
-| `/` | HomeScreen | Daily task list, momentum bar, day-state selector |
-| `/editor` | EditorScreen | Create new task |
-| `/editor/:id` | EditorScreen | Edit existing task |
-| `/apps` | AppsScreen | Mini-app launcher |
-| `/apps/pomodoro` | PomodoroApp | Fullscreen Pomodoro timer |
-| `/history` | HistoryScreen | 13-week heatmap + daily breakdown |
-| `/settings` | SettingsScreen | Backup/restore, sound settings, dark mode |
-| `*` | -> `/` | Catch-all fallback |
-
-All routes share: `ErrorBoundary` wrapper, `BottomNav` (hidden when Pomodoro is actively running), `Toast` notifications.
-
----
-
-## State (`src/store/useAppStore.js`)
-
-Single Zustand store. Key slices:
-
-| Key | Type | Description |
-|---|---|---|
-| `todayTasks[]` | Task[] | Live task list for today with completion state |
-| `todayDayState` | `'active'|'rest'|'pause'` | Current day classification |
-| `activeTimerId` | string\|null | Enforces single-timer rule across countdown + Pomodoro |
-| `heroSubtitle` | string | Editable dashboard subtitle (localStorage-backed) |
-| `showBackupPrompt` | bool | Weekly Monday backup reminder |
-| `pomodoroRunning` | bool | Hides BottomNav when true |
-| `toast` | object\|null | Active toast notification |
-
----
-
-## Database (`src/db/`)
-
-**`schema.js`** - Defines `DailyFocusDB` via Dexie with 3 tables:
-- `task_templates` - Reusable task definitions (checkbox / countdown / pomodoro)
-- `daily_logs` - One log per calendar date; primary key is ISO date string (`"2024-06-19"`)
-- `pomodoro_sessions` - Records of each completed Pomodoro set
-
-**`queries.js`** - All DB access helpers: task CRUD, `reorderTasks()`, `saveLog()`, `getAllLogs()`, `getLastNLogs(n)`, `addSession()`, `getSessionsByDate()`, `addTaskToDateLog()`, `removeTaskFromLog()`, `getUpcomingLogs()`
-
----
-
-## Hooks (`src/hooks/`)
-
-| File | Purpose |
-|---|---|
-| `useMidnightArchive.js` | On mount: detects new day -> clones templates into today's log; same day -> merges stored completion state. Hydrates store via `setTodayTasks` / `setTodayDayState`. Runs once at app boot. |
-| `useStreak.js` | Loads all logs once, runs `calculateStreaks()` + `getSevenDayDots()`, returns `{ currentStreak, bestStreak, yesterdayRate, weeklyAvgRate, dots }` |
-| `useCountdown.js` | Generic countdown timer. Accepts optional `storageKey` - saves remaining seconds to localStorage on pause, restores on mount, clears on complete/reset/task-edit. Screen-lock recovery via `visibilitychange`. |
-| `usePomodoro.js` | 6-phase state machine (idle->work->work_done->break->break_done->done). `pauseCurrent()` stops the interval and sets `isPaused=true`; `resumeCurrent()` restarts from current `secondsLeft`. Paused state + remaining seconds persisted to localStorage. Exposes `isPaused` and `isActivelyRunning` (true only when ticking, not when paused). |
-
----
-
-## Utils (`src/utils/`)
-
-| File | Purpose |
-|---|---|
-| `dateHelpers.js` | `todayStr()`, `yesterdayStr()`, `tomorrowStr()`, `getPastDate(n)`, `getISOWeek(dateStr)` - all return ISO date strings using UTC |
-| `streakCalc.js` | `calculateStreaks(logs)` -> streak counts + yesterday/weekly completion rates. `getSevenDayDots(logs)` -> 6-dot array for past 6 days |
-| `momentumMessage.js` | `generateMessage({ streak, weeklyAvgRate, yesterdayRate })` -> motivational 1-liner shown when no tasks exist |
-| `dayStateValidator.js` | `canSetDayState(newState, allLogs)` -> enforces max 2 rest days/week and max 2 consecutive pause days |
-| `sound.js` | Web Audio API tone sequences + Web Speech API voice for Pomodoro phase transitions. Profiles: tones / bell / chime / silent |
-| `vibrate.js` | Haptic feedback helpers: `vibrateOnce()`, `vibrateLong()`, `vibratePattern(arr)` |
-| `backupExport.js` | `exportBackup()` (JSON download), `exportCsv()` (CSV download), `importBackup(file)` (JSON upload + DB replace), `clearAllData()` |
-
----
-
-## Constants (`src/constants/`)
-
-| File | Contents |
-|---|---|
-| `dayStates.js` | `DAY_STATES` enum, `DAY_STATE_CONFIG` (label/emoji/colors), limits: `MAX_REST_DAYS_PER_WEEK=2`, `MAX_CONSECUTIVE_PAUSE_DAYS=2`, `MAX_TASKS=8` |
-| `colors.js` | `PRESET_COLORS[12]` - Tailwind color swatches with bg/text/border classes; `getColor(id)` lookup |
-| `emojiCategories.js` | Emoji arrays grouped by category (Fitness, Study, Health, Work, Personal, Food) |
-
----
-
-## Components
-
-### Home (`src/components/home/`)
-
-| File | Purpose |
-|---|---|
-| `HomeScreen.jsx` | Root home view: date strip, HeroTitle, MomentumBar, BackupBanner, DayStateButton, drag-sortable task list via `@dnd-kit` |
-| `DateStrip.jsx` | 14-day scrollable date picker; dots show task count per day; today is highlighted |
-| `HeroTitle.jsx` | "DailyFocus" heading + editable subtitle stored in Zustand + localStorage |
-| `MomentumBar.jsx` | Stats row: Streak - Best - Yesterday% - Today% - 7-day dots. Progress bar below (done/total). Motivational message when no tasks. |
-| `DayStateButton.jsx` | Active/Rest/Pause selector; validates limits via `canSetDayState()`; shows blocking reason in modal |
-| `TaskCard.jsx` | Dispatcher: renders CheckboxCard, CountdownCard, or PomodoroCard based on `taskType`. All cards have swipe-to-delete/edit and drag handle. CountdownCard shows Start/Pause/Resume. PomodoroCard shows Start/Pause/Resume/Break/Work buttons per phase. |
-| `SortableTaskCard.jsx` | Wraps TaskCard with `useSortable` from dnd-kit |
-| `TimerDisplay.jsx` | Formatted `mm:ss` timer text with optional phase badge |
-
-### Editor (`src/components/editor/`)
-
-| File | Purpose |
-|---|---|
-| `EditorScreen.jsx` | Routing wrapper: passes existing task or null + nextSortOrder + targetDate to TaskEditor |
-| `TaskEditor.jsx` | Full task form: name, emoji, color, taskType, timer fields, subtask editor (inline editing - tap label to edit, Enter/blur saves, Escape cancels), quick-assign chips for future dates |
-| `EmojiPicker.jsx` | Category grid from `EMOJI_CATEGORIES` |
-| `ColorPicker.jsx` | 12-color grid from `PRESET_COLORS` |
-| `TimerTypeSelect.jsx` | Radio buttons for checkbox / countdown / pomodoro |
-
-### History (`src/components/history/`)
-
-| File | Purpose |
-|---|---|
-| `HistoryScreen.jsx` | Summary stats + CalendarHeatmap + legend; click day -> DayDetail modal |
-| `CalendarHeatmap.jsx` | 53-week x 7-day grid; cell color by log state + completion ratio; violet for future planned days |
-| `DayDetail.jsx` | Modal: all tasks for selected date with completion status |
-
-### Apps (`src/components/apps/`)
-
-| File | Purpose |
-|---|---|
-| `AppsScreen.jsx` | Mini-app launcher |
-| `PomodoroApp.jsx` | Fullscreen Pomodoro: preset selector (25/5, 50/10, 90/20), mute toggle, large timer, set dots, phase badge. Controls: Start / Pause / Resume / Skip / Stop & Exit. Background dark only when `isActivelyRunning` (not just `isRunning`). |
-
-### Settings (`src/components/settings/`)
-
-| File | Purpose |
-|---|---|
-| `SettingsScreen.jsx` | Hero subtitle editor, dark mode toggle, Pomodoro sound profile picker, backup/import/clear-data controls |
-
-### Shared (`src/components/shared/`)
-
-| File | Purpose |
-|---|---|
-| `BottomNav.jsx` | 4-tab fixed nav (Home / Apps / History / Settings); hides when `pomodoroRunning` |
-| `Modal.jsx` | Overlay modal - backdrop + centered card, click-outside to close |
-| `Toast.jsx` | Top-center notification; supports success / error / pomodoro-done / pomodoro-break / pomodoro-work |
-| `ErrorBoundary.jsx` | React error boundary with graceful fallback UI |
-
----
-
-## Data Flow
-
+```bash
+npm run dev       # dev server at http://localhost:5173 (base path /)
+npm run build     # production build to dist/ (base path /dailyfocus/)
+npm run preview   # serve dist/ at http://localhost:4173/dailyfocus/
 ```
-App boot
-  -> useMidnightArchive() loads today's log from DB
-  -> setTodayTasks / setTodayDayState -> Zustand store
 
-MomentumBar mounts
-  -> useStreak() loads all logs -> calculateStreaks() -> streak/rate stats
-  -> todayTasks from store -> live today% derived inline
+No test runner or linter is configured. There is no `npm test` or `npm run lint`.
 
-Task toggle
-  -> updateTaskCompletion (store) -> saveLog() (DB)
-  -> completed tasks sink to bottom
+**Important:** `vite.config.js` switches `base` based on `command` - dev uses `/`, build uses `/dailyfocus/`. Never hardcode `/dailyfocus/` in source; use relative paths or Vite's `import.meta.env.BASE_URL`.
 
-Countdown
-  -> useCountdown(totalSeconds, onComplete, storageKey) drives timer
-  -> pause() -> saves secondsLeft to localStorage[storageKey]
-  -> mount with saved value -> shows Resume if secondsLeft < totalSeconds
-  -> complete/reset/task-edit -> clears localStorage
+---
 
-Pomodoro (task card or fullscreen app)
-  -> usePomodoro hook drives 6-phase state machine
-  -> pauseCurrent() -> clears interval, isPaused=true, saves {phase, currentSet, secondsLeft, isPaused} to localStorage
-  -> resumeCurrent() -> isPaused=false, interval restarts from current secondsLeft
-  -> isActivelyRunning = (phase === 'work' || 'break') && !isPaused
-  -> another timer starting -> resets this one only if isActivelyRunning (not if merely paused)
-  -> Pomodoro completion -> addSession() (DB) + task auto-complete
-```
+## Architecture
+
+A mobile-first PWA for daily habit tracking. All data is local - no backend, no auth.
+
+**Stack:** React 18 + React Router 6 + Zustand + Dexie (IndexedDB) + Tailwind 3 + Vite 5 + Workbox PWA
+
+### Data layer
+
+Three Dexie tables (`src/db/schema.js`):
+- `task_templates` - reusable task definitions; source of truth for the task list
+- `daily_logs` - one document per ISO date; stores `{ date, dayState, tasks[], weekNumber }`; tasks are embedded snapshots, not references
+- `pomodoro_sessions` - append-only log of completed Pomodoro sets
+
+All DB access goes through `src/db/queries.js`. The store never touches Dexie directly.
+
+### State (Zustand, `src/store/useAppStore.js`)
+
+Single store. The most important slice: `todayTasks[]` is the live task list for the selected date. Changes write optimistically to the store first, then async to DB via `saveLog()`. `activeTimerId` enforces the one-running-timer rule across all card types.
+
+### Boot sequence (`src/hooks/useMidnightArchive.js`)
+
+Runs once on mount. Detects whether today already has a log:
+- **Same day:** merges stored completion state back into `todayTasks`
+- **New day:** clones templates from `task_templates` into a fresh `daily_logs` entry, merging any pre-planned tasks already saved for today
+
+This is the only place `todayTasks` gets seeded. Everything else reads from the store.
+
+### Timer architecture
+
+Two hooks drive all timers:
+
+**`useCountdown`** - generic; takes `(totalSeconds, onComplete, storageKey?)`. With `storageKey`, pause state (remaining seconds) persists to localStorage and survives reloads. Screen-lock recovery via `visibilitychange`.
+
+**`usePomodoro`** - 6-phase state machine: `idle -> work -> work_done -> break -> break_done -> done`. Pause/resume: `pauseCurrent()` freezes the interval; `resumeCurrent()` restarts it. Persists `{ phase, currentSet, isPaused?, secondsLeft? }` to `localStorage[df_pomo_<taskId>]`. Exposes `isActivelyRunning` (true only when ticking, not when paused) - use this, not `isRunning`, when deciding whether a new timer should displace this one.
+
+Both hooks are used in `src/components/home/TaskCard.jsx` (inline cards) and `usePomodoro` is also used in `src/components/apps/PomodoroApp.jsx` (fullscreen).
+
+### Routing & layout
+
+`src/App.jsx` wraps all routes in `ErrorBoundary` + `Toast`. `BottomNav` hides when `pomodoroRunning` is true in the store. All routes are under `/dailyfocus/` in production.
+
+### Pre-planned tasks
+
+Tasks added for a future date are written directly to that date's `daily_logs` entry with `prePlanned: true` and IDs prefixed `pp_`. They never enter `task_templates`. `useMidnightArchive` merges them when that date becomes today.
 
 ---
 
 ## Key Conventions
 
-- **Dates are UTC ISO strings** (`toISOString().split('T')[0]`). Be aware of timezone offset when debugging date mismatches.
-- **Optimistic UI** - store updates first, DB write follows; toast on failure.
-- **Single timer rule** - `activeTimerId` in store; hooks self-pause if they're not the active one. Use `isActivelyRunning` (not `isRunning`) when deciding if a new timer should displace an existing one - a paused timer should not be displaced.
-- **LocalStorage keys**
+- **All dates are UTC ISO strings** - `todayStr()` uses `toISOString().split('T')[0]`. Never use local `new Date()` arithmetic alongside UTC-keyed DB records or you'll get date-boundary bugs.
+- **Optimistic UI everywhere** - store update first, DB write after, toast on failure.
+- **Single timer** - `activeTimerId` in Zustand. On mount, countdown/pomodoro cards register themselves; on unmount they clear themselves. A paused timer does not hold `activeTimerId`.
 
-| Key | Value stored |
+## LocalStorage Keys
+
+| Key | Purpose |
 |---|---|
-| `df_hero_subtitle` | string |
-| `df_pomo_sound` | profile name |
-| `df_pomo_voice` | bool string |
-| `df_pomo_${taskId}` | `{ phase, currentSet, isPaused?, secondsLeft? }` |
-| `df_countdown_${taskId}` | remaining seconds as string |
-| `df_last_backup_prompt` | ISO date string |
-| `df_dark_mode` | bool string |
+| `df_hero_subtitle` | Editable dashboard subtitle |
+| `df_pomo_sound` | Pomodoro sound profile |
+| `df_pomo_voice` | Voice announcement toggle |
+| `df_pomo_<taskId>` | Pomodoro crash/pause recovery: `{ phase, currentSet, isPaused?, secondsLeft? }` |
+| `df_countdown_<taskId>` | Countdown pause recovery: remaining seconds as string |
+| `df_last_backup_prompt` | ISO date of last Monday backup reminder |
+| `df_dark_mode` | Dark mode preference |
 
-- **Max tasks** - `MAX_TASKS = 8` enforced in editor.
-- **Mobile-first** - max-width 448px, 44px+ tap targets, swipe actions on task cards.
-- **Pre-planned tasks** - saved to `daily_logs` with `prePlanned: true`; task IDs prefixed `pp_`. `useMidnightArchive` merges them into the live log on the target date.
+## Gotchas
 
----
-
-## Build & Deploy
-
-- `npm run dev` - Vite dev server
-- `npm run build` - Output to `dist/`, base path `/dailyfocus/`
-- Push to `main` -> GitHub Actions builds + deploys to GitHub Pages automatically
-- Live URL: `https://wsnh2022.github.io/dailyfocus/`
+- **Dexie v3 only** - v4 has breaking API changes; do not upgrade
+- **HMR hook count** - changing the number of hooks in a component during hot reload causes a Zustand crash; restart `npm run dev`
+- **Rapid HMR edits** - Vite can serve stale modules after several fast saves; add a whitespace change to force re-emission
+- **React StrictMode** - double-fires effects in dev; all effects are written to be idempotent
